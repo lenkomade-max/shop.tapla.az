@@ -2,10 +2,15 @@ import { supabaseAdmin } from '@/lib/supabase/admin';
 import { PRODUCTS, REVIEWS, FAQS, RITUAL_STEPS, BENEFITS_LIST } from '@/constants/data';
 import { Product, Review, FAQ, Benefit } from '@/types';
 
+function slugify(text: string): string {
+  return text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim();
+}
+
 function mapProduct(row: Record<string, unknown>): Product {
+  const name = (row.name as string) || (row.title as string) || '';
   return {
     id: row.id as string,
-    slug: row.slug as string | undefined,
+    slug: (row.slug as string) || slugify(name) || (row.id as string),
     name: (row.name as string) || (row.title as string) || '',
     subtitle: (row.subtitle as string) || '',
     description: (row.description as string) || '',
