@@ -73,6 +73,7 @@ export const VALUE_PROPS = [
 export const PRODUCTS: Product[] = [
   {
     id: 'aluna-radiance-pro',
+    slug: 'aluna-radiance-pro',
     name: 'ALUNA Radiance Pro',
     subtitle: '7-si-1-də LED İşıq Terapiyası və Mikroaxın Liftinq Cihazı',
     description: 'Aluna Radiance Pro ev şəraitində peşəkar salon nəticələri əldə etmək üçün hazırlanmış premium gözəllik cihazıdır. 7 fərqli işıq dalğası (LED), mikroaxın liftinqi (EMS), termal masaj və sonik vibrasiya sayəsində dərini cavanlaşdırır, qırışları hamarlayır, akne və ləkələri nəzərəçarpacaq dərəcədə azaldır.',
@@ -105,6 +106,7 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: 'aluna-ultrasonic-clean',
+    slug: 'aluna-ultrasonic-clean',
     name: 'ALUNA Sonic Deep Cleanser',
     subtitle: 'Ultrases Sonik Üz Təmizləyici və Spatula Cihazı',
     description: 'Dərinin ən dərin qatlarında yığılmış makiyaj qalıqlarını, qara nöqtələri və artıq sebumu saniyələr içində təmizləyən ultrasəs texnologiyalı spatula. Ölü hüceyrələri yumşaq şəkildə soyaraq dərini hamar və ipək kimi edir.',
@@ -132,6 +134,7 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: 'aluna-eye-glow',
+    slug: 'aluna-eye-glow',
     name: 'ALUNA Eye Radiance Duo',
     subtitle: 'Göz Ətrafı Mikro-Vibrasiya və Termal Masaj Cihazı',
     description: 'Yorğun gözlərə son! 42°C termal masaj və 12,000 vibrasiya/dəq tezlikli sonik masaj başlığı ilə göz ətrafı şişkinlikləri, tünd halqaları azaldır, göz kreminin udulmasını maksimuma çatdırır.',
@@ -157,6 +160,7 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: 'aluna-lift-sculpt',
+    slug: 'aluna-lift-sculpt',
     name: 'ALUNA Contour Lift V-Sculpt',
     subtitle: 'Yüksək Tezlikli Mikroaxınlı Üz və Boyun Liftinq Aləti',
     description: 'Üz konturlarını mükəmməl şəkildə formaya salan V-formalı dizayn. İkiqat çənə (buxaq) görünüşünü azaldır, almacıq sümüklərini qabardır və boyun qırışlarını hamarlayır.',

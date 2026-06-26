@@ -76,7 +76,7 @@ export interface Shade {
 
 export interface Product {
   id: string;
-  slug?: string;
+  slug: string;
   name: string;
   subtitle: string;
   description: string;
