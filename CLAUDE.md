@@ -112,6 +112,18 @@ src/
 
 Данные: `services/db.ts` → пробует Supabase → падает на `constants/data.ts`
 
+## Админ-панель
+
+| Роут | Описание |
+|------|---------|
+| `/admin` | Логин (пароль из `ADMIN_PASSWORD`) + дашборд |
+| `/admin/products` | Список товаров |
+| `/admin/products/new` | Создание товара |
+| `/admin/products/[id]/edit` | Редактирование |
+| `/admin/orders` | Заказы со сменой статуса |
+
+Авторизация: JWT (jose), httpOnly cookie, 24ч.
+
 ## Сборка
 
 ```bash

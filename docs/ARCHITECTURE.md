@@ -88,6 +88,26 @@ The `LandingRenderer` reads sections array and renders each block. The `[slug]` 
 | `/checkout` | Dynamic | Checkout with cart + payment |
 | `/collections` | Static | Collections |
 | `/collections/{slug}` | SSG | Collection detail |
+| `/admin` | Dynamic | Админ-панель: логин + дашборд |
+| `/admin/products` | Dynamic | CRUD товаров (все Aluna-поля) |
+| `/admin/products/new` | Dynamic | Создание товара |
+| `/admin/products/[id]/edit` | Dynamic | Редактирование товара |
+| `/admin/orders` | Dynamic | Заказы со сменой статуса |
+
+## Админ-панель
+
+`ADMIN_PASSWORD` из `.env.local` → JWT (jose, httpOnly cookie, 24ч).
+
+| Файл | Назначение |
+|------|-----------|
+| `src/lib/auth.ts` | Server Actions: login/logout/checkAuth |
+| `src/app/admin/layout.tsx` | Проверка auth + навигация |
+| `src/app/admin/page.tsx` | Логин + дашборд (счётчики товаров/заказов) |
+| `src/app/admin/products/page.tsx` | Список с удалением |
+| `src/app/admin/products/new/page.tsx` | Создание |
+| `src/app/admin/products/[id]/edit/page.tsx` | Редактирование |
+| `src/app/admin/products/product-form.tsx` | Клиентский компонент формы (все Aluna-поля) |
+| `src/app/admin/orders/page.tsx` | Список + select смена статуса (Server Action) |
 
 ## Supabase
 
