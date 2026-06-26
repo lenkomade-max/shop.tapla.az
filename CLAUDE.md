@@ -6,16 +6,16 @@
 
 **Домен:** shop.tapla.az (Азербайджан, товары красоты)
 
+**Бренды:** TAPLA (оригинальные лендинги) + **ALUNA** (премиум skincare UI, интегрирован из shop.taplaaz-v2)
+
 ---
 
 ## Документация (обязательна к прочтению)
 
 | Файл | О чём |
 |------|-------|
-| `docs/ARCHITECTURE.md` | Полная архитектура: структура, роуты, темы, как работают лендинги |
+| `docs/ARCHITECTURE.md` | Полная архитектура: структура, роуты, темы, Aluna-секции, Supabase |
 | `docs/LANDING-STANDARD.md` | Стандарт создания лендингов. **Читать перед созданием нового лендинга** |
-
-Оба файла — основной источник истины.
 
 ---
 
@@ -23,7 +23,7 @@
 
 ```bash
 npm run dev       # dev-сервер :3000
-npm run build     # SSG + проверка TypeScript
+npm run build     # SSG + TypeScript check
 npm run lint      # ESLint
 ```
 
@@ -34,89 +34,87 @@ npm run lint      # ESLint
 ```
 src/
   app/
-    layout.tsx                    — Root layout (Inter, мета-теги)
-    page.tsx                      — Главная (ссылки на лендинги)
+    layout.tsx                    — Root layout (Inter, AppProviders, Header, Footer, StickyMobileBar)
+    page.tsx                      — Aluna homepage (Hero → ProductGrid → ValueProps → ... → FAQ)
     not-found.tsx                 — 404
-    landing/[slug]/page.tsx       — SSG лендинги (из registry.ts)
-    landing/essential-lash-serum/ — Отдельная кастомная страница (full custom)
-    products/page.tsx             — Каталог
-    products/[slug]/page.tsx      — Детальная товара
-    collections/page.tsx          — Коллекции
-    collections/[slug]/page.tsx   — Детальная коллекции
-    api/orders/route.ts           — API заказов
+    landing/[slug]/               — SSG лендинги (v1, registry.ts)
+    products/
+      page.tsx                    — Каталог
+      [slug]/page.tsx             — Детальная с generateStaticParams + generateMetadata
+      [slug]/ProductClient.tsx    — Клиентский компонент продукта (Aluna)
+    checkout/page.tsx             — Чекаут с корзиной и оплатой (Aluna)
+    collections/                  — Коллекции (v1)
+    api/orders/route.ts           — API заказов (v1)
   components/
-    ui/                           — shadcn/ui компоненты
-    landings/
-      landing-renderer.tsx        — Сборщик лендинга из конфига
-      sections/                   — 9 стандартных блоков (hero, benefits, ingredients...)
-  landings/
-    themes.ts                     — 6 тем: rose, luxuryGold, medical, minimal, organic, beautyPremium
-    registry.ts                   — Реестр лендингов (локальные, без Supabase)
-    {slug}/config.ts              — Конфиг секций для лендинга
-    {slug}/sections/              — Кастомные секции (опционально)
+    ui/                           — Button, Container, Badge, Heading, Section, Input, Modal, Drawer, Accordion
+    layout/                       — Header, Footer, AnnouncementBar, StickyMobileBar (Aluna)
+    cards/                        — ProductCard, ReviewCard (Aluna)
+    sections/                     — Hero, ProductGrid, ValueProps, FeaturesStep, PromoBanners, Benefits, ReviewsSection, FAQ
+    landings/                     — v1 landing system (landing-renderer, 9 sections)
+  landings/                       — v1 themes, registry, configs
+  store/
+    CartContext.tsx               — Корзина с localStorage (Aluna)
+  providers/
+    AppProviders.tsx              — CartProvider wrapper
+  services/
+    db.ts                         — Data service: Supabase → static fallback
+  constants/
+    data.ts                       — Aluna: 4 products, 4 reviews, 5 FAQs, 4 ritual steps, 4 benefits
   lib/
-    utils.ts                      — cn() (clsx + tailwind-merge)
-    animations.ts                 — Framer Motion варианты (fadeIn, staggerContainer, scaleIn)
-    supabase/
-      client.ts                   — Supabase клиент (анонимный)
-      admin.ts                    — Supabase admin (service_role)
-      types.ts                    — TypeScript интерфейсы (Product, Landing, Order, Lead...)
-      queries.ts                  — Функции запросов (getLandingBySlug, createOrder...)
-      migrations/001_init.sql     — Схема БД
+    supabase/                     — client, admin, types, queries, migrations
+    utils.ts                      — cn()
+    animations.ts                 — Framer Motion variants
   types/
-    index.ts                      — SectionConfig, ThemeConfig, SectionName
+    index.ts                      — v1 + v2 Aluna types
 ```
 
-## Роуты
+## Роуты (полные)
 
 | Путь | Тип | Описание |
 |------|-----|----------|
-| `/` | Static | Главная со ссылками на продукты |
-| `/landing/{slug}` | SSG | Лендинг товара (из registry.ts) |
-| `/landing/essential-lash-serum` | Static* | Полностью кастомный лендинг (своя page.tsx) |
-| `/products` | Static | Каталог |
-| `/products/{slug}` | SSG | Детальная товара |
-| `/collections` | Static | Коллекции |
-| `/collections/{slug}` | SSG | Детальная коллекции |
-| `/api/orders` | API | Создание заказа (POST) |
+| `/` | Static | Aluna homepage (8 секций) |
+| `/landing/{slug}` | SSG | Лендинг товара (v1) |
+| `/products` | Static | Каталог (v1) |
+| `/products/{slug}` | SSG | Детальная товара (Aluna data, v1 fallback) |
+| `/checkout` | Dynamic | Чекаут (Aluna, корзина + онлайн-оплата) |
+| `/collections` | Static | Коллекции (v1) |
+| `/collections/{slug}` | SSG | Детальная коллекции (v1) |
+| `/api/orders` | API | POST create order (v1) |
 
-## Архитектура лендингов
+## Aluna Premium Секции
 
-**Два подхода:**
+| Секция | Файл | Особенности |
+|--------|------|-------------|
+| Hero | `Hero.tsx` | 3 слайда, авто-ротация 6с, framer-motion |
+| ProductGrid | `ProductGrid.tsx` | Фильтр по категориям, QuickView модалка |
+| ValueProps | `ValueProps.tsx` | Тест кожи, сравнение, AI чат, консультация |
+| FeaturesStep | `FeaturesStep.tsx` | 4-шаговый ритуал, интерактивный deck |
+| PromoBanners | `PromoBanners.tsx` | Dual banners + spotlight + category grid |
+| Benefits | `Benefits.tsx` | 4 колонки с иконками |
+| ReviewsSection | `ReviewsSection.tsx` | Snapshot 5.0, фильтры, форма отзыва |
+| FAQ | `FAQ.tsx` | Поиск, accordion, контакты WhatsApp/Phone/Email |
 
-1. **Через конфиг** — `src/landings/{slug}/config.ts` + `[slug]/page.tsx` (SSG, 9 стандартных секций)
-2. **Полностью кастомная** — своя `app/landing/{slug}/page.tsx` (essential-lash-serum)
+## Ключевые решения интеграции
 
-После создания лендинга — зарегистрировать в `src/landings/registry.ts`.
-
-## 9 стандартных секций
-
-hero, benefits, ingredients, howToUse, beforeAfter, testimonials, faq, offer, checkout
-
-## Темы
-
-6 пресетов: rose, luxuryGold, medical, minimal, organic, beautyPremium
+- **framer-motion** вместо `motion/react` (та же API)
+- **lucide-react** v1.21.0 — соц-иконки: Globe, ExternalLink, CirclePlay
+- Импорты: `@/components/ui/...` вместо `../ui/...`
+- `[id]` → `[slug]` (чтобы избежать conflict в Next.js)
+- Supabase: lazy init отменён, `supabase` всегда non-null, fallback через try/catch
 
 ## Supabase
 
-Таблицы: products, landings, media, orders, leads, collections, collection_products
+Подключена: `nzkqorbyexisnbyjhvdf.supabase.co`
 
-`.env.local`:
+Таблицы:
+- **v1:** products, landings, media, orders, leads, collections, collection_products
+- **v2 (Aluna):** products, reviews, faqs
+
+Данные: `services/db.ts` → пробует Supabase → падает на `constants/data.ts`
+
+## Сборка
+
+```bash
+npm run build     # SSG — генерирует все страницы
+npm run dev       # dev-сервер
 ```
-NEXT_PUBLIC_SUPABASE_URL=...
-NEXT_PUBLIC_SUPABASE_ANON_KEY=...
-SUPABASE_SECRET_KEY=...
-```
-
-Без подключения — данные из локальных конфигов.
-
-## Добавление нового лендинга
-
-1. Создать `src/landings/{slug}/config.ts`
-2. Добавить в `src/landings/registry.ts`
-3. При необходимости — кастомные секции в `{slug}/sections/`
-4. `npm run build` — проверка
-
-## Новый лендинг (через AI)
-
-Используй `docs/LANDING-STANDARD.md` как промпт для AI-агента.

@@ -5,109 +5,106 @@
 - Next.js 16 + React 19
 - TypeScript
 - Tailwind CSS 4 + shadcn/ui
-- Framer Motion
+- **Framer Motion** (v12, replaces `motion/react`)
 - Supabase (PostgreSQL)
+- **lucide-react** (icons)
 
 ## Project Structure
 
 ```
 src/
   app/
-    layout.tsx            — Root layout (fonts, metadata)
-    page.tsx              — Homepage
-    not-found.tsx         — 404
-    landing/[slug]/       — Landing pages (SSG)
-    products/             — Product catalog
-    products/[slug]/      — Product detail
-    collections/          — Collections
+    layout.tsx              — Root layout (Inter, AppProviders, Header, Footer, StickyMobileBar)
+    page.tsx                — Homepage (Aluna landing)
+    not-found.tsx           — 404
+    landing/[slug]/         — Landing pages (SSG)
+    products/
+      page.tsx              — Product catalog
+      [slug]/               — Product detail + ProductClient
+    collections/            — Collections
+    checkout/               — Checkout page
   components/
-    ui/                   — shadcn/ui components
+    ui/                     — Button, Container, Badge, Heading, Section, Input, Modal, Drawer, Accordion
+    layout/                 — Header, Footer, AnnouncementBar, StickyMobileBar
+    cards/                  — ProductCard, ReviewCard
+    sections/               — Aluna premium sections (Hero, ProductGrid, ValueProps, FeaturesStep, PromoBanners, Benefits, ReviewsSection, FAQ)
     landings/
-      sections/           — Landing blocks (9 sections)
-        hero.tsx
-        benefits.tsx
-        ingredients.tsx
-        how-to-use.tsx
-        before-after.tsx
-        testimonials.tsx
-        faq.tsx
-        offer.tsx
-        checkout.tsx
-        index.ts
-      landing-renderer.tsx — Assembles landing from section config
+      sections/             — Landing blocks (9 sections)
+      landing-renderer.tsx  — Assembles landing from section config
   landings/
-    themes.ts             — 6 theme presets
-    registry.ts           — Local landing registry
-    {slug}/               — Individual landing modules
-      config.ts           — Sections config (JSON-like)
+    themes.ts               — 6 theme presets
+    registry.ts             — Local landing registry
+    {slug}/                 — Individual landing modules
   lib/
     supabase/
-      client.ts           — Supabase client
-      types.ts            — TypeScript interfaces
-      queries.ts          — DB query functions
-      migrations/         — SQL migrations
+      client.ts             — Supabase client (anon)
+      admin.ts              — Supabase admin (service_role)
+      types.ts              — TS interfaces (Product, Landing, Order, Lead...)
+      queries.ts            — DB query functions
+      migrations/           — SQL migrations
+    utils.ts                — cn() (clsx + tailwind-merge)
+    animations.ts           — Framer Motion variants
+  store/
+    CartContext.tsx          — Cart with localStorage persistence
+  providers/
+    AppProviders.tsx         — CartProvider wrapper
+  services/
+    db.ts                   — Data service (Supabase → static fallback)
+  constants/
+    data.ts                 — Aluna products, reviews, FAQs, ritual steps, benefits
   types/
-    index.ts              — Shared types
+    index.ts                — Shared types (v1 + v2 Aluna types merged)
 ```
 
-## How Landing Pages Work
+## How Landing Pages Work (v1 — preserved)
 
-Each landing is defined in `src/landings/{slug}/config.ts` as a config object with:
+Each landing is defined in `src/landings/{slug}/config.ts` as a config object.
 
-```ts
-export const myProductConfig = {
-  slug: 'my-product',
-  title: 'Product Name',
-  subtitle: 'Tagline',
-  theme: 'rose', // or any theme name, or custom
-  sections: [ /* array of section configs */ ],
-}
-```
+The `LandingRenderer` reads sections array and renders each block. The `[slug]` page pulls from registry.
 
-The `LandingRenderer` reads the sections array and renders each block. The `[slug]` page pulls config from the registry and generates static HTML at build time.
+9 standard sections: hero, benefits, ingredients, howToUse, beforeAfter, testimonials, faq, offer, checkout
 
-## Available Sections
+## Aluna Premium Sections (v2 — new)
 
-| Section | Component | Props |
-|---------|-----------|-------|
-| hero | `HeroSection` | description, image, ctaText |
-| benefits | `BenefitsSection` | benefits[] ({ title, description }) |
-| ingredients | `IngredientsSection` | ingredients[] ({ name, description }) |
-| howToUse | `HowToUseSection` | steps[] ({ title, description }) |
-| beforeAfter | `BeforeAfterSection` | items[] ({ before, after, label? }) |
-| testimonials | `TestimonialsSection` | testimonials[] ({ name, text, rating? }) |
-| faq | `FaqSection` | items[] ({ question, answer }) |
-| offer | `OfferSection` | price, oldPrice?, features[] |
-| checkout | `CheckoutSection` | submitLabel |
-
-## Adding a New Landing
-
-1. Create `src/landings/{slug}/config.ts`
-2. Add to `src/landings/registry.ts`
-3. Run `npm run build` (auto-generates static page)
-
-OR create custom sections in `src/landings/{slug}/sections/` if the standard blocks don't fit.
+| Section | File | Description |
+|---------|------|-------------|
+| Hero | `sections/Hero.tsx` | Editorial slider (3 slides, auto-rotate) |
+| ProductGrid | `sections/ProductGrid.tsx` | Category filter + product cards + QuickView modal |
+| ValueProps | `sections/ValueProps.tsx` | Skin quiz, device comparison, AI advisor, consultation |
+| FeaturesStep | `sections/FeaturesStep.tsx` | Evening ritual interactive deck |
+| PromoBanners | `sections/PromoBanners.tsx` | Dual banners + spotlight + category grid |
+| Benefits | `sections/Benefits.tsx` | 4-column benefit cards |
+| ReviewsSection | `sections/ReviewsSection.tsx` | Rating snapshot, filters, write-review modal |
+| FAQ | `sections/FAQ.tsx` | Searchable accordion + contact cards |
 
 ## Routes
 
 | Path | Type | Description |
 |------|------|-------------|
-| `/` | Static | Homepage |
-| `/landing/{slug}` | SSG | Product landing |
+| `/` | Static | Aluna homepage (full landing) |
+| `/landing/{slug}` | SSG | Product landing (v1) |
 | `/products` | Static | Catalog |
-| `/products/{slug}` | SSG | Product detail |
+| `/products/{slug}` | SSG | Product detail (Aluna + v1) |
+| `/checkout` | Dynamic | Checkout with cart + payment |
 | `/collections` | Static | Collections |
-
-## Themes
-
-6 presets available — `rose`, `luxuryGold`, `medical`, `minimal`, `organic`, `beautyPremium`.
-
-Each theme defines: colors (primary, secondary, accent, background, etc.), fonts (heading + body), borderRadius.
+| `/collections/{slug}` | SSG | Collection detail |
 
 ## Supabase
 
-When connected, data fetches from Supabase tables: `products`, `landings`, `media`, `orders`, `leads`, `collections`, `collection_products`.
+Connected to `nzkqorbyexisnbyjhvdf.supabase.co`.
 
-Until connected, all data comes from local config files in `src/landings/`.
+Tables:
+- **v1 (landings system):** `products`, `landings`, `media`, `orders`, `leads`, `collections`, `collection_products`
+- **v2 (Aluna):** `products`, `reviews`, `faqs`
 
-Run `src/lib/supabase/migrations/001_init.sql` in Supabase SQL Editor after creating the project.
+Data flow: `services/db.ts` → queries Supabase → falls back to `constants/data.ts` static data.
+
+All tables exist and are queryable. Seed scripts in `src/lib/supabase/seed/`.
+
+## Key Integration Notes
+
+- `@/` alias mapped to `./src/*`
+- `framer-motion` replaces v2's `motion/react` (same API)
+- `lucide-react` v1.21.0 — social icons: `Globe`, `ExternalLink`, `CirclePlay` (Twitter/Youtube removed upstream)
+- All v2 imports converted from relative (`../ui/`) to alias (`@/components/ui/`)
+- `[id]` route merged into existing `[slug]` to avoid Next.js ambiguous route error
