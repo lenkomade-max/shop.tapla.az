@@ -1,18 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
-import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
-import { checkAuth } from '@/lib/auth';
-
-async function deleteProduct(formData: FormData) {
-  'use server';
-  if (!(await checkAuth())) return;
-  const id = formData.get('id') as string;
-  if (!id) return;
-  await supabase.from('products').delete().eq('id', id);
-  revalidatePath('/admin/products');
-}
+import { deleteProduct } from '@/lib/actions';
 
 export default async function ProductsPage() {
   const { data: products, error } = await supabase

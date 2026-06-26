@@ -1,19 +1,8 @@
 import React from 'react';
-import { revalidatePath } from 'next/cache';
 import { supabase } from '@/lib/supabase/client';
-import { checkAuth } from '@/lib/auth';
+import { updateOrderStatus } from '@/lib/actions';
 
 const STATUSES = ['new', 'confirmed', 'shipped', 'delivered', 'cancelled'] as const;
-
-async function updateStatus(formData: FormData) {
-  'use server';
-  if (!(await checkAuth())) return;
-  const id = formData.get('id') as string;
-  const status = formData.get('status') as string;
-  if (!id || !status) return;
-  await supabase.from('orders').update({ status, updated_at: new Date().toISOString() }).eq('id', id);
-  revalidatePath('/admin/orders');
-}
 
 export default async function OrdersPage() {
   const { data: orders } = await supabase
@@ -57,7 +46,7 @@ export default async function OrdersPage() {
                 <td className="px-4 py-3">{o.quantity}</td>
                 <td className="px-4 py-3 font-medium">{Number(o.total).toLocaleString()} ₼</td>
                 <td className="px-4 py-3">
-                  <form action={updateStatus}>
+                  <form action={updateOrderStatus}>
                     <input type="hidden" name="id" value={o.id} />
                     <select
                       name="status"
