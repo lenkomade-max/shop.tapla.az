@@ -33,12 +33,16 @@ export async function deleteProduct(formData: FormData) {
 }
 
 export async function saveProduct(formData: FormData): Promise<void> {
-  if (!(await checkAuth())) return;
+  if (!(await checkAuth())) redirect('/admin');
 
   const id = formData.get('id') as string | null;
   const name = formData.get('name') as string;
-  const slug = formData.get('slug') as string;
-  if (!name || !slug) redirect(`/${id ? `admin/products/${id}/edit` : 'admin/products/new'}?error=Name+and+slug+required`);
+  let slug = formData.get('slug') as string;
+  const errorBase = id ? `admin/products/${id}/edit` : 'admin/products/new';
+
+  if (!name || !slug) {
+    redirect(`/${errorBase}?error=Name+and+slug+required`);
+  }
 
   const images = formData.getAll('images').filter(Boolean);
   const benefits = formData.getAll('benefits').filter(Boolean);
@@ -49,6 +53,26 @@ export async function saveProduct(formData: FormData): Promise<void> {
     const raw = formData.get('shades') as string;
     if (raw) shades = JSON.parse(raw);
   } catch {}
+
+  // Check slug uniqueness, auto-generate unique slug if taken
+  const { data: existing } = await supabaseAdmin
+    .from('products')
+    .select('id')
+    .eq('slug', slug)
+    .maybeSingle();
+  if (existing && existing.id !== id) {
+    let counter = 2;
+    while (true) {
+      const candidate = `${slug}-${counter}`;
+      const { data: dup } = await supabaseAdmin
+        .from('products')
+        .select('id')
+        .eq('slug', candidate)
+        .maybeSingle();
+      if (!dup) { slug = candidate; break; }
+      counter++;
+    }
+  }
 
   const payload: Record<string, unknown> = {
     name,
@@ -76,7 +100,7 @@ export async function saveProduct(formData: FormData): Promise<void> {
     ? await supabaseAdmin.from('products').update(payload).eq('id', id)
     : await supabaseAdmin.from('products').insert(payload);
 
-  if (error) redirect(`/${id ? `admin/products/${id}/edit` : 'admin/products/new'}?error=${encodeURIComponent(error.message)}`);
+  if (error) redirect(`/${errorBase}?error=${encodeURIComponent(error.message)}`);
 
   revalidatePath('/admin/products');
   redirect('/admin/products');
