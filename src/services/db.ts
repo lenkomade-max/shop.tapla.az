@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase/client';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { PRODUCTS, REVIEWS, FAQS, RITUAL_STEPS, BENEFITS_LIST } from '@/constants/data';
 import { Product, Review, FAQ, Benefit } from '@/types';
 
@@ -55,8 +55,8 @@ function mapFAQ(row: Record<string, unknown>): FAQ {
 export const dbService = {
   async getProducts(category?: string): Promise<Product[]> {
     try {
-      if (supabase) {
-        let query = supabase.from('products').select('*');
+      if (supabaseAdmin) {
+        let query = supabaseAdmin.from('products').select('*').eq('status', 'active');
         if (category) {
           query = query.eq('category', category);
         }
@@ -66,7 +66,7 @@ export const dbService = {
         }
       }
     } catch (err) {
-      console.warn('Supabase products fetch failed, using local fallback:', err);
+      console.warn('DB products fetch failed, using local fallback:', err);
     }
 
     if (category) {
@@ -77,18 +77,19 @@ export const dbService = {
 
   async getProductById(id: string): Promise<Product | null> {
     try {
-      if (supabase) {
-        const { data, error } = await supabase
+      if (supabaseAdmin) {
+        const { data, error } = await supabaseAdmin
           .from('products')
           .select('*')
           .eq('id', id)
-          .single();
+          .eq('status', 'active')
+          .maybeSingle();
         if (!error && data) {
           return mapProduct(data as Record<string, unknown>);
         }
       }
     } catch (err) {
-      console.warn(`Supabase product fetch for ID ${id} failed, using local fallback:`, err);
+      console.warn(`DB product fetch for ID ${id} failed, using local fallback:`, err);
     }
 
     return PRODUCTS.find(p => p.id === id) || null;
@@ -96,8 +97,8 @@ export const dbService = {
 
   async getReviews(): Promise<Review[]> {
     try {
-      if (supabase) {
-        const { data, error } = await supabase
+      if (supabaseAdmin) {
+        const { data, error } = await supabaseAdmin
           .from('reviews')
           .select('*')
           .order('date', { ascending: false });
@@ -106,7 +107,7 @@ export const dbService = {
         }
       }
     } catch (err) {
-      console.warn('Supabase reviews fetch failed, using local fallback:', err);
+      console.warn('DB reviews fetch failed, using local fallback:', err);
     }
 
     return REVIEWS;
@@ -114,8 +115,8 @@ export const dbService = {
 
   async getFAQs(category?: string): Promise<FAQ[]> {
     try {
-      if (supabase) {
-        let query = supabase.from('faqs').select('*').order('sort_order', { ascending: true });
+      if (supabaseAdmin) {
+        let query = supabaseAdmin.from('faqs').select('*').order('sort_order', { ascending: true });
         if (category) {
           query = query.eq('category', category);
         }
@@ -125,7 +126,7 @@ export const dbService = {
         }
       }
     } catch (err) {
-      console.warn('Supabase FAQs fetch failed, using local fallback:', err);
+      console.warn('DB FAQs fetch failed, using local fallback:', err);
     }
 
     if (category) {

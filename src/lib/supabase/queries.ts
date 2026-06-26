@@ -1,4 +1,4 @@
-import { supabase } from './client'
+import { supabaseAdmin } from './admin'
 import type { Product, Media, Collection } from './types'
 
 export interface LandingData {
@@ -14,7 +14,7 @@ export interface LandingData {
 }
 
 export async function getLandingBySlug(slug: string): Promise<LandingData | null> {
-  const { data: landing } = await supabase
+  const { data: landing } = await supabaseAdmin
     .from('landings')
     .select('*')
     .eq('slug', slug)
@@ -25,13 +25,13 @@ export async function getLandingBySlug(slug: string): Promise<LandingData | null
 
   const landingRow = landing as Record<string, unknown>
 
-  const { data: product } = await supabase
+  const { data: product } = await supabaseAdmin
     .from('products')
     .select('*')
     .eq('id', landingRow.product_id as string)
     .single()
 
-  const { data: images } = await supabase
+  const { data: images } = await supabaseAdmin
     .from('media')
     .select('*')
     .eq('product_id', landingRow.product_id as string)
@@ -52,7 +52,7 @@ export async function getLandingBySlug(slug: string): Promise<LandingData | null
 }
 
 export async function getProducts() {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('products')
     .select('*')
     .eq('status', 'active')
@@ -63,7 +63,7 @@ export async function getProducts() {
 }
 
 export async function getProductBySlug(slug: string) {
-  const { data: product, error } = await supabase
+  const { data: product, error } = await supabaseAdmin
     .from('products')
     .select('*')
     .eq('slug', slug)
@@ -74,7 +74,7 @@ export async function getProductBySlug(slug: string) {
 
   const productRow = product as Record<string, unknown>
 
-  const { data: images } = await supabase
+  const { data: images } = await supabaseAdmin
     .from('media')
     .select('*')
     .eq('product_id', productRow.id as string)
@@ -85,7 +85,7 @@ export async function getProductBySlug(slug: string) {
 }
 
 export async function getCollections() {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('collections')
     .select('*')
     .eq('status', 'active')
@@ -96,7 +96,7 @@ export async function getCollections() {
 }
 
 export async function getCollectionBySlug(slug: string) {
-  const { data: collection, error } = await supabase
+  const { data: collection, error } = await supabaseAdmin
     .from('collections')
     .select('*')
     .eq('slug', slug)
@@ -107,7 +107,7 @@ export async function getCollectionBySlug(slug: string) {
 
   const collectionRow = collection as Record<string, unknown>
 
-  const { data: products } = await supabase
+  const { data: products } = await supabaseAdmin
     .from('collection_products')
     .select('product_id')
     .eq('collection_id', collectionRow.id as string)
@@ -115,7 +115,7 @@ export async function getCollectionBySlug(slug: string) {
 
   const productIds = ((products as Record<string, unknown>[]) ?? []).map((p) => p.product_id as string)
 
-  const { data: items } = await supabase
+  const { data: items } = await supabaseAdmin
     .from('products')
     .select('*')
     .in('id', productIds)
@@ -133,7 +133,7 @@ export async function createOrder(order: {
   quantity?: number
   total: number
 }) {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('orders')
     .insert(order)
     .select()
@@ -151,7 +151,7 @@ export async function createLead(lead: {
   source?: string
   campaign?: string
 }) {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('leads')
     .insert(lead)
     .select()
