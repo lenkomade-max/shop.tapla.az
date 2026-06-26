@@ -1,25 +1,19 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase/client';
+import { saveProduct } from '@/lib/actions';
 
 interface Props {
   product?: Record<string, unknown>;
 }
 
 function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[^\w\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .trim();
+  return text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim();
 }
 
 export function ProductForm({ product }: Props) {
-  const router = useRouter();
   const isEdit = !!product;
+  const id = product?.id as string | undefined;
 
   const [name, setName] = useState((product?.name as string) || (product?.title as string) || '');
   const [slug, setSlug] = useState((product?.slug as string) || '');
@@ -58,66 +52,55 @@ export function ProductForm({ product }: Props) {
     if (slugAuto) setSlug(slugify(v));
   }
 
-  function addArrayItem(arr: unknown[], setter: (v: any[]) => void, empty: any) {
+  function addItem<T>(arr: T[], setter: (v: T[]) => void, empty: T) {
     setter([...arr, empty]);
   }
-
-  function removeArrayItem(arr: unknown[], setter: (v: any[]) => void, idx: number) {
+  function removeItem<T>(arr: T[], setter: (v: T[]) => void, idx: number) {
     const next = arr.filter((_, i) => i !== idx);
-    setter(next.length ? next : [arr[0] === '' ? '' : '']);
+    setter(next.length ? next : [arr[0]]);
+  }
+  function updateItem(arr: string[], setter: (v: string[]) => void, idx: number, val: string) {
+    const next = [...arr]; next[idx] = val; setter(next);
   }
 
-  function updateArrayItem(arr: string[], setter: (v: string[]) => void, idx: number, val: string) {
-    const next = [...arr];
-    next[idx] = val;
-    setter(next);
-  }
-
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (!slug) { setError('Slug обязателен'); return; }
     setSaving(true);
     setError('');
 
-    const payload: Record<string, unknown> = {
-      name,
-      slug,
-      subtitle,
-      description,
-      price: price ? Number(price) : 0,
-      old_price: originalPrice ? Number(originalPrice) : null,
-      rating: rating ? Number(rating) : 0,
-      reviews_count: reviewsCount ? Number(reviewsCount) : 0,
-      category,
-      status,
-      how_to_use: howToUse,
-      ingredients: ingredients || null,
-      is_new: isNew,
-      try_on_enabled: tryOnEnabled,
-      images: images.filter(Boolean),
-      benefits: benefits.filter(Boolean),
-      tags: tags.filter(Boolean),
-      shades: shades.filter(s => s.name),
-      // v1 backward compat
-      title: name,
-    };
+    const form = new FormData(e.currentTarget);
+    form.set('id', id || '');
+    form.set('name', name);
+    form.set('slug', slug);
+    form.set('subtitle', subtitle);
+    form.set('description', description);
+    form.set('price', price);
+    form.set('originalPrice', originalPrice);
+    form.set('rating', rating);
+    form.set('reviewsCount', reviewsCount);
+    form.set('category', category);
+    form.set('status', status);
+    form.set('howToUse', howToUse);
+    form.set('ingredients', ingredients);
+    form.set('isNew', String(isNew));
+    form.set('tryOnEnabled', String(tryOnEnabled));
+    form.set('shades', JSON.stringify(shades.filter(s => s.name)));
 
-    if (!slug) { setError('Slug обязателен'); setSaving(false); return; }
+    // Replace array fields
+    form.delete('images[]');
+    images.filter(Boolean).forEach(v => form.append('images[]', v));
+    form.delete('benefits[]');
+    benefits.filter(Boolean).forEach(v => form.append('benefits[]', v));
+    form.delete('tags[]');
+    tags.filter(Boolean).forEach(v => form.append('tags[]', v));
 
-    let error_: any;
-    if (isEdit) {
-      ({ error: error_ } = await supabase.from('products').update(payload).eq('id', product!.id));
-    } else {
-      ({ error: error_ } = await supabase.from('products').insert(payload));
-    }
-
-    if (error_) {
-      setError(error_.message);
+    const result = await saveProduct(form);
+    if (result?.error) {
+      setError(result.error);
       setSaving(false);
-      return;
     }
-
-    router.push('/admin/products');
-    router.refresh();
+    // success → redirect happens in server action
   }
 
   return (
@@ -135,9 +118,7 @@ export function ProductForm({ product }: Props) {
             <label className="mb-1 block text-xs font-medium text-zinc-600">
               Slug
               <button type="button" onClick={() => setSlugAuto(!slugAuto)}
-                className="ml-2 text-xs text-zinc-400 hover:text-black">
-                {slugAuto ? 'авто' : 'вручную'}
-              </button>
+                className="ml-2 text-xs text-zinc-400 hover:text-black">{slugAuto ? 'авто' : 'вручную'}</button>
             </label>
             <input value={slug} onChange={e => { setSlug(e.target.value); setSlugAuto(false); }} required
               className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm font-mono outline-none focus:border-black" />
@@ -210,16 +191,16 @@ export function ProductForm({ product }: Props) {
       <section className="rounded-xl border bg-white p-6 shadow-sm">
         <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-zinc-500">
           Изображения (URL)
-          <button type="button" onClick={() => addArrayItem(images, setImages, '')}
+          <button type="button" onClick={() => addItem(images, setImages, '')}
             className="ml-3 text-xs font-normal text-zinc-400 hover:text-black">+ Добавить</button>
         </h3>
         <div className="flex flex-col gap-2">
           {images.map((img, i) => (
             <div key={i} className="flex items-center gap-2">
-              <input value={img} onChange={e => updateArrayItem(images, setImages, i, e.target.value)}
+              <input value={img} onChange={e => updateItem(images, setImages, i, e.target.value)}
                 placeholder="https://example.com/photo.jpg"
                 className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black" />
-              <button type="button" onClick={() => removeArrayItem(images, setImages, i)}
+              <button type="button" onClick={() => removeItem(images, setImages, i)}
                 className="text-xs text-red-400 hover:text-red-600">Удалить</button>
             </div>
           ))}
@@ -230,16 +211,16 @@ export function ProductForm({ product }: Props) {
       <section className="rounded-xl border bg-white p-6 shadow-sm">
         <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-zinc-500">
           Преимущества (benefits)
-          <button type="button" onClick={() => addArrayItem(benefits, setBenefits, '')}
+          <button type="button" onClick={() => addItem(benefits, setBenefits, '')}
             className="ml-3 text-xs font-normal text-zinc-400 hover:text-black">+ Добавить</button>
         </h3>
         <div className="flex flex-col gap-2">
           {benefits.map((b, i) => (
             <div key={i} className="flex items-center gap-2">
-              <input value={b} onChange={e => updateArrayItem(benefits, setBenefits, i, e.target.value)}
+              <input value={b} onChange={e => updateItem(benefits, setBenefits, i, e.target.value)}
                 placeholder="Преимущество"
                 className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black" />
-              <button type="button" onClick={() => removeArrayItem(benefits, setBenefits, i)}
+              <button type="button" onClick={() => removeItem(benefits, setBenefits, i)}
                 className="text-xs text-red-400 hover:text-red-600">Удалить</button>
             </div>
           ))}
@@ -267,16 +248,15 @@ export function ProductForm({ product }: Props) {
       <section className="rounded-xl border bg-white p-6 shadow-sm">
         <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-zinc-500">
           Теги (tags)
-          <button type="button" onClick={() => addArrayItem(tags, setTags, '')}
+          <button type="button" onClick={() => addItem(tags, setTags, '')}
             className="ml-3 text-xs font-normal text-zinc-400 hover:text-black">+ Добавить</button>
         </h3>
         <div className="flex flex-wrap gap-2">
           {tags.map((t, i) => (
             <div key={i} className="flex items-center gap-2">
-              <input value={t} onChange={e => updateArrayItem(tags, setTags, i, e.target.value)}
-                placeholder="Тег"
-                className="w-40 rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black" />
-              <button type="button" onClick={() => removeArrayItem(tags, setTags, i)}
+              <input value={t} onChange={e => updateItem(tags, setTags, i, e.target.value)}
+                placeholder="Тег" className="w-40 rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black" />
+              <button type="button" onClick={() => removeItem(tags, setTags, i)}
                 className="text-xs text-red-400 hover:text-red-600">✕</button>
             </div>
           ))}
@@ -287,7 +267,7 @@ export function ProductForm({ product }: Props) {
       <section className="rounded-xl border bg-white p-6 shadow-sm">
         <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-zinc-500">
           Оттенки (shades)
-          <button type="button" onClick={() => addArrayItem(shades, setShades as any, { name: '', colorHex: '#000000', isHot: false, label: '' })}
+          <button type="button" onClick={() => addItem(shades, setShades as any, { name: '', colorHex: '#000000', isHot: false, label: '' })}
             className="ml-3 text-xs font-normal text-zinc-400 hover:text-black">+ Добавить</button>
         </h3>
         <div className="flex flex-col gap-3">
@@ -297,22 +277,19 @@ export function ProductForm({ product }: Props) {
                 <label className="mb-1 block text-xs text-zinc-500">Название</label>
                 <input value={s.name} onChange={e => {
                   const n = [...shades]; n[i] = { ...n[i], name: e.target.value }; setShades(n);
-                }} placeholder="Mirvari Ağ"
-                  className="block w-36 rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black" />
+                }} placeholder="Mirvari Ağ" className="block w-36 rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black" />
               </div>
               <div>
                 <label className="mb-1 block text-xs text-zinc-500">Цвет</label>
                 <input type="color" value={s.colorHex} onChange={e => {
                   const n = [...shades]; n[i] = { ...n[i], colorHex: e.target.value }; setShades(n);
-                }}
-                  className="h-9 w-12 cursor-pointer rounded border" />
+                }} className="h-9 w-12 cursor-pointer rounded border" />
               </div>
               <div>
                 <label className="mb-1 block text-xs text-zinc-500">Label</label>
                 <input value={s.label} onChange={e => {
                   const n = [...shades]; n[i] = { ...n[i], label: e.target.value }; setShades(n);
-                }} placeholder="Pearl White"
-                  className="block w-28 rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black" />
+                }} placeholder="Pearl White" className="block w-28 rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black" />
               </div>
               <label className="flex items-center gap-1 pb-1 text-xs">
                 <input type="checkbox" checked={s.isHot} onChange={e => {
@@ -320,7 +297,7 @@ export function ProductForm({ product }: Props) {
                 }} />
                 Hot
               </label>
-              <button type="button" onClick={() => removeArrayItem(shades, setShades as any, i)}
+              <button type="button" onClick={() => removeItem(shades, setShades as any, i)}
                 className="mb-1 text-xs text-red-400 hover:text-red-600">Удалить</button>
             </div>
           ))}
