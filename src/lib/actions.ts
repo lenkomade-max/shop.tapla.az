@@ -28,7 +28,8 @@ export async function deleteProduct(formData: FormData) {
   if (!(await checkAuth())) return;
   const id = formData.get('id') as string;
   if (!id) return;
-  await supabaseAdmin.from('products').delete().eq('id', id);
+  const { error } = await supabaseAdmin.from('products').delete().eq('id', id);
+  if (error) console.error('Delete product error:', error);
   revalidatePath('/admin/products');
 }
 
@@ -100,8 +101,12 @@ export async function saveProduct(formData: FormData): Promise<void> {
     ? await supabaseAdmin.from('products').update(payload).eq('id', id)
     : await supabaseAdmin.from('products').insert(payload);
 
-  if (error) redirect(`/${errorBase}?error=${encodeURIComponent(error.message)}`);
+  if (error) {
+    console.error('Save product error:', error);
+    redirect(`/${errorBase}?error=${encodeURIComponent(error.message)}`);
+  }
 
   revalidatePath('/admin/products');
+  revalidatePath('/products');
   redirect('/admin/products');
 }

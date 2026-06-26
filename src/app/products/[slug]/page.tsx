@@ -4,13 +4,10 @@ import type { Metadata } from 'next';
 import { dbService } from '@/services/db';
 import { ProductClient } from './ProductClient';
 
+export const dynamic = 'force-dynamic';
+
 interface Props {
   params: Promise<{ slug: string }>;
-}
-
-export async function generateStaticParams() {
-  const products = await dbService.getProducts();
-  return products.map((p) => ({ slug: p.slug || p.id }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
