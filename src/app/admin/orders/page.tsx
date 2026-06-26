@@ -1,11 +1,11 @@
 import React from 'react';
-import { supabase } from '@/lib/supabase/client';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { updateOrderStatus } from '@/lib/actions';
 
 const STATUSES = ['new', 'confirmed', 'shipped', 'delivered', 'cancelled'] as const;
 
 export default async function OrdersPage() {
-  const { data: orders } = await supabase
+  const { data: orders } = await supabaseAdmin
     .from('orders')
     .select('*, products!inner(name, slug)')
     .order('created_at', { ascending: false });

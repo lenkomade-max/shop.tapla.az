@@ -1,10 +1,10 @@
 import React from 'react';
 import Link from 'next/link';
-import { supabase } from '@/lib/supabase/client';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { deleteProduct } from '@/lib/actions';
 
 export default async function ProductsPage() {
-  const { data: products, error } = await supabase
+  const { data: products, error } = await supabaseAdmin
     .from('products')
     .select('id, name, slug, title, price, status, category, created_at')
     .order('created_at', { ascending: false });

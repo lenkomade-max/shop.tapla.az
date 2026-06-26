@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { supabase } from '@/lib/supabase/client';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 
 function NumberCard({ label, value, href }: { label: string; value: string | number; href: string }) {
   return (
@@ -13,8 +13,8 @@ function NumberCard({ label, value, href }: { label: string; value: string | num
 
 export default async function AdminPage() {
   const [{ count: productsCount }, { count: ordersCount }] = await Promise.all([
-    supabase.from('products').select('*', { count: 'exact', head: true }),
-    supabase.from('orders').select('*', { count: 'exact', head: true }),
+    supabaseAdmin.from('products').select('*', { count: 'exact', head: true }),
+    supabaseAdmin.from('orders').select('*', { count: 'exact', head: true }),
   ]);
 
   return (
