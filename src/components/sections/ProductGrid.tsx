@@ -1,0 +1,277 @@
+'use client';
+
+import React, { useState } from 'react';
+import { Section } from '@/components/ui/Section';
+import { Container } from '@/components/ui/Container';
+import { Heading } from '@/components/ui/Heading';
+import { ProductCard } from '@/components/cards/ProductCard';
+import { Product, Shade } from '@/types';
+import { Modal } from '@/components/ui/Modal';
+import { useCart } from '@/store/CartContext';
+import { Star, CheckCircle, ShoppingBag, Minimize2, ZoomIn } from 'lucide-react';
+import Image from 'next/image';
+import { clsx } from 'clsx';
+
+interface ProductGridProps {
+  products: Product[];
+}
+
+const CATEGORIES = [
+  { label: 'HAMSINI GÖSTƏR', value: 'all' },
+  { label: 'LED TERAPİYA', value: 'LED Terapiya' },
+  { label: 'TƏMİZLƏMƏ', value: 'Təmizləmə' },
+  { label: 'GÖZ QULLUĞU', value: 'Göz Qulluğu' },
+  { label: 'LİFTİNQ', value: 'Liftinq' },
+];
+
+export function ProductGrid({ products }: ProductGridProps) {
+  const { addToCart } = useCart();
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [selectedShade, setSelectedShade] = useState<Shade | undefined>(undefined);
+  const [purchaseQuantity, setPurchaseQuantity] = useState(1);
+
+  const filteredProducts = selectedCategory === 'all'
+    ? products
+    : products.filter(p => p.category === selectedCategory);
+
+  const handleOpenQuickView = (product: Product) => {
+    setQuickViewProduct(product);
+    setActiveImageIndex(0);
+    setPurchaseQuantity(1);
+    setSelectedShade(product.shades && product.shades.length > 0 ? product.shades[0] : undefined);
+  };
+
+  const handleCloseQuickView = () => {
+    setQuickViewProduct(null);
+  };
+
+  const handleAddToCartQuick = () => {
+    if (quickViewProduct) {
+      addToCart(quickViewProduct, selectedShade, purchaseQuantity);
+      setQuickViewProduct(null);
+    }
+  };
+
+  return (
+    <Section id="products" py="lg">
+      <Container>
+        {/* Header */}
+        <div className="max-w-3xl mx-auto text-center space-y-3 mb-12">
+          <span className="text-[10px] tracking-[0.25em] font-bold text-neutral-400 uppercase">
+            ALUNA BUTİK
+          </span>
+          <Heading level={2} align="center" className="font-serif">
+            MƏHSUL KOLLEKSİYAMIZ
+          </Heading>
+          <p className="text-xs sm:text-sm text-neutral-500 font-sans max-w-lg mx-auto leading-relaxed">
+            Dərinizə rəqəmsal dəqiqlik bəxş edən yüksək keyfiyyətli cihazlarımızla tanış olun və ehtiyacınıza uyğun olanı seçin.
+          </p>
+        </div>
+
+        {/* Category Filter Tabs */}
+        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 mb-12 sm:mb-16 border-b border-neutral-100 pb-4">
+          {CATEGORIES.map((cat) => (
+            <button
+              key={cat.value}
+              onClick={() => setSelectedCategory(cat.value)}
+              className={clsx(
+                'text-[10px] sm:text-xs tracking-widest font-semibold uppercase relative py-2 transition-colors cursor-pointer',
+                selectedCategory === cat.value
+                  ? 'text-neutral-950 font-bold after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-neutral-950'
+                  : 'text-neutral-400 hover:text-neutral-950'
+              )}
+            >
+              {cat.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Products Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          {filteredProducts.map((product) => (
+            <ProductCard
+              key={product.id}
+              product={product}
+              onQuickView={handleOpenQuickView}
+            />
+          ))}
+        </div>
+
+        {/* QUICK VIEW OVERLAY MODAL */}
+        <Modal
+          isOpen={!!quickViewProduct}
+          onClose={handleCloseQuickView}
+          size="3xl"
+        >
+          {quickViewProduct && (
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start font-sans">
+              {/* Product Gallery (Left) */}
+              <div className="md:col-span-6 space-y-3">
+                <div className="relative aspect-[4/5] bg-neutral-50 border border-neutral-100 overflow-hidden">
+                  <Image
+                    src={quickViewProduct.images[activeImageIndex] || quickViewProduct.images[0]}
+                    alt={quickViewProduct.name}
+                    fill
+                    className="object-cover"
+                  />
+                  <div className="absolute bottom-3 right-3 bg-black/60 text-white text-[9px] px-2 py-1 tracking-widest uppercase font-mono">
+                    {activeImageIndex + 1} / {quickViewProduct.images.length}
+                  </div>
+                </div>
+
+                {/* Micro thumbnails row */}
+                {quickViewProduct.images.length > 1 && (
+                  <div className="flex items-center space-x-2">
+                    {quickViewProduct.images.map((img, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setActiveImageIndex(idx)}
+                        className={clsx(
+                          'relative h-16 w-14 bg-neutral-50 border transition-all cursor-pointer',
+                          activeImageIndex === idx ? 'border-neutral-900 scale-105' : 'border-neutral-200'
+                        )}
+                      >
+                        <Image
+                          src={img}
+                          alt={`${quickViewProduct.name} thumbnail ${idx}`}
+                          fill
+                          className="object-cover"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Product Core parameters (Right) */}
+              <div className="md:col-span-6 flex flex-col justify-between h-full space-y-5">
+                <div>
+                  <span className="text-[10px] tracking-widest text-neutral-400 uppercase font-bold block mb-1">
+                    KOLLEKSİYA / {quickViewProduct.category.toUpperCase()}
+                  </span>
+                  
+                  {/* Title heading */}
+                  <h3 className="text-xl font-bold tracking-widest text-neutral-900 uppercase font-serif mb-1">
+                    {quickViewProduct.name}
+                  </h3>
+                  <p className="text-xs text-neutral-500 font-medium mb-3.5 leading-relaxed">
+                    {quickViewProduct.subtitle}
+                  </p>
+
+                  {/* Rating snapshot */}
+                  <div className="flex items-center space-x-1.5 mb-5 pb-4 border-b border-neutral-100">
+                    <div className="flex text-amber-400">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <Star
+                          key={i}
+                          className={clsx(
+                            'h-3.5 w-3.5 fill-current',
+                            i < Math.floor(quickViewProduct.rating) ? 'text-amber-400' : 'text-neutral-200'
+                          )}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-xs text-neutral-500 font-mono">
+                      {quickViewProduct.rating.toFixed(1)} ({quickViewProduct.reviewsCount} müştəri rəyi)
+                    </span>
+                  </div>
+
+                  {/* Description */}
+                  <p className="text-xs text-neutral-600 leading-relaxed font-sans mb-5 line-clamp-4">
+                    {quickViewProduct.description}
+                  </p>
+
+                  {/* Shade selectors */}
+                  {quickViewProduct.shades && quickViewProduct.shades.length > 0 && (
+                    <div className="mb-5">
+                      <span className="text-[10px] tracking-widest uppercase font-semibold text-neutral-400 block mb-2">
+                        RƏNG SEÇİMİ: <span className="text-neutral-900">{selectedShade?.name}</span>
+                      </span>
+                      <div className="flex items-center space-x-2">
+                        {quickViewProduct.shades.map((shade) => (
+                          <button
+                            key={shade.name}
+                            onClick={() => setSelectedShade(shade)}
+                            className={clsx(
+                              'w-5 h-5 rounded-full border transition-all relative cursor-pointer',
+                              selectedShade?.name === shade.name
+                                ? 'border-neutral-900 scale-110'
+                                : 'border-neutral-200 hover:scale-105'
+                            )}
+                            style={{ backgroundColor: shade.colorHex }}
+                          >
+                            {selectedShade?.name === shade.name && (
+                              <span className="absolute inset-0.5 rounded-full border border-white" />
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Price info */}
+                  <div className="flex items-baseline space-x-3 mb-5">
+                    <span className="text-lg font-bold font-mono text-neutral-900">
+                      {quickViewProduct.price.toFixed(2)} ₼
+                    </span>
+                    {quickViewProduct.originalPrice && (
+                      <span className="text-xs text-neutral-400 line-through font-mono">
+                        {quickViewProduct.originalPrice.toFixed(2)} ₼
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Features highlights */}
+                  <div className="bg-neutral-50 p-4 border border-neutral-100 mb-5 space-y-2">
+                    <span className="text-[10px] tracking-widest font-semibold text-neutral-400 uppercase block mb-1">
+                      ÖZƏL FAYDALARI:
+                    </span>
+                    {quickViewProduct.benefits.slice(0, 2).map((b, idx) => (
+                      <div key={idx} className="flex items-start space-x-2 text-[11px] text-neutral-600">
+                        <CheckCircle className="h-3.5 w-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                        <span>{b}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Quantity and Cart Submit */}
+                <div className="flex items-center space-x-3">
+                  {/* Quantity */}
+                  <div className="flex items-center border border-neutral-200 h-12">
+                    <button
+                      onClick={() => setPurchaseQuantity(q => Math.max(1, q - 1))}
+                      className="px-3 h-full hover:bg-neutral-50 text-neutral-500 cursor-pointer"
+                    >
+                      -
+                    </button>
+                    <span className="px-4 font-mono font-semibold text-neutral-800 text-xs">
+                      {purchaseQuantity}
+                    </span>
+                    <button
+                      onClick={() => setPurchaseQuantity(q => q + 1)}
+                      className="px-3 h-full hover:bg-neutral-50 text-neutral-500 cursor-pointer"
+                    >
+                      +
+                    </button>
+                  </div>
+
+                  {/* Add action */}
+                  <button
+                    onClick={handleAddToCartQuick}
+                    className="flex-1 bg-neutral-950 text-white h-12 text-[10px] tracking-widest font-semibold uppercase hover:bg-neutral-800 transition-colors flex items-center justify-center space-x-2.5 cursor-pointer"
+                  >
+                    <ShoppingBag className="h-4 w-4" />
+                    <span>SƏBƏTƏ ƏLAVƏ ET</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </Modal>
+      </Container>
+    </Section>
+  );
+}
