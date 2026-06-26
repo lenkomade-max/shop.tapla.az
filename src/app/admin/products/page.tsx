@@ -1,0 +1,97 @@
+import React from 'react';
+import Link from 'next/link';
+import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
+import { supabase } from '@/lib/supabase/client';
+import { checkAuth } from '@/lib/auth';
+
+async function deleteProduct(formData: FormData) {
+  'use server';
+  if (!(await checkAuth())) return;
+  const id = formData.get('id') as string;
+  if (!id) return;
+  await supabase.from('products').delete().eq('id', id);
+  revalidatePath('/admin/products');
+}
+
+export default async function ProductsPage() {
+  const { data: products, error } = await supabase
+    .from('products')
+    .select('id, name, slug, title, price, status, category, created_at')
+    .order('created_at', { ascending: false });
+
+  return (
+    <div>
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="text-xl font-bold">Товары</h2>
+        <Link
+          href="/admin/products/new"
+          className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+        >
+          + Новый товар
+        </Link>
+      </div>
+
+      <div className="overflow-hidden rounded-xl border bg-white shadow-sm">
+        <table className="w-full text-left text-sm">
+          <thead className="border-b bg-zinc-50 text-xs uppercase text-zinc-500">
+            <tr>
+              <th className="px-4 py-3 font-medium">Название</th>
+              <th className="px-4 py-3 font-medium">Slug</th>
+              <th className="px-4 py-3 font-medium">Цена</th>
+              <th className="px-4 py-3 font-medium">Категория</th>
+              <th className="px-4 py-3 font-medium">Статус</th>
+              <th className="px-4 py-3 font-medium">Дата</th>
+              <th className="px-4 py-3 font-medium" />
+            </tr>
+          </thead>
+          <tbody>
+            {(products ?? []).length === 0 && (
+              <tr>
+                <td colSpan={7} className="px-4 py-12 text-center text-zinc-400">
+                  Нет товаров. <Link href="/admin/products/new" className="text-black underline">Создать первый</Link>
+                </td>
+              </tr>
+            )}
+            {(products ?? []).map(p => (
+              <tr key={p.id} className="border-b last:border-0 hover:bg-zinc-50">
+                <td className="px-4 py-3 font-medium">{p.name || p.title}</td>
+                <td className="px-4 py-3 font-mono text-xs text-zinc-400">{p.slug}</td>
+                <td className="px-4 py-3">{p.price ? p.price.toLocaleString() + ' ₼' : '—'}</td>
+                <td className="px-4 py-3 text-zinc-500">{p.category || '—'}</td>
+                <td className="px-4 py-3">
+                  <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                    p.status === 'active' ? 'bg-green-100 text-green-700'
+                    : p.status === 'draft' ? 'bg-yellow-100 text-yellow-700'
+                    : 'bg-red-100 text-red-700'
+                  }`}>
+                    {p.status}
+                  </span>
+                </td>
+                <td className="px-4 py-3 text-xs text-zinc-400">
+                  {new Date(p.created_at).toLocaleDateString('ru')}
+                </td>
+                <td className="px-4 py-3">
+                  <div className="flex gap-2">
+                    <Link
+                      href={`/admin/products/${p.id}/edit`}
+                      className="text-xs text-zinc-500 hover:text-black"
+                    >
+                      Редакт.
+                    </Link>
+                    <form action={deleteProduct} onSubmit={e => { if (!confirm('Удалить товар?')) e.preventDefault(); }}>
+                      <input type="hidden" name="id" value={p.id} />
+                      <button type="submit" className="text-xs text-zinc-400 hover:text-red-500">
+                        Удалить
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
