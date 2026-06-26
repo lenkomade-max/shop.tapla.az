@@ -32,13 +32,23 @@ export async function deleteProduct(formData: FormData) {
   revalidatePath('/admin/products');
 }
 
-export async function saveProduct(formData: FormData) {
+export async function saveProduct(_prev: unknown, formData: FormData): Promise<{ error: string } | void> {
   if (!(await checkAuth())) return { error: 'Unauthorized' };
 
-  const id = formData.get('id') as string;
+  const id = formData.get('id') as string | null;
   const name = formData.get('name') as string;
   const slug = formData.get('slug') as string;
   if (!name || !slug) return { error: 'Name and slug required' };
+
+  const images = formData.getAll('images').filter(Boolean);
+  const benefits = formData.getAll('benefits').filter(Boolean);
+  const tags = formData.getAll('tags').filter(Boolean);
+
+  let shades: unknown[] = [];
+  try {
+    const raw = formData.get('shades') as string;
+    if (raw) shades = JSON.parse(raw);
+  } catch {}
 
   const payload: Record<string, unknown> = {
     name,
@@ -56,26 +66,18 @@ export async function saveProduct(formData: FormData) {
     ingredients: formData.get('ingredients') || null,
     is_new: formData.get('isNew') === 'true',
     try_on_enabled: formData.get('tryOnEnabled') === 'true',
-    images: formData.getAll('images[]').filter(Boolean),
-    benefits: formData.getAll('benefits[]').filter(Boolean),
-    tags: formData.getAll('tags[]').filter(Boolean),
-    shades: [],
+    images,
+    benefits,
+    tags,
+    shades,
   };
 
-  // Parse shades JSON
-  try {
-    const shadesRaw = formData.get('shades') as string;
-    if (shadesRaw) payload.shades = JSON.parse(shadesRaw);
-  } catch {}
-
-  let error;
-  if (id) {
-    ({ error } = await supabaseAdmin.from('products').update(payload).eq('id', id));
-  } else {
-    ({ error } = await supabaseAdmin.from('products').insert(payload));
-  }
+  const { error } = id
+    ? await supabaseAdmin.from('products').update(payload).eq('id', id)
+    : await supabaseAdmin.from('products').insert(payload);
 
   if (error) return { error: error.message };
+
   revalidatePath('/admin/products');
   redirect('/admin/products');
 }
