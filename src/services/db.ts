@@ -5,6 +5,7 @@ import { Product, Review, FAQ, Benefit } from '@/types';
 function mapProduct(row: Record<string, unknown>): Product {
   return {
     id: row.id as string,
+    slug: row.slug as string | undefined,
     name: (row.name as string) || (row.title as string) || '',
     subtitle: (row.subtitle as string) || '',
     description: (row.description as string) || '',
@@ -93,6 +94,26 @@ export const dbService = {
     }
 
     return PRODUCTS.find(p => p.id === id) || null;
+  },
+
+  async getProductBySlug(slug: string): Promise<Product | null> {
+    try {
+      if (supabaseAdmin) {
+        const { data, error } = await supabaseAdmin
+          .from('products')
+          .select('*')
+          .eq('slug', slug)
+          .eq('status', 'active')
+          .maybeSingle();
+        if (!error && data) {
+          return mapProduct(data as Record<string, unknown>);
+        }
+      }
+    } catch (err) {
+      console.warn(`DB product fetch for slug ${slug} failed, using local fallback:`, err);
+    }
+
+    return PRODUCTS.find(p => p.slug === slug || p.id === slug) || null;
   },
 
   async getReviews(): Promise<Review[]> {

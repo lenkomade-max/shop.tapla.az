@@ -10,12 +10,12 @@ interface Props {
 
 export async function generateStaticParams() {
   const products = await dbService.getProducts();
-  return products.map((p) => ({ slug: p.id }));
+  return products.map((p) => ({ slug: p.slug || p.id }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const product = await dbService.getProductById(slug);
+  const product = await dbService.getProductBySlug(slug);
   if (!product) return {};
   return {
     title: product.name,
@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ProductPage({ params }: Props) {
   const { slug } = await params;
-  const product = await dbService.getProductById(slug);
+  const product = await dbService.getProductBySlug(slug);
 
   if (!product) {
     notFound();
