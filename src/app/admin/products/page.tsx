@@ -9,8 +9,17 @@ export default async function ProductsPage() {
     .select('id, name, slug, title, price, status, category, created_at')
     .order('created_at', { ascending: false });
 
+  if (error) {
+    console.error('Admin products fetch error:', error);
+  }
+
   return (
     <div>
+      {error && (
+        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          Ошибка Supabase: {error.message} (code: {error.code})
+        </div>
+      )}
       <div className="mb-6 flex items-center justify-between">
         <h2 className="text-xl font-bold">Товары</h2>
         <Link

@@ -5,10 +5,12 @@ import { updateOrderStatus } from '@/lib/actions';
 const STATUSES = ['new', 'confirmed', 'shipped', 'delivered', 'cancelled'] as const;
 
 export default async function OrdersPage() {
-  const { data: orders } = await supabaseAdmin
+  const { data: orders, error } = await supabaseAdmin
     .from('orders')
-    .select('*, products!inner(name, slug)')
+    .select('*')
     .order('created_at', { ascending: false });
+
+  if (error) console.error('Admin orders fetch error:', error);
 
   return (
     <div>

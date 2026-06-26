@@ -12,13 +12,25 @@ function NumberCard({ label, value, href }: { label: string; value: string | num
 }
 
 export default async function AdminPage() {
-  const [{ count: productsCount }, { count: ordersCount }] = await Promise.all([
+  const [productsRes, ordersRes] = await Promise.all([
     supabaseAdmin.from('products').select('*', { count: 'exact', head: true }),
     supabaseAdmin.from('orders').select('*', { count: 'exact', head: true }),
   ]);
 
+  if (productsRes.error) console.error('Admin products count error:', productsRes.error);
+  if (ordersRes.error) console.error('Admin orders count error:', ordersRes.error);
+
+  const productsCount = productsRes.count;
+  const ordersCount = ordersRes.count;
+
   return (
     <div>
+      {(productsRes.error || ordersRes.error) && (
+        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          {productsRes.error && <div>Products: {productsRes.error.message} (code: {productsRes.error.code})</div>}
+          {ordersRes.error && <div>Orders: {ordersRes.error.message} (code: {ordersRes.error.code})</div>}
+        </div>
+      )}
       <h2 className="mb-6 text-xl font-bold">Дашборд</h2>
       <div className="grid grid-cols-3 gap-4">
         <NumberCard label="Товаров" value={productsCount ?? 0} href="/admin/products" />
