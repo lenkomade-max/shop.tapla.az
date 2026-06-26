@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { supabaseAdmin } from '@/lib/supabase/admin';
-import { deleteProduct } from '@/lib/actions';
+import { DeleteButton } from './delete-button';
 
 export default async function ProductsPage() {
   const { data: products, error } = await supabaseAdmin
@@ -77,12 +77,7 @@ export default async function ProductsPage() {
                     >
                       Редакт.
                     </Link>
-                    <form action={deleteProduct} onSubmit={e => { if (!confirm('Удалить товар?')) e.preventDefault(); }}>
-                      <input type="hidden" name="id" value={p.id} />
-                      <button type="submit" className="text-xs text-zinc-400 hover:text-red-500">
-                        Удалить
-                      </button>
-                    </form>
+                    <DeleteButton id={p.id} />
                   </div>
                 </td>
               </tr>
