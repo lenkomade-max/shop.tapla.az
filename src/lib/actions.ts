@@ -32,13 +32,13 @@ export async function deleteProduct(formData: FormData) {
   revalidatePath('/admin/products');
 }
 
-export async function saveProduct(_prev: unknown, formData: FormData): Promise<{ error: string } | void> {
-  if (!(await checkAuth())) return { error: 'Unauthorized' };
+export async function saveProduct(formData: FormData): Promise<void> {
+  if (!(await checkAuth())) return;
 
   const id = formData.get('id') as string | null;
   const name = formData.get('name') as string;
   const slug = formData.get('slug') as string;
-  if (!name || !slug) return { error: 'Name and slug required' };
+  if (!name || !slug) redirect(`/${id ? `admin/products/${id}/edit` : 'admin/products/new'}?error=Name+and+slug+required`);
 
   const images = formData.getAll('images').filter(Boolean);
   const benefits = formData.getAll('benefits').filter(Boolean);
@@ -76,7 +76,7 @@ export async function saveProduct(_prev: unknown, formData: FormData): Promise<{
     ? await supabaseAdmin.from('products').update(payload).eq('id', id)
     : await supabaseAdmin.from('products').insert(payload);
 
-  if (error) return { error: error.message };
+  if (error) redirect(`/${id ? `admin/products/${id}/edit` : 'admin/products/new'}?error=${encodeURIComponent(error.message)}`);
 
   revalidatePath('/admin/products');
   redirect('/admin/products');
