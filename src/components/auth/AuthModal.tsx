@@ -165,32 +165,46 @@ function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
     setLoading(true)
     setError('')
 
-    const nameParts = name.trim().split(/\s+/)
-    const firstName = nameParts[0] || ''
-    const lastName = nameParts.slice(1).join(' ') || ''
+    try {
+      const nameParts = name.trim().split(/\s+/)
+      const firstName = nameParts[0] || ''
+      const lastName = nameParts.slice(1).join(' ') || ''
 
-    const { createClient } = await import('@/lib/supabase/client')
-    const supabase = createClient()
-    const { error: signUpError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { first_name: firstName, last_name: lastName, phone: phone || undefined },
-      },
-    })
+      const { createClient } = await import('@/lib/supabase/client')
+      const supabase = createClient()
 
-    if (signUpError) {
-      setError(signUpError.message === 'User already registered'
-        ? 'Bu email artıq qeydiyyatdan keçib'
-        : signUpError.message === 'Signup requires a valid password'
-          ? 'Şifrə tələb olunur'
-          : signUpError.message)
-    } else {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
-        await supabase.auth.signInWithPassword({ email, password })
+      const { error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { first_name: firstName, last_name: lastName, phone: phone || undefined },
+        },
+      })
+
+      if (signUpError) {
+        const msg = typeof signUpError === 'object' && signUpError !== null
+          ? signUpError.message || JSON.stringify(signUpError)
+          : String(signUpError)
+        setError(msg === 'User already registered'
+          ? 'Bu email artıq qeydiyyatdan keçib'
+          : msg === 'Signup requires a valid password'
+            ? 'Şifrə tələb olunur'
+            : msg)
+      } else {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (!session) {
+          const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
+          if (signInError) {
+            setError('Email təsdiqlənməyib. Zəhmət olmasa emailinizi yoxlayın.')
+            setLoading(false)
+            return
+          }
+        }
+        onSuccess()
       }
-      onSuccess()
+    } catch (err) {
+      const e = err as Record<string, unknown> | null
+      setError(e && typeof e === 'object' ? String(e?.message ?? e) : String(err))
     }
     setLoading(false)
   }
