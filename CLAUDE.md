@@ -115,8 +115,7 @@ src/
 
 При добавлении новой таблицы или изменении структуры:
 1. Добавить `CREATE TABLE IF NOT EXISTS` в `schema.sql`
-2. Выполнить SQL в Supabase SQL Editor
-3. **НЕ плодить** файлы `011_`, `012_` — только один `schema.sql`
+
 
 ### Архитектура: API-first (как в vakansiya)
 
@@ -137,6 +136,37 @@ lib/api/
 6. **Никакой бизнес-логики в SQL** — форматирование, валидация, create/update логика только в коде
 
 **Пример:** форматирование телефона (`+994`) — в `lib/api/profile.ts` (TypeScript), не в SQL триггере.
+
+## Платёжная система (Pasha Bank)
+
+Оплата через шлюз **tapla.az** (отдельный Next.js проект на Vercel).
+
+### Как работает
+
+1. Чекаут → `submitOrder()` в `lib/actions.ts`
+2. Если `paymentMethod === 'online_card'` → вызывает `POST tapla.az/api/payments/pasha/create`
+3. Шлюз создаёт транзакцию в Pasha Bank (mTLS), возвращает `redirectUrl`
+4. Браузер редиректится на страницу Pasha Bank — пользователь вводит карту
+5. Банк шлёт callback на `tapla.az/api/payments/pasha/callback` → шлюз обновляет `orders.status = 'paid'`
+6. Браузер возвращается на `tapla.az/api/payments/pasha/return` → редирект на `shop.tapla.az/checkout/success`
+
+### Ключевые файлы
+
+| Файл | Роль |
+|------|------|
+| `src/lib/actions.ts` | `submitOrder()` — создаёт заказ + вызывает шлюз для online_card |
+| `src/app/checkout/page.tsx` | Чекаут — убраны поля карты (ввод на стороне Pasha), редирект по `redirectUrl` |
+| `src/app/checkout/success/page.tsx` | Страница успешной оплаты |
+| `src/lib/supabase/migrations/001_payment_transactions.sql` | Таблица платежей (общая с tapla.az) |
+| `src/lib/supabase/migrations/002_extend_orders_status.sql` | Статусы `paid`, `payment_failed` |
+| `src/lib/supabase/migrations/003_fix_product_id_nullable.sql` | Фикс NOT NULL на product_id |
+
+### Vercel env vars (shop.tapla.az)
+
+```
+GATEWAY_API_KEY=<общий секрет с tapla.az>
+GATEWAY_BASE_URL=https://tapla.az
+```
 
 ## Админ-панель
 
