@@ -146,18 +146,28 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
 }
 
 function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
-  const [phone, setPhone] = useState('')
+  const [phone, setPhone] = useState('+994')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value
+    if (val.startsWith('+994') || val === '+') {
+      setPhone(val)
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
+
+    const nameParts = name.trim().split(/\s+/)
+    const firstName = nameParts[0] || ''
+    const lastName = nameParts.slice(1).join(' ') || ''
 
     const { createClient } = await import('@/lib/supabase/client')
     const supabase = createClient()
@@ -187,27 +197,16 @@ function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <label className="text-[9px] font-bold tracking-widest text-neutral-500 uppercase block mb-1">Ad</label>
-          <input
-            type="text"
-            value={firstName}
-            onChange={e => setFirstName(e.target.value)}
-            required
-            className="w-full border border-neutral-200 px-4 py-3 text-xs focus:outline-hidden focus:border-neutral-900"
-          />
-        </div>
-        <div>
-          <label className="text-[9px] font-bold tracking-widest text-neutral-500 uppercase block mb-1">Soyad</label>
-          <input
-            type="text"
-            value={lastName}
-            onChange={e => setLastName(e.target.value)}
-            required
-            className="w-full border border-neutral-200 px-4 py-3 text-xs focus:outline-hidden focus:border-neutral-900"
-          />
-        </div>
+      <div>
+        <label className="text-[9px] font-bold tracking-widest text-neutral-500 uppercase block mb-1">Ad, Soyad</label>
+        <input
+          type="text"
+          value={name}
+          onChange={e => setName(e.target.value)}
+          required
+          placeholder="Ad Soyad"
+          className="w-full border border-neutral-200 px-4 py-3 text-xs focus:outline-hidden focus:border-neutral-900"
+        />
       </div>
       <div>
         <label className="text-[9px] font-bold tracking-widest text-neutral-500 uppercase block mb-1">Email</label>
@@ -220,14 +219,11 @@ function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
         />
       </div>
       <div>
-        <label className="text-[9px] font-bold tracking-widest text-neutral-500 uppercase block mb-1">
-          Telefon <span className="text-neutral-300">(istəyə bağlı)</span>
-        </label>
+        <label className="text-[9px] font-bold tracking-widest text-neutral-500 uppercase block mb-1">Telefon</label>
         <input
           type="tel"
           value={phone}
-          onChange={e => setPhone(e.target.value)}
-          placeholder="+994"
+          onChange={handlePhoneChange}
           className="w-full border border-neutral-200 px-4 py-3 text-xs focus:outline-hidden focus:border-neutral-900"
         />
       </div>

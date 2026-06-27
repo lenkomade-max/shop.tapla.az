@@ -1,7 +1,5 @@
-ALTER TABLE profiles ALTER COLUMN phone DROP NOT NULL;
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 DROP FUNCTION IF EXISTS handle_new_auth_user;
-DROP FUNCTION IF EXISTS handle_new_user;
 
 CREATE OR REPLACE FUNCTION handle_new_auth_user()
 RETURNS TRIGGER AS $$
