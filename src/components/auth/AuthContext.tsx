@@ -1,8 +1,8 @@
 'use client'
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react'
 import { createClient, resetClient } from '@/lib/supabase/client'
-import { ensureProfile, updatePhone } from '@/lib/api/profile'
+import { ensureProfile, updatePhone, formatPhone } from '@/lib/api/profile'
 import type { Profile } from '@/lib/supabase/types'
 import type { User, AuthChangeEvent, Session } from '@supabase/supabase-js'
 import { AuthModal } from './AuthModal'
@@ -28,24 +28,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [returnTo, setReturnTo] = useState<string | undefined>()
   const [isAuthRedirecting, setIsAuthRedirecting] = useState(false)
+  const syncingRef = useRef(false) // защита от дублирования syncProfile
 
   useEffect(() => {
     const supabase = createClient()
 
     const syncProfile = async (userId: string) => {
-      const { data: userData } = await supabase.auth.getUser()
-      const meta = userData?.user?.user_metadata ?? {}
+      if (syncingRef.current) return // уже синхронизируемся
+      syncingRef.current = true
 
-      const profile = await ensureProfile({
-        authUserId: userId,
-        email: userData?.user?.email,
-        firstName: (meta.first_name ?? meta.given_name) as string | undefined,
-        lastName: (meta.last_name ?? meta.family_name) as string | undefined,
-        avatarUrl: (meta.avatar_url ?? meta.picture) as string | undefined,
-        phone: meta.phone as string | undefined,
-      })
+      try {
+        const { data: userData } = await supabase.auth.getUser()
+        const meta = userData?.user?.user_metadata ?? {}
 
-      if (profile) setProfile(profile)
+        const p = await ensureProfile({
+          authUserId: userId,
+          email: userData?.user?.email,
+          firstName: (meta.first_name ?? meta.given_name) as string | undefined,
+          lastName: (meta.last_name ?? meta.family_name) as string | undefined,
+          avatarUrl: (meta.avatar_url ?? meta.picture) as string | undefined,
+          phone: meta.phone as string | undefined,
+        })
+
+        if (p) setProfile(p)
+      } catch (err) {
+        console.error('[syncProfile] error:', err)
+      } finally {
+        syncingRef.current = false
+      }
     }
 
     const initAuth = async () => {
@@ -73,7 +83,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const isAuthenticated = !!user
 
-  const isPhoneRequired = !!user && !!profile && !profile.phone
+  // Не показывать PhonePrompt пока идёт загрузка или синхронизация
+  const isPhoneRequired = !isLoading && !syncingRef.current && !!user && !!profile && !profile.phone
 
   const openLogin = useCallback((redirectTo?: string) => {
     setReturnTo(redirectTo)
@@ -118,7 +129,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!user) return
     const ok = await updatePhone(user.id, phone)
     if (ok) {
-      setProfile(prev => prev ? { ...prev, phone } : null)
+      // Сохраняем форматированный номер в стейт (как в БД)
+      const formatted = formatPhone(phone) ?? phone
+      setProfile(prev => prev ? { ...prev, phone: formatted } : null)
     }
   }
 

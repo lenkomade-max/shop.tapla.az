@@ -36,13 +36,13 @@ interface CheckoutForm {
 
 export default function CheckoutPage() {
   const { cartItems, cartTotal, clearCart } = useCart();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderConfirmed, setOrderConfirmed] = useState(false);
   const [generatedOrderNumber, setGeneratedOrderNumber] = useState('');
   const [orderError, setOrderError] = useState('');
-  
+
   // Local form state
   const [form, setForm] = useState<CheckoutForm>({
     firstName: '',
@@ -65,6 +65,19 @@ export default function CheckoutPage() {
     }, 0);
     return () => clearTimeout(timer);
   }, []);
+
+  // Авто-заполнение из профиля при загрузке (только если поля ещё пустые)
+  useEffect(() => {
+    if (mounted && profile) {
+      setForm(prev => ({
+        ...prev,
+        firstName: prev.firstName || profile.first_name || '',
+        lastName: prev.lastName || profile.last_name || '',
+        phone: prev.phone || profile.phone || '',
+        email: prev.email || profile.email || '',
+      }));
+    }
+  }, [mounted, profile]);
 
   if (!mounted) {
     return <div className="min-h-screen bg-[#FAF9F6] pt-32 text-center text-xs uppercase tracking-widest font-mono">Yüklənir...</div>;
