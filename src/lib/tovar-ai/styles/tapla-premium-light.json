@@ -1,40 +1,25 @@
 {
   "name": "TAPLA Premium Light",
-  "description": "Светлый премиум — основной стиль TAPLA MARKETPLACE. Для большинства товаров: электроника, бытовая техника, аксессуары.",
-  "applies_to": ["default", "Elektronika", "Məişət texnikası", "Aksesuarlar", "Kosmetika"],
+  "description": "Основной стиль TAPLA MARKETPLACE — светлый премиум. Для большинства товаров.",
+  "applies_to": ["default", "Elektronika", "Məişət texnikası", "Aksesuarlar", "Kosmetika", "İdman", "Mətbəx", "Uşaq malları"],
   "design_spec": {
-    "background": "Clean white-to-light-grey studio sweep, no patterns, no textures, subtle gradient from #FFFFFF to #F5F5F5",
-    "lighting": "Three-point studio lighting: key light from front-left (softbox), fill light from front-right (40% intensity), rim light from top-back. Soft shadows only under the product. No harsh shadows.",
-    "color_palette": "Product retains natural colors. Accent elements use TAPLA brand charcoal #2D2D2D with thin gold #C9A96E accent lines. Price badges: black background with white text.",
-    "typography": {
-      "headlines": "Bold geometric sans-serif (like Montserrat 700), 28-48pt, color #1A1A1A, uppercase for product names",
-      "body": "Light sans-serif (like Inter 300), 14-18pt, color #666666",
-      "badges": "Bold condensed, 12-16pt, white text on black pill background (#1A1A1A)",
-      "prices": "Bold, 24-36pt, color #1A1A1A, old price with red strikethrough"
-    },
-    "composition_rules": {
-      "product_zone": "Center 60% of frame, no overlap with text zones",
-      "text_zone": "Top 15% for headline, bottom 15% for price/badges. Never block the product.",
-      "white_space": "Minimum 15% breathing room around product"
-    },
-    "mandatory_elements": ["TAPLA logo bottom-right corner (small, 40px height, watermark opacity 30%)"],
+    "background": "Clean white-to-light-grey studio sweep, no patterns, no textures, gradient #FFFFFF to #F5F5F5",
+    "lighting": "Three-point studio lighting: key front-left softbox, fill front-right 40%, rim top-back. Soft shadows only.",
+    "color_palette": "Product natural colors. TAPLA charcoal #2D2D2D + gold #C9A96E accents. Price badges black/white.",
+    "composition": "Product center 60% of frame. Text top 15% and bottom 15%, never overlap product. 15% breathing room.",
+    "mandatory_elements": ["TAPLA logo bottom-right, small, watermark 30% opacity"],
     "forbidden": [
       "English text anywhere",
       "Cyrillic text anywhere",
-      "Comic-style fonts",
-      "Neon effects",
-      "Lens flares",
-      "Heavy vignetting",
-      "Fake shadows that don't match lighting",
-      "3D renders that look like plastic toys",
-      "Watermarks from stock sites",
-      "QR codes"
+      "Neon effects, lens flares, heavy vignetting",
+      "Fake shadows mismatching lighting",
+      "3D renders looking like plastic toys",
+      "Stock watermarks, QR codes"
     ]
   },
   "text_rules": {
-    "language": "AZERBAIJANI LATIN ONLY. Never English. Never Russian. Never Cyrillic.",
+    "language": "AZERBAIJANI LATIN ONLY. Never English. Never Russian.",
     "max_headline_chars": 30,
-    "max_subtitle_chars": 50,
-    "tone": "Professional, trustworthy, premium. Not pushy. Not cheap."
+    "tone": "Professional, trustworthy, premium"
   }
 }

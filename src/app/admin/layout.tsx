@@ -19,6 +19,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <nav className="flex gap-4 text-sm text-zinc-600">
               <Link href="/admin/products" className="hover:text-black">Товары</Link>
               <Link href="/admin/orders" className="hover:text-black">Заказы</Link>
+              <Link href="/admin/tovar-ai" className="hover:text-black">Tovar.AI</Link>
             </nav>
           </div>
           <form action={logoutAction}>

@@ -63,24 +63,13 @@ export interface StylePreset {
     background: string
     lighting: string
     color_palette: string
-    typography: {
-      headlines: string
-      body: string
-      badges: string
-      prices: string
-    }
-    composition_rules: {
-      product_zone: string
-      text_zone: string
-      white_space: string
-    }
+    composition: string
     mandatory_elements: string[]
     forbidden: string[]
   }
   text_rules: {
     language: string
     max_headline_chars: number
-    max_subtitle_chars: number
     tone: string
   }
 }

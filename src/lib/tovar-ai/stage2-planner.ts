@@ -161,11 +161,10 @@ function styleToTextBlock(p: StylePreset): string {
     `COLOR PALETTE: ${d.color_palette}`,
     `BACKGROUND: ${d.background}`,
     `LIGHTING: ${d.lighting}`,
-    `TYPOGRAPHY: Headlines — ${d.typography.headlines}. Body — ${d.typography.body}. Badges — ${d.typography.badges}. Prices — ${d.typography.prices}.`,
-    `COMPOSITION: Product in ${d.composition_rules.product_zone}. Text in ${d.composition_rules.text_zone}. ${d.composition_rules.white_space} breathing room.`,
+    `COMPOSITION: ${d.composition}`,
     `MANDATORY: ${d.mandatory_elements.join('; ')}.`,
     `FORBIDDEN: ${d.forbidden.join('; ')}.`,
-    `TEXT LANGUAGE: ${p.text_rules.language}. Tone: ${p.text_rules.tone}. Max headline ${p.text_rules.max_headline_chars} chars.`,
+    `TEXT: ${p.text_rules.language}. Tone: ${p.text_rules.tone}. Max headline ${p.text_rules.max_headline_chars} chars.`,
   ].join(' ')
 }
 

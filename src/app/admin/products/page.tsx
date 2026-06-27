@@ -70,12 +70,18 @@ export default async function ProductsPage() {
                   {new Date(p.created_at).toLocaleDateString('ru')}
                 </td>
                 <td className="px-4 py-3">
-                  <div className="flex gap-2">
+                  <div className="flex gap-3">
                     <Link
                       href={`/admin/products/${p.id}/edit`}
                       className="text-xs text-zinc-500 hover:text-black"
                     >
-                      Редакт.
+                      Redaktə
+                    </Link>
+                    <Link
+                      href={`/admin/products/${p.id}/generate-cards`}
+                      className="text-xs text-zinc-500 hover:text-black"
+                    >
+                      Kartlar
                     </Link>
                     <DeleteButton id={p.id} />
                   </div>
