@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import { createClient, resetClient } from '@/lib/supabase/client'
-import { ensureProfileClient, updatePhone } from '@/lib/api/profile'
+import { ensureProfile, updatePhone } from '@/lib/api/profile'
 import type { Profile } from '@/lib/supabase/types'
 import type { User, AuthChangeEvent, Session } from '@supabase/supabase-js'
 import { AuthModal } from './AuthModal'
@@ -32,11 +32,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const supabase = createClient()
 
-    const ensureProfile = async (userId: string) => {
+    const syncProfile = async (userId: string) => {
       const { data: userData } = await supabase.auth.getUser()
       const meta = userData?.user?.user_metadata ?? {}
 
-      const profile = await ensureProfileClient({
+      const profile = await ensureProfile({
         authUserId: userId,
         email: userData?.user?.email,
         firstName: (meta.first_name ?? meta.given_name) as string | undefined,
@@ -52,7 +52,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const { data: { session } } = await supabase.auth.getSession()
       setUser(session?.user ?? null)
       if (session?.user) {
-        await ensureProfile(session.user.id)
+        await syncProfile(session.user.id)
       }
       setIsLoading(false)
     }
@@ -61,7 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event: AuthChangeEvent, session: Session | null) => {
       setUser(session?.user ?? null)
       if (event === 'SIGNED_IN' && session?.user) {
-        ensureProfile(session.user.id)
+        syncProfile(session.user.id)
       }
       if (event === 'SIGNED_OUT') {
         setProfile(null)

@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import { ensureProfileServer } from '@/lib/api/profile'
+import { ensureProfile } from '@/lib/api/profile-server'
 import { NextResponse } from 'next/server'
 
 export async function GET(request: Request) {
@@ -18,7 +18,7 @@ export async function GET(request: Request) {
 
   const { data: { session } } = await supabase.auth.getSession()
   if (session?.user) {
-    await ensureProfileServer({
+    await ensureProfile({
       authUserId: session.user.id,
       email: session.user.email,
       firstName: session.user.user_metadata?.first_name ?? session.user.user_metadata?.given_name,
