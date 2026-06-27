@@ -59,6 +59,7 @@ src/
     data.ts                       — 4 electronics products, reviews, FAQs, steps, benefits
   lib/
     supabase/                     — client, admin, types, queries, schema.sql (единый DDL)
+    api/                          — profile.ts, profile-server.ts (бизнес-логика, не в SQL!)
     utils.ts                      — cn()
     animations.ts                 — Framer Motion variants
   types/
@@ -107,6 +108,35 @@ src/
 - **v2:** products, reviews, faqs (TAPLA MARKETPLACE data)
 
 Данные: `services/db.ts` → пробует Supabase → падает на `constants/data.ts`
+
+### Схема БД
+
+**Единый файл:** `src/lib/supabase/schema.sql` — полный актуальный DDL (таблицы, индексы, RLS).
+
+При добавлении новой таблицы или изменении структуры:
+1. Добавить `CREATE TABLE IF NOT EXISTS` в `schema.sql`
+2. Выполнить SQL в Supabase SQL Editor
+3. **НЕ плодить** файлы `011_`, `012_` — только один `schema.sql`
+
+### Архитектура: API-first (как в vakansiya)
+
+**Правило:** бизнес-логика в TypeScript (`lib/api/`), а НЕ в SQL триггерах.
+
+```
+lib/api/
+  profile.ts        — клиентские операции с профилем (браузер, anon key + RLS)
+  profile-server.ts — серверные операции (service_role, для Route Handlers)
+```
+
+**Паттерн для новой фичи:**
+1. Создать `lib/api/<feature>.ts` — все операции с БД через Server Actions или async-функции
+2. Если нужен серверный доступ (service_role) — создать `<feature>-server.ts`
+3. Клиентские компоненты импортируют из `lib/api/<feature>.ts`
+4. Route Handlers / Server Actions импортируют из `lib/api/<feature>-server.ts`
+5. SQL содержит **только структуру** (CREATE TABLE, индексы, RLS, updated_at триггер)
+6. **Никакой бизнес-логики в SQL** — форматирование, валидация, create/update логика только в коде
+
+**Пример:** форматирование телефона (`+994`) — в `lib/api/profile.ts` (TypeScript), не в SQL триггере.
 
 ## Админ-панель
 
