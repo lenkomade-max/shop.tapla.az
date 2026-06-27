@@ -20,6 +20,7 @@ import {
 import { useCart } from '@/store/CartContext';
 import { Container } from '@/components/ui/Container';
 import { useAuth } from '@/components/auth/AuthContext';
+import SecurePaymentTransition from '@/components/checkout/SecurePaymentTransition';
 
 interface CheckoutForm {
   fullName: string;
@@ -38,6 +39,8 @@ export default function CheckoutPage() {
   const { user, profile } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  const [redirectUrl, setRedirectUrl] = useState('');
   const [orderConfirmed, setOrderConfirmed] = useState(false);
   const [generatedOrderNumber, setGeneratedOrderNumber] = useState('');
   const [orderError, setOrderError] = useState('');
@@ -161,9 +164,11 @@ export default function CheckoutPage() {
       return;
     }
 
-    // If online_card, redirect to Pasha Bank payment page
+    // If online_card, show secure transition animation then redirect
     if (result.redirectUrl) {
-      window.location.href = result.redirectUrl;
+      setRedirectUrl(result.redirectUrl);
+      setIsRedirecting(true);
+      window.scrollTo({ top: document.querySelector('form')?.offsetTop || 300, behavior: 'smooth' });
       return;
     }
 
@@ -539,7 +544,9 @@ export default function CheckoutPage() {
                   )}
 
                   {/* If Online Payment is chosen, reveal interactive card inputs */}
-                  {form.paymentMethod === 'online_card' && (
+                  {form.paymentMethod === 'online_card' && isRedirecting ? (
+                    <SecurePaymentTransition redirectUrl={redirectUrl} />
+                  ) : form.paymentMethod === 'online_card' ? (
                     <div className="bg-neutral-50 border border-neutral-200 p-5 space-y-4 transition-all duration-300 animate-fadeIn">
                       {/* Pasha Bank secure checkout banner */}
                       <div className="bg-white p-3.5 border border-neutral-200/80 flex items-center justify-between">
@@ -576,7 +583,7 @@ export default function CheckoutPage() {
                         </p>
                       </div>
                     </div>
-                  )}
+                  ) : null}
                 </div>
 
                 {orderError && (
