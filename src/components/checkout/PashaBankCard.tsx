@@ -84,7 +84,7 @@ export default function PashaBankCard() {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
-      className="relative bg-white border border-neutral-200 shadow-sm overflow-hidden"
+      className="relative overflow-hidden"
     >
       <FloatingParticles />
 

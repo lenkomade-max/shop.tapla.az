@@ -28,7 +28,7 @@ export default function SecurePaymentTransition({ redirectUrl }: SecurePaymentTr
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: 'easeOut' }}
-      className="relative bg-white border border-neutral-200 shadow-sm overflow-hidden"
+      className="relative overflow-hidden"
     >
       {/* Floating particles */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">

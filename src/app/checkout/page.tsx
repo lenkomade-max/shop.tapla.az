@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { motion } from 'framer-motion';
 import { 
   ShoppingBag, 
   CheckCircle2, 
@@ -431,7 +432,9 @@ export default function CheckoutPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {/* Online payment */}
                     <label className={`border p-5 flex flex-col justify-between space-y-3 cursor-pointer transition-all duration-300 relative ${
-                      form.paymentMethod === 'online_card' ? 'border-neutral-950 bg-neutral-50/50 shadow-xs' : 'border-neutral-200 hover:border-neutral-400'
+                      form.paymentMethod === 'online_card'
+                        ? 'border-neutral-950 bg-neutral-50/50 shadow-xs sm:col-span-2'
+                        : 'border-neutral-200 hover:border-neutral-400'
                     }`}>
                       <input
                         type="radio"
@@ -455,24 +458,41 @@ export default function CheckoutPage() {
                         Visa, MasterCard, BirKart və ya Tamkart ilə dərhal və tam təhlükəsiz ödəniş.
                       </span>
 
-                      {/* Pasha Bank securing badge */}
-                      <div className="pt-2.5 border-t border-neutral-200/60 flex items-center justify-between">
-                        <div className="flex items-center space-x-1">
-                          <svg className="w-3.5 h-3.5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                            <path fillRule="evenodd" d="M2.166 4.9L10 1.154l7.834 3.746A1 1 0 0118.5 5.8v4.962a9 9 0 01-5.367 8.232l-2.766 1.155a1 1 0 01-.734 0l-2.766-1.155A9 9 0 011.5 10.762V5.8a1 1 0 01.666-.9zM10 3.146L3.5 6.257V10.76a7 7 0 004.174 6.403l2.326.97 2.326-.97a7 7 0 004.174-6.403V6.257L10 3.146zM13.707 8.707a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                          </svg>
-                          <span className="text-[8.5px] font-bold text-neutral-500 tracking-wider">PASHA Bank Acquiring</span>
+                      {/* When NOT selected: mini badge only */}
+                      {form.paymentMethod !== 'online_card' && (
+                        <div className="pt-2.5 border-t border-neutral-200/60 flex items-center justify-between">
+                          <div className="flex items-center space-x-1">
+                            <svg className="w-3.5 h-3.5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M2.166 4.9L10 1.154l7.834 3.746A1 1 0 0118.5 5.8v4.962a9 9 0 01-5.367 8.232l-2.766 1.155a1 1 0 01-.734 0l-2.766-1.155A9 9 0 011.5 10.762V5.8a1 1 0 01.666-.9zM10 3.146L3.5 6.257V10.76a7 7 0 004.174 6.403l2.326.97 2.326-.97a7 7 0 004.174-6.403V6.257L10 3.146zM13.707 8.707a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                            <span className="text-[8.5px] font-bold text-neutral-500 tracking-wider">PASHA Bank Acquiring</span>
+                          </div>
+                          <Image src="/images/pashabank-logo.svg" alt="PASHA Bank" width={55} height={14} className="h-3.5 w-auto opacity-70" />
                         </div>
-                        {/* Pasha Bank Micro-logo SVG */}
-                        <div className="flex items-center space-x-1 opacity-90 scale-95">
-                          <svg className="w-3.5 h-3.5" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M20 50L40 20H55L35 50L55 80H40L20 50Z" fill="#0A3C94" />
-                            <path d="M42 50L62 20H77L57 50L77 80H62L42 50Z" fill="#F0B800" />
-                            <path d="M64 50L84 20H99L79 50L99 80H84L64 50Z" fill="#20C060" />
-                          </svg>
-                          <span className="text-[8.5px] font-black text-[#0E1E38] tracking-tight">PASHA Bank</span>
-                        </div>
-                      </div>
+                      )}
+
+                      {/* When selected + redirecting: transition animation */}
+                      {form.paymentMethod === 'online_card' && isRedirecting && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          className="pt-2 border-t border-neutral-200/60"
+                        >
+                          <SecurePaymentTransition redirectUrl={redirectUrl} />
+                        </motion.div>
+                      )}
+
+                      {/* When selected + NOT redirecting: live animated card */}
+                      {form.paymentMethod === 'online_card' && !isRedirecting && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          transition={{ duration: 0.35 }}
+                          className="pt-2 border-t border-neutral-200/60"
+                        >
+                          <PashaBankCard />
+                        </motion.div>
+                      )}
                     </label>
 
                     {/* COD Cash */}
@@ -544,12 +564,6 @@ export default function CheckoutPage() {
                     </div>
                   )}
 
-                  {/* If Online Payment is chosen, reveal interactive card inputs */}
-                  {form.paymentMethod === 'online_card' && isRedirecting ? (
-                    <SecurePaymentTransition redirectUrl={redirectUrl} />
-                  ) : form.paymentMethod === 'online_card' ? (
-                    <PashaBankCard />
-                  ) : null}
                 </div>
 
                 {orderError && (
