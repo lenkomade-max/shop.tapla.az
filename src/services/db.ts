@@ -59,17 +59,6 @@ function mapFAQ(row: Record<string, unknown>): FAQ {
 }
 
 export const dbService = {
-  async debugProducts(): Promise<string | null> {
-    try {
-      const su = process.env.NEXT_PUBLIC_SUPABASE_URL;
-      const sk = process.env.SUPABASE_SECRET_KEY;
-      const { data, error } = await supabaseAdmin.from('products').select('id, name, slug, status').limit(10);
-      return JSON.stringify({ url: su?.slice(0,20), hasKey: !!sk, data, error: error?.message || null }, null, 2);
-    } catch (e: unknown) {
-      return 'Exception: ' + (e instanceof Error ? e.message : String(e));
-    }
-  },
-
   async getProducts(category?: string): Promise<Product[]> {
     try {
       if (supabaseAdmin) {
@@ -115,7 +104,7 @@ export const dbService = {
   async getProductBySlug(slug: string): Promise<Product | null> {
     try {
       if (supabaseAdmin) {
-        const { data, error } = await supabaseAdmin
+        let { data, error } = await supabaseAdmin
           .from('products')
           .select('*')
           .eq('slug', slug)
@@ -123,6 +112,17 @@ export const dbService = {
           .maybeSingle();
         if (!error && data) {
           return mapProduct(data as Record<string, unknown>);
+        }
+        if (!error && !data) {
+          ({ data, error } = await supabaseAdmin
+            .from('products')
+            .select('*')
+            .eq('id', slug)
+            .eq('status', 'active')
+            .maybeSingle());
+          if (!error && data) {
+            return mapProduct(data as Record<string, unknown>);
+          }
         }
       }
     } catch (err) {

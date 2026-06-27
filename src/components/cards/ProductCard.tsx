@@ -50,7 +50,7 @@ export function ProductCard({ product, onQuickView }: ProductCardProps) {
       </div>
 
       <div className="relative w-full aspect-[4/5] bg-neutral-50 overflow-hidden">
-        <Link href={`/products/${product.id}`} className="block w-full h-full relative">
+        <Link href={`/products/${product.slug}`} className="block w-full h-full relative">
           <Image
             src={product.images[activeImageIndex] || product.images[0]}
             alt={product.name}
@@ -94,7 +94,7 @@ export function ProductCard({ product, onQuickView }: ProductCardProps) {
             </span>
           </div>
 
-          <Link href={`/products/${product.id}`} className="block group/title">
+          <Link href={`/products/${product.slug}`} className="block group/title">
             <h4 className="text-xs sm:text-sm font-semibold tracking-widest uppercase text-neutral-900 mb-1 hover:text-neutral-600 transition-colors">
               {product.name}
             </h4>
