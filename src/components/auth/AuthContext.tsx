@@ -31,16 +31,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const supabase = createClient()
 
+    const ensureProfile = async (userId: string) => {
+      let { data: p } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('auth_user_id', userId)
+        .maybeSingle()
+
+      if (!p) {
+        const { data: user } = await supabase.auth.getUser()
+        const { data: newProfile } = await supabase
+          .from('profiles')
+          .insert({
+            auth_user_id: userId,
+            email: user?.user?.email,
+            first_name: user?.user?.user_metadata?.first_name,
+            last_name: user?.user?.user_metadata?.last_name,
+            avatar_url: user?.user?.user_metadata?.avatar_url,
+            is_guest: false,
+          })
+          .select()
+          .single()
+        p = newProfile
+      }
+
+      setProfile(p as Profile | null)
+    }
+
     const initAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession()
       setUser(session?.user ?? null)
       if (session?.user) {
-        const { data: p } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('auth_user_id', session.user.id)
-          .single()
-        setProfile(p as Profile | null)
+        await ensureProfile(session.user.id)
       }
       setIsLoading(false)
     }
@@ -49,20 +71,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event: AuthChangeEvent, session: Session | null) => {
       setUser(session?.user ?? null)
       if (event === 'SIGNED_IN' && session?.user) {
-        supabase
-          .from('profiles')
-          .select('*')
-          .eq('auth_user_id', session.user.id)
-          .single()
-          .then((result: { data: unknown }) => setProfile(result.data as Profile | null))
+        ensureProfile(session.user.id)
       }
       if (event === 'SIGNED_OUT') {
         setProfile(null)
-        setIsLoading(false)
       }
     })
 
-    return () => subscription.unsubscribe()
+    return () => subscription?.unsubscribe()
   }, [])
 
   const isAuthenticated = !!user
