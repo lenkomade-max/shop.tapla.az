@@ -179,6 +179,50 @@ export async function submitOrder(formData: CheckoutFormData) {
 
   revalidatePath('/admin/orders')
   const o = order as Record<string, unknown>
+
+  // For online_card payment, create transaction via tapla.az gateway
+  if (formData.paymentMethod === 'online_card') {
+    const gatewayUrl = process.env.GATEWAY_BASE_URL || 'https://tapla.az'
+    const apiKey = process.env.GATEWAY_API_KEY || ''
+
+    try {
+      const gwResponse = await fetch(`${gatewayUrl}/api/payments/pasha/create`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+        },
+        body: JSON.stringify({
+          orderId: o.id,
+          profileId,
+          amount: formData.total,
+          items: formData.items.map(item => ({
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+          })),
+        }),
+      })
+
+      if (!gwResponse.ok) {
+        const errData = await gwResponse.json().catch(() => ({}))
+        return { success: false, error: (errData as any).error || 'Ödəniş yaradılması xətası' }
+      }
+
+      const gwData = await gwResponse.json()
+      return {
+        success: true as const,
+        orderId: o.id as string,
+        orderNumber: `TPL-${String(o.id).slice(0, 6).toUpperCase()}`,
+        isGuest: !session?.user,
+        redirectUrl: (gwData as any).redirectUrl as string,
+      }
+    } catch (err) {
+      console.error('Gateway error:', err)
+      return { success: false, error: `Ödəniş şlyuzu xətası: ${err instanceof Error ? err.message : 'Naməlum xəta'}` }
+    }
+  }
+
   return {
     success: true as const,
     orderId: o.id as string,

@@ -90,17 +90,7 @@ export default function CheckoutPage() {
     if (!form.phone.trim()) errors.phone = 'Əlaqə nömrənizi daxil edin';
     if (!form.address.trim()) errors.address = 'Çatdırılma ünvanını daxil edin';
     
-    if (form.paymentMethod === 'online_card') {
-      if (form.cardNumber.replace(/\s/g, '').length !== 16) {
-        errors.cardNumber = 'Düzgün kart nömrəsi daxil edin (16 rəqəm)';
-      }
-      if (!/^\d{2}\/\d{2}$/.test(form.cardExpiry)) {
-        errors.cardExpiry = 'AA/İİ formatında daxil edin';
-      }
-      if (form.cardCvv.length !== 3) {
-        errors.cardCvv = 'CVV 3 rəqəmli olmalıdır';
-      }
-    }
+    // online_card: card is entered on Pasha Bank's secure page — no client-side validation needed
 
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
@@ -168,6 +158,12 @@ export default function CheckoutPage() {
     if (!result.success) {
       setOrderError(result.error || 'Sifariş zamanı xəta baş verdi');
       setIsSubmitting(false);
+      return;
+    }
+
+    // If online_card, redirect to Pasha Bank payment page
+    if (result.redirectUrl) {
+      window.location.href = result.redirectUrl;
       return;
     }
 
@@ -565,52 +561,19 @@ export default function CheckoutPage() {
                         </div>
                       </div>
 
-                      <p className="text-[10px] font-bold tracking-wider uppercase text-neutral-600 flex items-center space-x-1.5">
-                        <CreditCard className="h-3.5 w-3.5 text-neutral-900" />
-                        <span>KART MƏLUMATLARINI DAXİL EDİN</span>
-                      </p>
-
-                      <div className="space-y-3">
-                        <div className="space-y-1">
-                          <label className="text-[9px] font-bold tracking-widest text-neutral-400">KART NÖMRƏSİ</label>
-                          <input
-                            type="text"
-                            name="cardNumber"
-                            value={form.cardNumber}
-                            onChange={handleInputChange}
-                            placeholder="0000 0000 0000 0000"
-                            className={`w-full bg-white border ${formErrors.cardNumber ? 'border-red-500' : 'border-neutral-200'} text-xs font-mono px-4 py-3 focus:outline-hidden focus:border-neutral-950`}
-                          />
-                          {formErrors.cardNumber && <p className="text-[9px] font-semibold text-red-500 uppercase">{formErrors.cardNumber}</p>}
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="space-y-1">
-                            <label className="text-[9px] font-bold tracking-widest text-neutral-400">SON İSTİFADƏ (AA/İİ)</label>
-                            <input
-                              type="text"
-                              name="cardExpiry"
-                              value={form.cardExpiry}
-                              onChange={handleInputChange}
-                              placeholder="MM/YY"
-                              className={`w-full bg-white border ${formErrors.cardExpiry ? 'border-red-500' : 'border-neutral-200'} text-xs font-mono px-4 py-3 focus:outline-hidden focus:border-neutral-950`}
-                            />
-                            {formErrors.cardExpiry && <p className="text-[9px] font-semibold text-red-500 uppercase">{formErrors.cardExpiry}</p>}
-                          </div>
-
-                          <div className="space-y-1">
-                            <label className="text-[9px] font-bold tracking-widest text-neutral-400">CVV / CVC</label>
-                            <input
-                              type="password"
-                              name="cardCvv"
-                              value={form.cardCvv}
-                              onChange={handleInputChange}
-                              placeholder="***"
-                              className={`w-full bg-white border ${formErrors.cardCvv ? 'border-red-500' : 'border-neutral-200'} text-xs font-mono px-4 py-3 focus:outline-hidden focus:border-neutral-950`}
-                            />
-                            {formErrors.cardCvv && <p className="text-[9px] font-semibold text-red-500 uppercase">{formErrors.cardCvv}</p>}
-                          </div>
-                        </div>
+                      <div className="bg-emerald-50/30 border border-emerald-200/40 p-4 space-y-2.5">
+                        <p className="text-[10px] font-bold tracking-widest uppercase text-emerald-700 flex items-center space-x-1.5">
+                          <svg className="w-3.5 h-3.5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M2.166 4.9L10 1.154l7.834 3.746A1 1 0 0118.5 5.8v4.962a9 9 0 01-5.367 8.232l-2.766 1.155a1 1 0 01-.734 0l-2.766-1.155A9 9 0 011.5 10.762V5.8a1 1 0 01.666-.9zM10 3.146L3.5 6.257V10.76a7 7 0 004.174 6.403l2.326.97 2.326-.97a7 7 0 004.174-6.403V6.257L10 3.146zM13.707 8.707a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                          </svg>
+                          <span>TƏHLÜKƏSİZ ONLAYN ÖDƏNİŞ</span>
+                        </p>
+                        <p className="text-[10px] text-neutral-600 leading-relaxed font-sans">
+                          Ödəniş səhifəsində kart məlumatlarınızı daxil edəcəksiniz. Bütün əməliyyatlar <strong>PASHA Bank</strong> tərəfindən 128-bit SSL şifrələmə ilə qorunur.
+                        </p>
+                        <p className="text-[9px] text-neutral-400 font-sans">
+                          «SİFARİŞİ TƏSDİQLƏ VƏ TAMAMLA» düyməsinə kliklədikdən sonra təhlükəsiz ödəniş səhifəsinə yönləndiriləcəksiniz.
+                        </p>
                       </div>
                     </div>
                   )}
