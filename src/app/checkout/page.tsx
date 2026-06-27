@@ -22,7 +22,7 @@ import { useCart } from '@/store/CartContext';
 import { Container } from '@/components/ui/Container';
 import { useAuth } from '@/components/auth/AuthContext';
 import SecurePaymentTransition from '@/components/checkout/SecurePaymentTransition';
-import PashaBankCard from '@/components/checkout/PashaBankCard';
+import SecurePaymentAnimation from '@/components/checkout/SecurePaymentAnimation';
 
 interface CheckoutForm {
   fullName: string;
@@ -490,7 +490,7 @@ export default function CheckoutPage() {
                           transition={{ duration: 0.35 }}
                           className="pt-2 border-t border-neutral-200/60"
                         >
-                          <PashaBankCard />
+                          <SecurePaymentAnimation />
                         </motion.div>
                       )}
                     </label>
