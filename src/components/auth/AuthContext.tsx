@@ -32,30 +32,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const supabase = createClient()
 
     const ensureProfile = async (userId: string) => {
-      let { data: p } = await supabase
+      const { data: existing } = await supabase
         .from('profiles')
         .select('*')
         .eq('auth_user_id', userId)
         .maybeSingle()
 
-      if (!p) {
-        const { data: user } = await supabase.auth.getUser()
-        const { data: newProfile } = await supabase
-          .from('profiles')
-          .insert({
-            auth_user_id: userId,
-            email: user?.user?.email,
-            first_name: user?.user?.user_metadata?.first_name,
-            last_name: user?.user?.user_metadata?.last_name,
-            avatar_url: user?.user?.user_metadata?.avatar_url,
-            is_guest: false,
-          })
-          .select()
-          .single()
-        p = newProfile
+      if (existing) {
+        setProfile(existing as Profile)
+        return
       }
 
-      setProfile(p as Profile | null)
+      const { data: userData } = await supabase.auth.getUser()
+      const { data: created, error } = await supabase
+        .from('profiles')
+        .insert({
+          auth_user_id: userId,
+          email: userData?.user?.email ?? undefined,
+          first_name: userData?.user?.user_metadata?.first_name ?? undefined,
+          last_name: userData?.user?.user_metadata?.last_name ?? undefined,
+          avatar_url: userData?.user?.user_metadata?.avatar_url ?? undefined,
+          is_guest: false,
+        })
+        .select()
+        .single()
+
+      if (error) {
+        console.error('ensureProfile insert error:', error)
+        return
+      }
+
+      setProfile(created as Profile)
     }
 
     const initAuth = async () => {

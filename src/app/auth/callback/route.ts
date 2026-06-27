@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 import { NextResponse } from 'next/server'
 
 export async function GET(request: Request) {
@@ -14,6 +15,28 @@ export async function GET(request: Request) {
   const supabase = await createClient()
   const { error } = await supabase.auth.exchangeCodeForSession(code)
   if (error) return NextResponse.redirect(`${redirectOrigin}/?auth_error=exchange_failed`)
+
+  const { data: { session } } = await supabase.auth.getSession()
+  if (session?.user) {
+    const { data: existing } = await supabaseAdmin
+      .from('profiles')
+      .select('id')
+      .eq('auth_user_id', session.user.id)
+      .maybeSingle()
+
+    if (!existing) {
+      await supabaseAdmin
+        .from('profiles')
+        .insert({
+          auth_user_id: session.user.id,
+          email: session.user.email,
+          first_name: session.user.user_metadata?.first_name ?? session.user.user_metadata?.given_name,
+          last_name: session.user.user_metadata?.last_name ?? session.user.user_metadata?.family_name,
+          avatar_url: session.user.user_metadata?.avatar_url ?? session.user.user_metadata?.picture,
+          is_guest: false,
+        })
+    }
+  }
 
   return NextResponse.redirect(`${redirectOrigin}${next}`)
 }
