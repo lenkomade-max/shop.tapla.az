@@ -77,3 +77,17 @@ export interface CollectionProduct {
   product_id: string
   sort_order: number
 }
+
+export interface Profile {
+  id: string
+  auth_user_id: string | null
+  phone: string
+  email: string | null
+  first_name: string | null
+  last_name: string | null
+  avatar_url: string | null
+  role: 'customer' | 'admin'
+  is_guest: boolean
+  created_at: string
+  updated_at: string
+}

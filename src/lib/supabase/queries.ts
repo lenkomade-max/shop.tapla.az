@@ -1,5 +1,6 @@
 import { supabaseAdmin } from './admin'
-import type { Product, Media, Collection } from './types'
+import type { Product, Media, Collection, Profile } from './types'
+import type { CartItem } from '@/store/CartContext'
 
 export interface LandingData {
   id: string
@@ -159,4 +160,65 @@ export async function createLead(lead: {
 
   if (error) throw error
   return data
+}
+
+// --- Profile queries ---
+
+export async function getProfileByPhone(phone: string): Promise<Profile | null> {
+  const { data } = await supabaseAdmin
+    .from('profiles')
+    .select('*')
+    .eq('phone', phone)
+    .maybeSingle()
+  return data as Profile | null
+}
+
+export async function createGuestProfile(data: {
+  phone: string
+  email?: string
+  first_name?: string
+  last_name?: string
+}): Promise<Profile> {
+  const { data: profile, error } = await supabaseAdmin
+    .from('profiles')
+    .insert({ ...data, is_guest: true })
+    .select()
+    .single()
+  if (error) throw error
+  return profile as Profile
+}
+
+export async function getProfileByAuthUserId(authUserId: string): Promise<Profile | null> {
+  const { data } = await supabaseAdmin
+    .from('profiles')
+    .select('*')
+    .eq('auth_user_id', authUserId)
+    .maybeSingle()
+  return data as Profile | null
+}
+
+// --- Cart sync queries ---
+
+export async function syncCartFromLocal(userId: string, items: CartItem[]) {
+  let synced = 0
+  for (const item of items) {
+    const { error } = await supabaseAdmin
+      .from('user_cart')
+      .upsert({
+        auth_user_id: userId,
+        product_id: item.product.id,
+        shade_name: item.selectedShade?.name || '',
+        quantity: item.quantity,
+      }, { onConflict: 'user_cart_auth_user_id_product_id_shade_name_key', ignoreDuplicates: false })
+    if (!error) synced++
+  }
+  return { synced }
+}
+
+export async function getUserCart(userId: string): Promise<CartItem[] | null> {
+  const { data } = await supabaseAdmin
+    .from('user_cart')
+    .select('*')
+    .eq('auth_user_id', userId)
+  return data as unknown as CartItem[] | null
 }

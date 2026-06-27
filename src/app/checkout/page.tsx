@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { useCart } from '@/store/CartContext';
 import { Container } from '@/components/ui/Container';
+import { useAuth } from '@/components/auth/AuthContext';
 
 interface CheckoutForm {
   firstName: string;
@@ -35,10 +36,12 @@ interface CheckoutForm {
 
 export default function CheckoutPage() {
   const { cartItems, cartTotal, clearCart } = useCart();
+  const { user } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderConfirmed, setOrderConfirmed] = useState(false);
   const [generatedOrderNumber, setGeneratedOrderNumber] = useState('');
+  const [orderError, setOrderError] = useState('');
   
   // Local form state
   const [form, setForm] = useState<CheckoutForm>({
@@ -123,20 +126,43 @@ export default function CheckoutPage() {
     setForm(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
 
     setIsSubmitting(true);
+    setOrderError('');
 
-    // Simulate database record creation & stripe processing
-    setTimeout(() => {
-      const randomId = 'TPL-' + Math.floor(100000 + Math.random() * 900000);
-      setGeneratedOrderNumber(randomId);
+    const { submitOrder } = await import('@/lib/actions');
+
+    const result = await submitOrder({
+      firstName: form.firstName,
+      lastName: form.lastName,
+      phone: form.phone,
+      email: form.email,
+      city: form.city,
+      address: form.address,
+      paymentMethod: form.paymentMethod,
+      items: cartItems.map(item => ({
+        productId: item.product.id,
+        name: item.product.name,
+        price: item.product.price,
+        quantity: item.quantity,
+        shade: item.selectedShade?.name,
+      })),
+      total: cartTotal,
+    });
+
+    if (!result.success) {
+      setOrderError(result.error || 'Sifariş zamanı xəta baş verdi');
       setIsSubmitting(false);
-      setOrderConfirmed(true);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 2000);
+      return;
+    }
+
+    setGeneratedOrderNumber(result.orderNumber!);
+    setIsSubmitting(false);
+    setOrderConfirmed(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleFinish = () => {
@@ -221,6 +247,23 @@ export default function CheckoutPage() {
                 Kuryerimiz sifarişi təsdiqləmək və çatdırılma vaxtını dəqiqləşdirmək üçün yaxın 15 dəqiqə ərzində sizinlə əlaqə saxlayacaqdır.
               </p>
               
+              {!user && (
+                <div className="border border-neutral-200 bg-neutral-50 p-5 space-y-3">
+                  <p className="text-[10px] font-bold tracking-widest uppercase text-neutral-900">
+                    Sifarişlərinizi izləmək üçün hesab yaradın
+                  </p>
+                  <p className="text-[9px] text-neutral-500 font-sans leading-relaxed">
+                    Sifariş statusunuzu izləmək, əvvəlki sifarişlərinizə baxmaq və daha sürətli alış-veriş etmək üçün qeydiyyatdan keçin.
+                  </p>
+                  <button
+                    onClick={() => window.location.href = '/?register=1'}
+                    className="w-full bg-neutral-950 text-white text-[10px] font-bold tracking-widest uppercase py-3 border border-neutral-950 hover:bg-transparent hover:text-neutral-900 transition-colors cursor-pointer"
+                  >
+                    QEYDİYYATDAN KEÇ
+                  </button>
+                </div>
+              )}
+
               <button
                 onClick={handleFinish}
                 className="w-full sm:w-auto bg-neutral-950 text-white text-[10px] tracking-widest font-bold uppercase px-8 py-4 border border-neutral-950 hover:bg-transparent hover:text-neutral-900 transition-colors duration-300 cursor-pointer"
@@ -575,6 +618,12 @@ export default function CheckoutPage() {
                     </div>
                   )}
                 </div>
+
+                {orderError && (
+                  <div className="bg-red-50 border border-red-200 p-4">
+                    <p className="text-[10px] font-semibold text-red-600 uppercase tracking-wider">{orderError}</p>
+                  </div>
+                )}
 
                 {/* Form Submit Button */}
                 <button

@@ -1,11 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { MessageSquareCode, Gift, Flame, ShoppingCart } from 'lucide-react';
+import { MessageSquareCode, Gift, Flame, ShoppingCart, User } from 'lucide-react';
 import { useCart } from '@/store/CartContext';
+import { useAuth } from '@/components/auth/AuthContext';
 
 export function StickyMobileBar() {
   const { setIsCartOpen, cartCount } = useCart();
+  const { user, openLogin } = useAuth();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -35,11 +37,11 @@ export function StickyMobileBar() {
       </button>
 
       <button
-        onClick={handleDiscountClick}
+        onClick={() => user ? window.location.href = '/profile' : openLogin()}
         className="flex flex-col items-center justify-center space-y-1.5 border-r border-neutral-900 active:bg-neutral-900 transition-colors cursor-pointer"
       >
-        <Gift className="h-4 w-4 text-amber-200" />
-        <span>15% ENDİRİM</span>
+        <User className="h-4 w-4 text-neutral-300" />
+        <span>{user ? 'PROFİL' : 'DAXİL OL'}</span>
       </button>
 
       <a

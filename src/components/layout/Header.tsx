@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Menu, X, ShoppingBag, Search, User, Trash2, Plus, Minus, ArrowRight } from 'lucide-react';
+import { Menu, X, ShoppingBag, Search, Trash2, Plus, Minus, ArrowRight } from 'lucide-react';
 import { NAVIGATION_ITEMS } from '@/constants/data';
 import { useCart } from '@/store/CartContext';
 import { Drawer } from '@/components/ui/Drawer';
@@ -11,6 +11,7 @@ import { AnnouncementBar } from './AnnouncementBar';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { AuthButton } from '@/components/auth/AuthButton';
 
 export function Header() {
   const router = useRouter();
@@ -145,9 +146,7 @@ export function Header() {
                 ))}
               </nav>
 
-              <button className="p-1 cursor-pointer hover:opacity-75 transition-opacity" aria-label="Profil">
-                <User className="h-5 w-5" />
-              </button>
+              <AuthButton />
 
               <button
                 onClick={() => setIsCartOpen(true)}

@@ -4,6 +4,8 @@ import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { supabaseAdmin } from './supabase/admin';
 import { login as authLogin, logout as authLogout, checkAuth } from './auth';
+import { createClient } from './supabase/server';
+import { getProfileByPhone, createGuestProfile } from './supabase/queries';
 
 export async function loginAction(password: string) {
   const ok = await authLogin(password);
@@ -111,4 +113,75 @@ export async function saveProduct(formData: FormData): Promise<void> {
   revalidatePath('/products');
   revalidatePath('/', 'layout');
   redirect('/admin/products');
+}
+
+export interface CheckoutFormData {
+  firstName: string
+  lastName: string
+  phone: string
+  email: string
+  city: string
+  address: string
+  paymentMethod: string
+  items: Array<{ productId: string; name: string; price: number; quantity: number; shade?: string }>
+  total: number
+}
+
+export async function submitOrder(formData: CheckoutFormData) {
+  let profileId: string
+  const existingProfile = await getProfileByPhone(formData.phone)
+
+  if (existingProfile) {
+    profileId = existingProfile.id
+    await supabaseAdmin.from('profiles').update({
+      first_name: formData.firstName,
+      last_name: formData.lastName,
+      email: formData.email || existingProfile.email,
+    }).eq('id', profileId)
+  } else {
+    const newProfile = await createGuestProfile({
+      phone: formData.phone,
+      email: formData.email || undefined,
+      first_name: formData.firstName,
+      last_name: formData.lastName,
+    })
+    profileId = newProfile.id
+  }
+
+  const { data: order, error } = await supabaseAdmin.from('orders').insert({
+    profile_id: profileId,
+    customer_name: `${formData.firstName} ${formData.lastName}`,
+    phone: formData.phone,
+    email: formData.email || null,
+    city: formData.city,
+    address: formData.address,
+    payment_method: formData.paymentMethod,
+    total: formData.total,
+    status: 'new',
+    quantity: formData.items.reduce((s, i) => s + i.quantity, 0),
+  }).select().single()
+
+  if (error) {
+    console.error('Order error:', error)
+    return { success: false, error: error.message }
+  }
+
+  const supabase = await createClient()
+  const { data: { session } } = await supabase.auth.getSession()
+  if (session?.user) {
+    await supabaseAdmin.from('orders').update({ auth_user_id: session.user.id }).eq('id', (order as Record<string, unknown>).id)
+    await supabaseAdmin.from('profiles').update({
+      auth_user_id: session.user.id,
+      is_guest: false,
+    }).eq('id', profileId)
+  }
+
+  revalidatePath('/admin/orders')
+  const o = order as Record<string, unknown>
+  return {
+    success: true as const,
+    orderId: o.id as string,
+    orderNumber: `TPL-${String(o.id).slice(0, 6).toUpperCase()}`,
+    isGuest: !session?.user,
+  }
 }
