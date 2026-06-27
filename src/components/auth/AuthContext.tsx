@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import { createClient, resetClient } from '@/lib/supabase/client'
+import { ensureProfileClient, updatePhone } from '@/lib/api/profile'
 import type { Profile } from '@/lib/supabase/types'
 import type { User, AuthChangeEvent, Session } from '@supabase/supabase-js'
 import { AuthModal } from './AuthModal'
@@ -32,55 +33,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const supabase = createClient()
 
     const ensureProfile = async (userId: string) => {
-      // 1. Проверить существующий профиль
-      const { data: existing } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('auth_user_id', userId)
-        .maybeSingle()
-
-      if (existing) {
-        setProfile(existing as Profile)
-        return
-      }
-
-      // 2. Получить метаданные пользователя из Supabase Auth
       const { data: userData } = await supabase.auth.getUser()
       const meta = userData?.user?.user_metadata ?? {}
 
-      // 3. Вставить профиль (может упасть из-за phone UNIQUE или гонки)
-      const { data: created, error } = await supabase
-        .from('profiles')
-        .insert({
-          auth_user_id: userId,
-          email: userData?.user?.email ?? undefined,
-          first_name: meta.first_name ?? meta.given_name ?? undefined,
-          last_name: meta.last_name ?? meta.family_name ?? undefined,
-          avatar_url: meta.avatar_url ?? meta.picture ?? undefined,
-          phone: meta.phone ?? undefined,
-          is_guest: false,
-        })
-        .select()
-        .single()
+      const profile = await ensureProfileClient({
+        authUserId: userId,
+        email: userData?.user?.email,
+        firstName: (meta.first_name ?? meta.given_name) as string | undefined,
+        lastName: (meta.last_name ?? meta.family_name) as string | undefined,
+        avatarUrl: (meta.avatar_url ?? meta.picture) as string | undefined,
+        phone: meta.phone as string | undefined,
+      })
 
-      if (error) {
-        // Если гонка (другой клиент уже вставил) — просто перечитать
-        if (error.code === '23505') {
-          const { data: retry } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('auth_user_id', userId)
-            .maybeSingle()
-          if (retry) {
-            setProfile(retry as Profile)
-            return
-          }
-        }
-        console.error('ensureProfile insert error:', error)
-        return
-      }
-
-      setProfile(created as Profile)
+      if (profile) setProfile(profile)
     }
 
     const initAuth = async () => {
@@ -116,8 +81,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const requireAuth = useCallback((redirectTo?: string): boolean => {
-    // Читаем user напрямую из замыкания, но проверяем через getSession для актуальности
-    // isAuthenticated в зависимостях меняет ссылку при каждом логине/логауте — это ок
     if (isAuthenticated) {
       if (redirectTo) window.location.href = redirectTo
       return true
@@ -153,12 +116,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const setPhone = async (phone: string) => {
     if (!user) return
-    const supabase = createClient()
-    await supabase
-      .from('profiles')
-      .update({ phone })
-      .eq('auth_user_id', user.id)
-    setProfile(prev => prev ? { ...prev, phone } : null)
+    const ok = await updatePhone(user.id, phone)
+    if (ok) {
+      setProfile(prev => prev ? { ...prev, phone } : null)
+    }
   }
 
   return (
