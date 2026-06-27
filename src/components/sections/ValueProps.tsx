@@ -18,7 +18,7 @@ export function ValueProps() {
 
   // AI Advisor State
   const [messages, setMessages] = useState<{ role: 'user' | 'assistant'; text: string }[]>([
-    { role: 'assistant', text: 'Salam! Mən Aluna Virtual Gözəllik məsləhətçisiyəm. Dərinizdə hansı problemi həll etmək istədiyinizi qeyd edin (məs. sızanaqlar, qırışlar, qocalma əlamətləri) və mən sizə ən uyğun cihazı məsləhət görüm.' }
+    { role: 'assistant', text: 'Salam! Mən TAPLA MARKETPLACE köməkçisiyəm. Hansı məhsulu axtardığınızı qeyd edin (məs. notebook, telefon, qulaqlıq) və mən sizə ən uyğun seçimi tövsiyə edim.' }
   ]);
   const [userInput, setUserInput] = useState('');
 
@@ -47,13 +47,13 @@ export function ValueProps() {
 
     // Simulated responsive Azerbaijani AI recommendation
     setTimeout(() => {
-      let response = 'Möhtəşəm sualdır! Sizin dəri ehtiyaclarınıza əsasən, sizə ALUNA Radiance Pro cihazımızı tövsiyə edirəm. O, həm mikroaxın liftinqi, həm də ləkə əleyhinə göy/qırmızı LED dalğalarına malikdir. Ətraflı məhsul siyahımızda baxa bilərsiniz.';
-      if (userMsg.toLowerCase().includes('təmizlə') || userMsg.toLowerCase().includes('qara') || userMsg.toLowerCase().includes('sebum')) {
-        response = 'Dərinizin dərin təmizlənməsi və qara nöqtələrin təmizlənməsi üçün sizə ALUNA Sonic Deep Cleanser ultrasəs spatulamızı məsləhət görürəm. Həftədə 2 dəfə istifadə etməklə məsamələri dərindən açacaqsınız.';
-      } else if (userMsg.toLowerCase().includes('göz') || userMsg.toLowerCase().includes('şişkin')) {
-        response = 'Gözaltı torbalar, yorğunluq və tünd halqalar üçün göz ətrafı Eye Radiance Duo masajerimiz mükəmməl seçimdir. 42°C istilik masajı dərhal nəticə verir.';
-      } else if (userMsg.toLowerCase().includes('buxaq') || userMsg.toLowerCase().includes('çənə') || userMsg.toLowerCase().includes('oval')) {
-        response = 'Üz ovalını kəskinləşdirmək və buxaq problemləri üçün ikiqat masaj başlıqlı ALUNA Contour Lift V-Sculpt cihazımız tam sizə görədir. Gündəlik 5 dəqiqə istifadə edin.';
+      let response = 'Möhtəşəm seçimdir! Sizə Apple MacBook Air M3-ü tövsiyə edirəm. M3 çip ilə super sürətli, 18 saat batareya ömrü və yüngül çəkisi ilə iş üçün idealdır.';
+      if (userMsg.toLowerCase().includes('telefon') || userMsg.toLowerCase().includes('samsung')) {
+        response = 'Əgər yüksək səviyyəli smartfon axtarırsınızsa, Samsung Galaxy S25 Ultra mükəmməl seçimdir. 200MP kamera, S Pen dəstəyi və Snapdragon 8 Elite prosessoru ilə ən güclü flagship.';
+      } else if (userMsg.toLowerCase().includes('qulaqlıq') || userMsg.toLowerCase().includes('səs') || userMsg.toLowerCase().includes('musiqi')) {
+        response = 'Sony WH-1000XM5 noise-cancelling qulaqlığı məsləhət görürəm. Dünyanın ən yaxşı səs-küy bloklaması, 30 saat batareya ömrü və üstün səs keyfiyyəti.';
+      } else if (userMsg.toLowerCase().includes('planşet') || userMsg.toLowerCase().includes('iPad') || userMsg.toLowerCase().includes('rəsm')) {
+        response = 'iPad Pro M4 — planşetlərin kralı. M4 çip, Ultra Retina XDR displey və Apple Pencil Pro dəstəyi ilə həm iş, həm də yaradıcılıq üçün ən güclü seçim.';
       }
       setMessages(prev => [...prev, { role: 'assistant', text: response }]);
     }, 1000);
@@ -118,15 +118,15 @@ export function ValueProps() {
       <Modal
         isOpen={activeModal === 'prop-1'}
         onClose={() => setActiveModal(null)}
-        title="1-DƏQİQƏLİK ÜZ QULLUĞU TESTİ"
+        title="1-DƏQİQƏLİK MƏHSUL TESTİ"
       >
         <div className="space-y-6 font-sans">
           {quizStep === 0 && (
             <div className="space-y-4">
               <h4 className="text-xs tracking-widest font-bold uppercase text-neutral-400">ADDIM 1 / 3</h4>
-              <p className="text-sm font-semibold text-neutral-800">Dəri tipinizi necə xarakterizə edirsiniz?</p>
+              <p className="text-sm font-semibold text-neutral-800">Hansı məhsul kateqoriyası ilə maraqlanırsınız?</p>
               <div className="grid grid-cols-1 gap-2">
-                {['Quru və qabıqlanan', 'Yağlı və parıldayan', 'Müəyyən nahiyələri yağlı, bəzi nahiyələri quru (Qarışıq)', 'Normal və problemsiz'].map((ans) => (
+                {['Notebook / Ultrabook', 'Smartfon / Planşet', 'Qulaqlıq / Audio', 'Aksesuar / Qadjet'].map((ans) => (
                   <button
                     key={ans}
                     onClick={() => handleQuizAnswer(ans)}
@@ -142,9 +142,9 @@ export function ValueProps() {
           {quizStep === 1 && (
             <div className="space-y-4">
               <h4 className="text-xs tracking-widest font-bold uppercase text-neutral-400">ADDIM 2 / 3</h4>
-              <p className="text-sm font-semibold text-neutral-800">Ən çox həll etmək istədiyiniz dəri problemi hansıdır?</p>
+              <p className="text-sm font-semibold text-neutral-800">Məhsulu əsasən hansı məqsədlə istifadə edəcəksiniz?</p>
               <div className="grid grid-cols-1 gap-2">
-                {['Sızanaq, akne və genişlənmiş məsamələr', 'Qara nöqtələr və dərin kirlər', 'Üz ovalının sallanması, buxaq və qırışlar', 'Gözaltı torbalar və tünd halqalar'].map((ans) => (
+                {['İş / Təhsil (ofis proqramları, tədqiqat)', 'Oyun / Əyləncə (oyun, film, musiqi)', 'Yaradıcılıq (dizayn, video montaj, rəsm)', 'Gündəlik istifadə (browsing, sosial media)'].map((ans) => (
                   <button
                     key={ans}
                     onClick={() => handleQuizAnswer(ans)}
@@ -160,9 +160,9 @@ export function ValueProps() {
           {quizStep === 2 && (
             <div className="space-y-4">
               <h4 className="text-xs tracking-widest font-bold uppercase text-neutral-400">ADDIM 3 / 3</h4>
-              <p className="text-sm font-semibold text-neutral-800">Gündəlik gözəllik rituallarına nə qədər vaxt ayıra bilərsiniz?</p>
+              <p className="text-sm font-semibold text-neutral-800">Büdcəniz nə qədərdir?</p>
               <div className="grid grid-cols-1 gap-2">
-                {['Hər gün maksimum 5 dəqiqə', 'Hər gün 10-15 dəqiqə', 'Həftədə bir-iki dəfə daha ətraflı baxım'].map((ans) => (
+                {['500 ₼ - 1000 ₼', '1000 ₼ - 2000 ₼', '2000 ₼ - 3000 ₼', '3000 ₼+'].map((ans) => (
                   <button
                     key={ans}
                     onClick={() => handleQuizAnswer(ans)}
@@ -180,9 +180,9 @@ export function ValueProps() {
               <CheckCircle className="h-10 w-10 text-emerald-600 mx-auto animate-bounce" />
               <div className="space-y-2">
                 <h4 className="text-xs tracking-widest font-bold uppercase text-neutral-400">TESTİN NƏTİCƏSİ</h4>
-                <h3 className="text-base sm:text-lg font-bold uppercase text-neutral-900">SİZƏ UYĞUN CİHAZ: ALUNA RADIANCE PRO</h3>
+                <h3 className="text-base sm:text-lg font-bold uppercase text-neutral-900">SİZƏ UYĞUN MƏHSUL</h3>
                 <p className="text-xs text-neutral-500 leading-relaxed max-w-sm mx-auto">
-                  Seçimlərinizə əsasən, dərhal kollagen artımını dəstəkləyən, sızanaqları müalicə edən və mikroaxınlı liftinq verən LED Terapiya cihazımız sizin üçün ən mükəmməl seçimdir.
+                  Seçimlərinizə əsasən, sizə ən uyğun məhsulu tapdıq. Məhsul səhifəsində ətraflı texniki xüsusiyyətləri və qiymətləri müqayisə edə bilərsiniz.
                 </p>
               </div>
               <div className="flex gap-3 justify-center pt-2">
@@ -197,7 +197,7 @@ export function ValueProps() {
                   onClick={() => setActiveModal(null)}
                   className="bg-neutral-950 text-white px-5 py-3 text-[10px] tracking-widest uppercase font-semibold hover:bg-neutral-850 transition-colors flex items-center"
                 >
-                  CİHAZI GÖR
+                  MƏHSULU GÖR
                 </a>
               </div>
             </div>
@@ -213,36 +213,36 @@ export function ValueProps() {
       >
         <div className="space-y-4 font-sans text-xs">
           <p className="text-neutral-500 leading-relaxed">
-            Ehtiyaclarınıza uyğun Aluna texnologiyalarını asanlıqla yan-yana müqayisə edin:
+            Ehtiyaclarınıza uyğun məhsulları asanlıqla yan-yana müqayisə edin:
           </p>
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse border border-neutral-100">
               <thead>
                 <tr className="bg-neutral-50 text-neutral-900 uppercase font-bold tracking-widest border-b border-neutral-100 text-[9px]">
                   <th className="p-3">Xüsusiyyət</th>
-                  <th className="p-3">Radiance Pro</th>
-                  <th className="p-3">Sonic Deep</th>
-                  <th className="p-3">V-Sculpt</th>
+                  <th className="p-3">MacBook Air M3</th>
+                  <th className="p-3">S25 Ultra</th>
+                  <th className="p-3">iPad Pro M4</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-neutral-100 text-[11px] text-neutral-600">
                 <tr>
-                  <td className="p-3 font-semibold text-neutral-900">Əsas Texnologiya</td>
-                  <td className="p-3">7-Rəng LED, EMS</td>
-                  <td className="p-3">Ultrases (24kHz)</td>
-                  <td className="p-3">EMS Mikroaxın</td>
+                  <td className="p-3 font-semibold text-neutral-900">Prosessor</td>
+                  <td className="p-3">Apple M3</td>
+                  <td className="p-3">Snapdragon 8 Elite</td>
+                  <td className="p-3">Apple M4</td>
                 </tr>
                 <tr>
-                  <td className="p-3 font-semibold text-neutral-900">İstifadə Məqsədi</td>
-                  <td className="p-3">Ləkə, Qırış, Akne</td>
-                  <td className="p-3">Dərin Təmizləmə</td>
-                  <td className="p-3">Çənə / Boyun Liftinq</td>
+                  <td className="p-3 font-semibold text-neutral-900">Yaddaş / RAM</td>
+                  <td className="p-3">8GB / 256GB SSD</td>
+                  <td className="p-3">12GB / 256GB</td>
+                  <td className="p-3">8GB / 256GB</td>
                 </tr>
                 <tr>
-                  <td className="p-3 font-semibold text-neutral-900">Həssas Dəri</td>
-                  <td className="p-3">Tam təhlükəsiz</td>
-                  <td className="p-3">Həftədə 2 dəfə</td>
-                  <td className="p-3">Tam təhlükəsiz</td>
+                  <td className="p-3 font-semibold text-neutral-900">Ekran</td>
+                  <td className="p-3">13.6″ Liquid Retina</td>
+                  <td className="p-3">6.9″ Dynamic AMOLED</td>
+                  <td className="p-3">11″ Ultra Retina XDR</td>
                 </tr>
                 <tr>
                   <td className="p-3 font-semibold text-neutral-900">Zəmanət</td>
@@ -252,9 +252,9 @@ export function ValueProps() {
                 </tr>
                 <tr className="font-bold text-neutral-900">
                   <td className="p-3">Qiymət</td>
-                  <td className="p-3">249.00 ₼</td>
-                  <td className="p-3">129.00 ₼</td>
-                  <td className="p-3">199.00 ₼</td>
+                  <td className="p-3">2,399.00 ₼</td>
+                  <td className="p-3">3,299.00 ₼</td>
+                  <td className="p-3">2,199.00 ₼</td>
                 </tr>
               </tbody>
             </table>
@@ -274,7 +274,7 @@ export function ValueProps() {
       <Modal
         isOpen={activeModal === 'prop-3'}
         onClose={() => setActiveModal(null)}
-        title="ALUNA VİRTUAL AI ASSİSTENT"
+        title="TAPLA VİRTUAL KÖMƏKÇİ"
       >
         <div className="flex flex-col h-[50vh] justify-between font-sans">
           {/* Messages Feed */}
@@ -300,7 +300,7 @@ export function ValueProps() {
               type="text"
               value={userInput}
               onChange={(e) => setUserInput(e.target.value)}
-              placeholder="Sualınızı daxil edin (məs. 'sızanaq üçün nə etməli?')..."
+              placeholder="Sualınızı daxil edin (məs. 'oyun üçün notebook hansıdır?')..."
               className="flex-1 bg-neutral-50 border border-neutral-200 px-4 py-3 text-xs focus:outline-none focus:border-neutral-950"
             />
             <button
@@ -317,11 +317,11 @@ export function ValueProps() {
       <Modal
         isOpen={activeModal === 'prop-4'}
         onClose={() => setActiveModal(null)}
-        title="KOSMETOLOQ İLƏ CANLI GÖRÜŞ"
+        title="TEXNİKİ DƏSTƏK İLƏ GÖRÜŞ"
       >
         <div className="space-y-4 font-sans text-xs">
           <p className="text-neutral-500 leading-relaxed">
-            Bizim rəsmi tibbi kosmetoloqlarımızla ödənişsiz 15 dəqiqəlik onlayn video konsultasiya sifariş edin. Dərinizin tam analizini edin.
+            Bizim texniki mütəxəssislərimizlə ödənişsiz onlayn konsultasiya sifariş edin. Məhsul seçimi və texniki suallarınız üçün yardım alın.
           </p>
           <form
             onSubmit={(e) => {

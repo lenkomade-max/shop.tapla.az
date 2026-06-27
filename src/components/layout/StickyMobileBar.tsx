@@ -16,11 +16,11 @@ export function StickyMobileBar() {
   }, []);
 
   const handleSupportClick = () => {
-    alert('Aluna Müştəri Xidmətləri: WhatsApp (+994 55 123-45-67) və ya Onlayn Çat vasitəsilə 24/7 xidmətinizdəyik!');
+    alert('TAPLA MARKETPLACE Müştəri Xidmətləri: WhatsApp (+994 55 123-45-67) və ya Onlayn Çat vasitəsilə 24/7 xidmətinizdəyik!');
   };
 
   const handleDiscountClick = () => {
-    alert('Klubumuza xoş gəldiniz! Sifariş zamanı ALUNA15 kodunu istifadə edərək dərhal 15% endirim qazanın.');
+    alert('TAPLA MARKETPLACE-ə xoş gəldiniz! İlk sifarişinizə xüsusi endirim kodu mövcuddur.');
   };
 
   return (

@@ -16,7 +16,7 @@ export function PromoBanners() {
         <div className="relative group aspect-square sm:aspect-video md:aspect-[4/5] bg-neutral-950 text-white overflow-hidden flex flex-col justify-end p-6 sm:p-12 md:p-16">
           <Image
             src="https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&q=80&w=1000" // Premium beauty products styling
-            alt="Aluna Sonik təmizləmə gücü"
+            alt="TAPLA Notebook və Ultrabooklar"
             fill
             className="object-cover opacity-50 group-hover:scale-105 transition-transform duration-1000 ease-out"
           />
@@ -25,10 +25,10 @@ export function PromoBanners() {
               EKSKLYUZİV ERKƏN KEÇİD
             </span>
             <Heading level={3} className="font-serif leading-tight">
-              MƏMİŞŞAH ÜÇLÜ TƏMİZLƏMƏ GÜCÜ
+              YENİ NƏSİL NOTEBOOKLAR
             </Heading>
             <p className="text-xs text-neutral-300 font-sans max-w-sm leading-relaxed">
-              Məsamələri 99.8% kirlərdən dərhal təmizləyən, dərini qurutmayan və təbii ph balansını qoruyan unikal sonik dalğalı təmizləmə spatula sistemi.
+              Intel Core Ultra, SSD, 32GB RAM — oyun və iş üçün ən güclü notebooklar ən sərfəli qiymətlərlə.
             </p>
             <div className="pt-2">
               <a href="#products">
@@ -44,7 +44,7 @@ export function PromoBanners() {
         <div className="relative group aspect-square sm:aspect-video md:aspect-[4/5] bg-neutral-900 text-white overflow-hidden flex flex-col justify-end p-6 sm:p-12 md:p-16">
           <Image
             src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&q=80&w=1000" // Premium skincare application model
-            alt="Aluna LED Cavanlaşma gücü"
+            alt="TAPLA Telefon və Planşetlər"
             fill
             className="object-cover opacity-45 group-hover:scale-105 transition-transform duration-1000 ease-out"
           />
@@ -53,10 +53,10 @@ export function PromoBanners() {
               ELMİ TƏSDİQLƏNMİŞ LƏTİFLİK
             </span>
             <Heading level={3} className="font-serif leading-tight">
-              GƏNC DƏRİNİN SÜNİ İNTELLEKT GÜCÜ
+              AKSESUARLARDA BÖYÜK ENDİRİM
             </Heading>
             <p className="text-xs text-neutral-300 font-sans max-w-sm leading-relaxed">
-              İstifadəçilərin 100%-i 14 günlük tətbiqdən sonra qırışların azaldığını, dərinin daha gənc, canlı və dolğun göründüyünü təsdiqləmişdir.*
+              Qulaqlıq, smart saat, kabel, şarj cihazı və daha çoxu — bütün aksesuarlar endirimli qiymətlərlə.
             </p>
             <div className="pt-2">
               <a href="#products">
@@ -73,7 +73,7 @@ export function PromoBanners() {
       <div className="relative group h-[50vh] sm:h-[60vh] md:h-[70vh] bg-neutral-950 text-white overflow-hidden flex items-center">
         <Image
           src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&q=80&w=1600" // Clean visual background for full banner
-          alt="Aluna Radiance full spotlight"
+            alt="TAPLA Kampaniya"
           fill
           className="object-cover opacity-40 group-hover:scale-102 transition-transform duration-1000 ease-out"
         />
@@ -83,13 +83,13 @@ export function PromoBanners() {
         <Container className="relative z-10">
           <div className="max-w-2xl space-y-4 sm:space-y-6">
             <span className="text-[10px] sm:text-xs font-bold tracking-[0.25em] text-amber-200 uppercase">
-              YENİ LİMİTSİZ PARLAQLIQ SERİYASI
+              YENİ MÖVSÜM ENDİRİMLƏRİ
             </span>
             <Heading level={2} className="font-serif text-white font-light max-w-xl">
-              ALUNA GLOW - MÜKƏMMƏL ÜZ KONTURU VƏ PARILTISI
+              TAPLA MARKETPLACE - BÜTÜN ELEKTRONIKA BIR YERDƏ
             </Heading>
             <p className="text-xs sm:text-sm text-neutral-300 font-sans font-light leading-relaxed max-w-md">
-              Yeni mikroaxınlı liftinq başlığı və patentləşdirilmiş LED dalğaları ilə dərinin təbii regenerasiyasını tətikləyin. Salon qulluğunu evinizdə hiss edin.
+              Smartfon, notebook, planşet, televizor, mətbəx texnikası və daha çoxu. Rəsmi zəmanət, sürətli çatdırılma, ən ucuz qiymətlər.
             </p>
             <div className="pt-4">
               <a href="#products">
@@ -107,10 +107,10 @@ export function PromoBanners() {
         <Container>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             {[
-              { label: 'LED CİHAZLARI', href: '#products' },
-              { label: 'TƏMİZLƏMƏ ALƏTLƏRİ', href: '#products' },
-              { label: 'QULLUQ SERUMLARI', href: '#products' },
-              { label: 'HƏDİYYƏ DƏSTLƏRİ', href: '#products' },
+              { label: 'NOTEBOOK / ULTRABOOK', href: '#products' },
+              { label: 'SMARTFON / PLANŞET', href: '#products' },
+              { label: 'TV / AUDİO', href: '#products' },
+              { label: 'AKSESUAR / QADJET', href: '#products' },
             ].map((cat, index) => (
               <a
                 key={index}

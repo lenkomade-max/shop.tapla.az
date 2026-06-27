@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const ANNOUNCEMENTS = [
-  { text: 'YENİ ALUNA RADIANCE PRO SATIŞDA! İLK SİFARİŞƏ ÖZƏL 15% ENDİRİM - ALUNA15', href: '#aluna-radiance-pro' },
+  { text: 'BAKI DAXİLİ 24 SAAT ƏRZİNDƏ TAMAMİLƏ PULSUZ ÇATDIRILMA!', href: '#faq' },
   { text: 'BAKI DAXİLİ 24 SAAT ƏRZİNDƏ TAMAMİLƏ PULSUZ ÇATDIRILMA!', href: '#faq' },
   { text: 'BÜTÜN CİHAZLARIMIZA RƏSMİ 2 İLLİK ZƏMANƏT TƏQDİM OLUNUR', href: '#benefits' },
 ];

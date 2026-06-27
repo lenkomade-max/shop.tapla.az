@@ -73,19 +73,14 @@ export function ReviewCard({ review }: ReviewCardProps) {
               Şəhər: <span className="text-neutral-800 font-medium">{review.location}</span>
             </div>
           )}
-          {review.ageRange && (
+          {review.productCategory && (
             <div className="text-neutral-500">
-              Yaş: <span className="text-neutral-800 font-medium">{review.ageRange}</span>
+              Kateqoriya: <span className="text-neutral-800 font-medium">{review.productCategory}</span>
             </div>
           )}
-          {review.skinType && (
+          {review.usagePurpose && (
             <div className="text-neutral-500">
-              Dəri Tipi: <span className="text-neutral-800 font-medium">{review.skinType}</span>
-            </div>
-          )}
-          {review.skinTone && (
-            <div className="text-neutral-500">
-              Dəri Rəngi: <span className="text-neutral-800 font-medium">{review.skinTone}</span>
+              Məqsəd: <span className="text-neutral-800 font-medium">{review.usagePurpose}</span>
             </div>
           )}
 

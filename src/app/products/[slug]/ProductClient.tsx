@@ -139,7 +139,7 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <Sparkles className="h-4 w-4 text-neutral-800 animate-pulse" />
-                    <h3 className="text-xs font-bold tracking-widest uppercase">ALUNA LED SİMULYATORU</h3>
+                    <h3 className="text-xs font-bold tracking-widest uppercase">INTERAKTİV LED GÖSTERİCİ</h3>
                   </div>
                   <button 
                     onClick={() => setShowSimulator(!showSimulator)}
@@ -427,7 +427,7 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
                 {Array.from({ length: 5 }).map((_, i) => <Star key={i} className="h-3 w-3 fill-current" />)}
               </div>
               <p className="text-xs text-neutral-600 leading-relaxed">
-                Bu cihazı (ALUNA Radiance Pro) alandan bəri dərimdə möhtəşəm bir canlanma var. Üstəlik dizaynı o qədər estetikdir ki, istifadə etməyə çox bəyənirəm. Hər kəsə tövsiyə edirəm!
+                Bu məhsulu TAPLA MARKETPLACE-dən aldım və çox məmnun qaldım. Keyfiyyət mükəmməldir, çatdırılma isə çox sürətli idi. Hər kəsə tövsiyə edirəm!
               </p>
             </div>
             <div className="bg-white p-6 border border-neutral-100 space-y-4">
@@ -439,7 +439,7 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
                 {Array.from({ length: 5 }).map((_, i) => <Star key={i} className="h-3 w-3 fill-current" />)}
               </div>
               <p className="text-xs text-neutral-600 leading-relaxed">
-                Yoldaşıma hədiyyə olaraq sifariş vermişdim, çox bəyəndi. Xüsusilə çatdırılma sürəti inanılmazdır, sifarişdən bir neçə saat sonra ünvanımızda idi. Təşəkkürlər ALUNA!
+                Yoldaşıma hədiyyə olaraq sifariş vermişdim, çox bəyəndi. Xüsusilə çatdırılma sürəti inanılmazdır, sifarişdən bir neçə saat sonra ünvanımızda idi. Təşəkkürlər TAPLA!
               </p>
             </div>
           </div>

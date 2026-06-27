@@ -10,10 +10,10 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
 export const metadata: Metadata = {
   title: {
-    default: 'ALUNA | Premium Gözəllik və Üz Qulluğu Cihazları',
-    template: '%s | ALUNA',
+    default: 'TAPLA MARKETPLACE | Onlayn Elektronika Mağazası',
+    template: '%s | TAPLA MARKETPLACE',
   },
-  description: 'Aluna ilə evinizdə lüks salon qulluğu. 7 fərqli LED işıq terapiyası, EMS mikroaxın liftinqi və sonik üz təmizləmə cihazları ilə dərhal gənclik və parlaqlıq.',
+  description: 'TAPLA MARKETPLACE — Azərbaycanda ən sərfəli qiymətlərlə elektronika, notebook, telefon, aksesuar və daha çoxu. Sürətli çatdırılma, zəmanət və etibarlı xidmət.',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

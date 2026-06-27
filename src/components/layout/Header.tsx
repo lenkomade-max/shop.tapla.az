@@ -120,7 +120,7 @@ export function Header() {
                 href="/"
                 className="text-2xl sm:text-3xl font-serif tracking-[0.25em] font-light hover:opacity-90 transition-opacity uppercase"
               >
-                ALUNA
+                TAPLA
               </Link>
             </div>
 
@@ -188,7 +188,7 @@ export function Header() {
       </header>
     </div>
 
-      <Drawer isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} title="ALUNA MENYU" position="left">
+      <Drawer isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} title="MENYU" position="left">
         <div className="flex flex-col space-y-6 pt-4">
           {NAVIGATION_ITEMS.map((item) => (
             <div key={item.label} className="border-b border-neutral-100 pb-3">
@@ -241,7 +241,7 @@ export function Header() {
               <ShoppingBag className="h-10 w-10 text-neutral-300 stroke-1" />
               <div className="space-y-1">
                 <p className="text-xs font-semibold tracking-widest text-neutral-900 uppercase">Səbətiniz boşdur</p>
-                <p className="text-xs text-neutral-400 font-sans">Premium Aluna cihazlarını kəşf edərək dərhal sifariş edin.</p>
+                <p className="text-xs text-neutral-400 font-sans">Premium məhsulları kəşf edərək dərhal sifariş edin.</p>
               </div>
               <button
                 onClick={() => setIsCartOpen(false)}

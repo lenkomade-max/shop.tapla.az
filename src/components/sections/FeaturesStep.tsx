@@ -30,13 +30,13 @@ export function FeaturesStep({ steps }: FeaturesStepProps) {
         {/* Header */}
         <div className="max-w-3xl mx-auto text-center space-y-3 mb-16 sm:mb-20">
           <span className="text-[10px] tracking-[0.25em] font-bold text-amber-200 uppercase">
-            GÜNDƏLİK QULLUQ ZƏNCİRİ
+            RAHAT ALIŞ-VERİŞ TƏCRÜBƏSİ
           </span>
           <Heading level={2} align="center" className="font-serif text-white">
-            ALUNA İLƏ AXŞAM RİTUALI
+            TAPLA MARKETPLACE İLƏ ALIŞ-VERİŞ
           </Heading>
           <p className="text-xs sm:text-sm text-neutral-400 font-sans max-w-lg mx-auto leading-relaxed">
-            Dərinizin gecə boyu özünü bərpa etməsi üçün Aluna texnologiyalarını birləşdirən 4 sadə addımlı lüks qulluq sistemi.
+            Məhsul seçimi, müqayisə, sifariş və çatdırılma — 4 sadə addımda TAPLA təcrübəsi.
           </p>
         </div>
 
@@ -113,7 +113,7 @@ export function FeaturesStep({ steps }: FeaturesStepProps) {
               <div className="absolute inset-0 bg-linear-to-t from-neutral-950 via-transparent to-transparent flex items-end p-6 sm:p-8">
                 <div className="space-y-2">
                   <span className="bg-amber-200 text-neutral-950 text-[9px] tracking-widest font-bold px-2.5 py-1 uppercase select-none">
-                    ADDIM 0{steps[activeStep].stepNumber} / RİTUAL
+                    ADDIM 0{steps[activeStep].stepNumber}
                   </span>
                   <h3 className="text-lg sm:text-xl md:text-2xl font-serif text-white uppercase tracking-wider font-light">
                     {steps[activeStep].title}
@@ -126,7 +126,7 @@ export function FeaturesStep({ steps }: FeaturesStepProps) {
                       href={steps[activeStep].href}
                       className="text-[10px] tracking-widest uppercase font-semibold text-white border-b border-white hover:text-amber-200 hover:border-amber-200 transition-colors py-1 inline-flex items-center space-x-1"
                     >
-                      <span>MƏHSULU SİFARİŞ ET</span>
+                      <span>ƏTRAFLI BAX</span>
                       <ArrowRight className="h-3 w-3" />
                     </a>
                   </div>

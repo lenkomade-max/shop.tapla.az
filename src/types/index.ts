@@ -32,7 +32,7 @@ export interface LandingConfig {
   sections: SectionConfig[]
 }
 
-export type ThemeName = 'rose' | 'luxuryGold' | 'medical' | 'minimal' | 'organic' | 'beautyPremium'
+export type ThemeName = 'rose' | 'luxuryGold' | 'medical' | 'minimal' | 'organic'
 
 export interface ThemeColors {
   primary: string
@@ -59,7 +59,7 @@ export interface ThemeConfig {
   borderRadius: string
 }
 
-// --- Aluna v2 types ---
+// --- Product types ---
 
 export interface Media {
   url: string;
@@ -103,9 +103,8 @@ export interface Review {
   comment: string;
   date: string;
   location?: string;
-  ageRange?: string;
-  skinType?: string;
-  skinTone?: string;
+  productCategory?: string;
+  usagePurpose?: string;
   verifiedBuyer: boolean;
   images?: string[];
   likes: number;

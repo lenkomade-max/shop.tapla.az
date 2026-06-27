@@ -18,10 +18,10 @@ interface ProductGridProps {
 
 const CATEGORIES = [
   { label: 'HAMSINI GÖSTƏR', value: 'all' },
-  { label: 'LED TERAPİYA', value: 'LED Terapiya' },
-  { label: 'TƏMİZLƏMƏ', value: 'Təmizləmə' },
-  { label: 'GÖZ QULLUĞU', value: 'Göz Qulluğu' },
-  { label: 'LİFTİNQ', value: 'Liftinq' },
+  { label: 'NOTEBOOK / ULTRABOOK', value: 'Notebook / Ultrabook' },
+  { label: 'SMARTFON / PLANŞET', value: 'Smartfon / Planşet' },
+  { label: 'AKSESUAR / QADJET', value: 'Aksesuar / Qadjet' },
+  { label: 'PLANŞET', value: 'Planşet' },
 ];
 
 export function ProductGrid({ products }: ProductGridProps) {
@@ -60,13 +60,13 @@ export function ProductGrid({ products }: ProductGridProps) {
         {/* Header */}
         <div className="max-w-3xl mx-auto text-center space-y-3 mb-12">
           <span className="text-[10px] tracking-[0.25em] font-bold text-neutral-400 uppercase">
-            ALUNA BUTİK
+            TAPLA MARKETPLACE
           </span>
           <Heading level={2} align="center" className="font-serif">
-            MƏHSUL KOLLEKSİYAMIZ
+            MƏHSUL KATEQORİYALARIMIZ
           </Heading>
           <p className="text-xs sm:text-sm text-neutral-500 font-sans max-w-lg mx-auto leading-relaxed">
-            Dərinizə rəqəmsal dəqiqlik bəxş edən yüksək keyfiyyətli cihazlarımızla tanış olun və ehtiyacınıza uyğun olanı seçin.
+            Elektronika dünyasının ən sevilən məhsulları ilə tanış olun və ehtiyacınıza uyğun olanı seçin.
           </p>
         </div>
 

@@ -26,7 +26,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {
     if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem('aluna_cart');
+      const stored = localStorage.getItem('tapla_cart');
       if (stored) {
         try {
           return JSON.parse(stored);
@@ -50,7 +50,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (isMounted) {
-      localStorage.setItem('aluna_cart', JSON.stringify(cartItems));
+      localStorage.setItem('tapla_cart', JSON.stringify(cartItems));
     }
   }, [cartItems, isMounted]);
 

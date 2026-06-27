@@ -131,7 +131,7 @@ export default function CheckoutPage() {
 
     // Simulate database record creation & stripe processing
     setTimeout(() => {
-      const randomId = 'ALN-' + Math.floor(100000 + Math.random() * 900000);
+      const randomId = 'TPL-' + Math.floor(100000 + Math.random() * 900000);
       setGeneratedOrderNumber(randomId);
       setIsSubmitting(false);
       setOrderConfirmed(true);
@@ -163,7 +163,7 @@ export default function CheckoutPage() {
                 SİFARİŞİNİZ TƏSDİQLƏNDİ!
               </h1>
               <p className="text-xs text-neutral-500 font-sans leading-relaxed max-w-md mx-auto">
-                Təbrik edirik! Aluna premium gözəllik cihazları ilə mükəmməl dəri qulluğu ritualına başlamaq üçün ilk addımı atdınız.
+                Təbrik edirik! TAPLA MARKETPLACE-dən etdiyiniz alış-veriş üçün təşəkkür edirik.
               </p>
             </div>
 
@@ -488,7 +488,7 @@ export default function CheckoutPage() {
                       </div>
                       <div className="pt-1 flex flex-col sm:flex-row gap-3">
                         <a
-                          href="https://wa.me/994503003030?text=Salam,%20Aluna-da%20na%C4%9Fd%20sifari%C5%9Fi%20%C3%BC%C3%A7%C3%BCn%205%20AZN%20beh%20%C3%B6d%C9%99m%C9%99k%20ist%C9%99yir%C9%99m"
+                          href="https://wa.me/994503003030?text=Salam,%20TAPLA-dan%20na%C4%9Fd%20sifari%C5%9Fi%20%C3%BC%C3%A7%C3%BCn%205%20AZN%20beh%20%C3%B6d%C9%99m%C9%99k%20ist%C9%99yir%C9%99m"
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center justify-center space-x-2 bg-[#25D366] text-white px-5 py-3 text-[9px] font-bold uppercase tracking-widest hover:bg-[#20ba56] transition-colors"
@@ -668,7 +668,7 @@ export default function CheckoutPage() {
                 <ShieldCheck className="h-5 w-5 text-neutral-800 flex-shrink-0 mt-0.5" />
                 <div className="space-y-1">
                   <p className="font-semibold text-neutral-800">100% GÜVƏNLİ ALIŞ-VERİŞ</p>
-                  <p>ALUNA-da bütün əməliyyatlarınız SSL təhlükəsizlik protokolları ilə tam şifrələnir və qorunur.</p>
+                  <p>TAPLA MARKETPLACE-də bütün əməliyyatlarınız SSL təhlükəsizlik protokolları ilə tam şifrələnir və qorunur.</p>
                 </div>
               </div>
             </div>

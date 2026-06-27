@@ -34,18 +34,18 @@ export function Footer() {
 
           <div className="lg:col-span-7 grid grid-cols-2 sm:grid-cols-4 gap-8">
             <div className="space-y-4">
-              <h5 className="text-[11px] font-semibold tracking-widest uppercase text-white">ALUNA HAQQINDA</h5>
+              <h5 className="text-[11px] font-semibold tracking-widest uppercase text-white">TAPLA HAQQINDA</h5>
               <ul className="space-y-2.5 text-xs text-neutral-400">
-                <li><Link href="#about" className="hover:text-white transition-colors">Biz Kimik?</Link></li>
-                <li><Link href="#ritual" className="hover:text-white transition-colors">Aluna Texnologiyası</Link></li>
-                <li><Link href="#benefits" className="hover:text-white transition-colors">Niyə Aluna?</Link></li>
-                <li><Link href="#about" className="hover:text-white transition-colors">Brend Hekayəmiz</Link></li>
+                <li><Link href="/" className="hover:text-white transition-colors">Ana Səhifə</Link></li>
+                <li><Link href="/products" className="hover:text-white transition-colors">Bütün Məhsullar</Link></li>
+                <li><Link href="#benefits" className="hover:text-white transition-colors">Niyə TAPLA?</Link></li>
+                <li><Link href="#faq" className="hover:text-white transition-colors">FAQ</Link></li>
                 <li><Link href="#about" className="hover:text-white transition-colors">Karyera</Link></li>
               </ul>
             </div>
 
             <div className="space-y-4">
-              <h5 className="text-[11px] font-semibold tracking-widest uppercase text-white">ŞƏXSİ ALUNA</h5>
+              <h5 className="text-[11px] font-semibold tracking-widest uppercase text-white">ŞƏXSİ KABİNET</h5>
               <ul className="space-y-2.5 text-xs text-neutral-400">
                 <li><Link href="#" className="hover:text-white transition-colors">Şəxsi Kabinet</Link></li>
                 <li><Link href="#" className="hover:text-white transition-colors">Sifarişlərim</Link></li>
@@ -70,18 +70,18 @@ export function Footer() {
               <ul className="space-y-2.5 text-xs text-neutral-400">
                 <li className="font-semibold text-white">+994 (55) 123-45-67</li>
                 <li className="text-neutral-500 text-[10px]">Dəstək saatı: 09:00 - 21:00 (Hər gün)</li>
-                <li><a href="mailto:support@aluna.az" className="hover:text-white transition-colors">support@aluna.az</a></li>
-                <li><Link href="#consultation" className="hover:text-white transition-colors">Kosmetoloqla Görüş</Link></li>
-                <li><Link href="#about" className="hover:text-white transition-colors">Rəsmi Mağazalar</Link></li>
+                <li><a href="mailto:support@tapla.az" className="hover:text-white transition-colors">support@tapla.az</a></li>
+                <li><Link href="#faq" className="hover:text-white transition-colors">Texniki Dəstək</Link></li>
+                <li><Link href="#about" className="hover:text-white transition-colors">Rəsdi Mağazalar</Link></li>
               </ul>
             </div>
           </div>
 
           <div className="lg:col-span-5 space-y-6">
             <div className="space-y-2">
-              <h5 className="text-xs sm:text-sm font-light tracking-[0.25em] text-white uppercase font-serif">ALUNA-YA QOŞULUN</h5>
+              <h5 className="text-xs sm:text-sm font-light tracking-[0.25em] text-white uppercase font-serif">TAPLA-YA QOŞULUN</h5>
               <p className="text-xs text-neutral-400 leading-relaxed font-sans">
-                İlk alış-verişinizdə <strong className="text-white">15% endirim</strong> və yalnız üzvlərə özəl lüks kampaniyalar haqqında ilk siz xəbərdar olun.
+                İlk alış-verişinizdə <strong className="text-white">endirim</strong> və yalnız üzvlərə özəl kampaniyalar haqqında ilk siz xəbərdar olun.
               </p>
             </div>
 
@@ -89,7 +89,7 @@ export function Footer() {
               <div className="bg-neutral-900 border border-neutral-800 p-5 text-center space-y-2">
                 <ShieldCheck className="h-8 w-8 text-amber-200 mx-auto" />
                 <h6 className="text-xs font-semibold tracking-widest uppercase text-white">TƏŞƏKKÜR EDİRİK!</h6>
-                <p className="text-[11px] text-neutral-400 font-sans">Aluna Gözəllik Klubuna üzvlüyünüz uğurla təsdiqləndi. 15% endirim kuponunuz e-mailinizə göndərildi.</p>
+                <p className="text-[11px] text-neutral-400 font-sans">TAPLA Market klubuna üzvlüyünüz uğurla təsdiqləndi. Endirim kuponunuz e-mailinizə göndərildi.</p>
               </div>
             ) : (
               <form onSubmit={handleSubscribe} className="space-y-3.5">
@@ -139,7 +139,7 @@ export function Footer() {
                     className="mt-1 h-3.5 w-3.5 bg-neutral-900 border-neutral-800 text-neutral-950 focus:ring-neutral-800 rounded-none accent-white cursor-pointer"
                   />
                   <label htmlFor="promo-updates" className="text-[10px] text-neutral-400 leading-normal font-sans cursor-pointer">
-                    Mən Aluna Gözəllik və Skincare məhsulları haqqında xəbərləri, xüsusi promo-kodları və yenilikləri e-mail və SMS vasitəsilə almağa razıyam.
+                    Mən TAPLA MARKETPLACE haqqında xəbərləri, xüsusi promo-kodları və yenilikləri e-mail və SMS vasitəsilə almağa razıyam.
                   </label>
                 </div>
 
@@ -183,14 +183,14 @@ export function Footer() {
 
         <div className="pt-8 mt-8 border-t border-neutral-900 flex flex-col md:flex-row items-center justify-between gap-4 text-[10px] text-neutral-500">
           <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-6 gap-y-2">
-            <span>&copy; {new Date().getFullYear()} ALUNA BEAUTY LLC. BÜTÜN HÜQUQLAR QORUNUR.</span>
+            <span>&copy; {new Date().getFullYear()} TAPLA MARKETPLACE MMC. BÜTÜN HÜQUQLAR QORUNUR.</span>
             <Link href="#" className="hover:text-white transition-colors">MƏXFİLİK SİYASƏTİ</Link>
             <Link href="#" className="hover:text-white transition-colors">İSTİFADƏ ŞƏRTLƏRİ</Link>
             <Link href="#" className="hover:text-white transition-colors">KUKİ Siyasəti</Link>
           </div>
 
           <div className="flex items-center space-x-1.5 text-[9px] text-neutral-600">
-            <span>Premium Azerbaijani Beauty Brand. Powered by Aluna Technology.</span>
+            <span>Premium Azerbaijani Electronics Marketplace. Powered by Tapla Platform.</span>
           </div>
         </div>
       </Container>

@@ -16,7 +16,7 @@ export function LoginForm() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50">
       <form onSubmit={handleSubmit} className="w-full max-w-sm rounded-xl border bg-white p-8 shadow-sm">
-        <h1 className="mb-6 text-center text-lg font-bold uppercase tracking-wider">Aluna Admin</h1>
+        <h1 className="mb-6 text-center text-lg font-bold uppercase tracking-wider">TAPLA Admin</h1>
         <input
           name="password"
           type="password"

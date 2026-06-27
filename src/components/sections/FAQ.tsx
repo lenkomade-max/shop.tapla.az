@@ -33,7 +33,7 @@ export function FAQ({ faqs }: FAQProps) {
             TEZ-TEZ VERİLƏN SUALLAR
           </Heading>
           <p className="text-xs sm:text-sm text-neutral-500 font-sans max-w-lg mx-auto leading-relaxed">
-            Aluna cihazlarının istifadə qaydaları, zəmanət müddəti, ölkədaxili çatdırılma və təhlükəsizlik qaydaları haqqında bütün sualların cavabları.
+            TAPLA MARKETPLACE-də çatdırılma, zəmanət, qaytarma və ödəniş qaydaları haqqında bütün sualların cavabları.
           </p>
         </div>
 
@@ -81,7 +81,7 @@ export function FAQ({ faqs }: FAQProps) {
                 SUALINIZA CAVAB TAPMADINIZ?
               </h3>
               <p className="text-xs sm:text-sm text-neutral-400 font-sans leading-relaxed max-w-md mx-auto">
-                Bizim mehriban gözəllik komandamız hər bir sualınızı cavablandırmaq və sizə mükəmməl cihazı seçməkdə kömək etmək üçün buradadır.
+                Bizim mehriban dəstək komandamız hər bir sualınızı cavablandırmaq və sizə kömək etmək üçün buradadır.
               </p>
             </div>
 
@@ -108,12 +108,12 @@ export function FAQ({ faqs }: FAQProps) {
               </a>
 
               <a
-                href="mailto:support@aluna.az"
+                href="mailto:support@tapla.az"
                 className="bg-neutral-900 border border-neutral-800 p-4 hover:border-white transition-all duration-300 flex flex-col items-center space-y-2 group"
               >
                 <Mail className="h-5 w-5 text-neutral-400 group-hover:scale-110 transition-transform duration-300" />
                 <span className="text-[10px] tracking-widest uppercase font-semibold">E-MAİL YAZIN</span>
-                <span className="text-[9px] text-neutral-500 font-sans">support@aluna.az</span>
+                <span className="text-[9px] text-neutral-500 font-sans">support@tapla.az</span>
               </a>
             </div>
           </div>

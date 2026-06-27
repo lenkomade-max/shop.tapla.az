@@ -19,7 +19,7 @@ export function ReviewsSection({ initialReviews }: ReviewsSectionProps) {
   const [reviews, setReviews] = useState<Review[]>(initialReviews);
   const [isWriteReviewOpen, setIsWriteReviewOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState('highest');
-  const [filterSkinType, setFilterSkinType] = useState('all');
+  const [filterCategory, setFilterCategory] = useState('all');
 
   // New review form states
   const [newName, setNewName] = useState('');
@@ -27,9 +27,8 @@ export function ReviewsSection({ initialReviews }: ReviewsSectionProps) {
   const [newComment, setNewComment] = useState('');
   const [newRating, setNewRating] = useState(5);
   const [newLocation, setNewLocation] = useState('');
-  const [newAge, setNewAge] = useState('25-34');
-  const [newSkinType, setNewSkinType] = useState('Normal');
-  const [newSkinTone, setNewSkinTone] = useState('Buğdayı');
+  const [newProductCategory, setNewProductCategory] = useState('Notebook');
+  const [newUsagePurpose, setNewUsagePurpose] = useState('İş / Təhsil');
 
   const handleWriteReviewSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,9 +45,8 @@ export function ReviewsSection({ initialReviews }: ReviewsSectionProps) {
       comment: newComment,
       date: 'Bugün',
       location: newLocation || 'Bakı',
-      ageRange: newAge,
-      skinType: newSkinType,
-      skinTone: newSkinTone,
+      productCategory: newProductCategory,
+      usagePurpose: newUsagePurpose,
       verifiedBuyer: true,
       likes: 0,
       dislikes: 0,
@@ -66,7 +64,7 @@ export function ReviewsSection({ initialReviews }: ReviewsSectionProps) {
   };
 
   const filteredReviews = reviews
-    .filter(r => filterSkinType === 'all' || r.skinType?.toLowerCase().includes(filterSkinType.toLowerCase()))
+    .filter(r => filterCategory === 'all' || r.productCategory?.toLowerCase().includes(filterCategory.toLowerCase()))
     .sort((a, b) => {
       if (sortOrder === 'highest') return b.rating - a.rating;
       if (sortOrder === 'lowest') return a.rating - b.rating;
@@ -82,10 +80,10 @@ export function ReviewsSection({ initialReviews }: ReviewsSectionProps) {
             MÜŞTƏRİ MƏMNUNİYYƏTİ
           </span>
           <Heading level={2} align="center" className="font-serif">
-            ALUNA İSTİFADƏÇİ RƏYLƏRİ
+            MÜŞTƏRİ RƏYLƏRİ
           </Heading>
           <p className="text-xs sm:text-sm text-neutral-500 font-sans max-w-lg mx-auto leading-relaxed">
-            Həqiqi istifadəçilərimizin Aluna texnologiyaları ilə əldə etdikləri unikal nəticələr və dəri dəyişiklikləri haqqında rəyləri oxuyun.
+            Həqiqi müştərilərimizin TAPLA MARKETPLACE-də aldıqları məhsullar haqqında rəyləri.
           </p>
         </div>
 
@@ -112,7 +110,7 @@ export function ReviewsSection({ initialReviews }: ReviewsSectionProps) {
             <div className="bg-emerald-50/50 border border-emerald-100 p-4 flex items-center space-x-3 text-emerald-800 rounded-none">
               <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0" />
               <p className="text-xs font-semibold leading-relaxed">
-                İstifadəçilərimizin <span className="underline decoration-2">100%-i</span> bu məhsulu rəfiqələrinə və ailə üzvlərinə tövsiyə edir.
+                Müştərilərimizin <span className="underline decoration-2">95%-i</span> TAPLA MARKETPLACE-i dostlarına tövsiyə edir.
               </p>
             </div>
           </div>
@@ -144,7 +142,7 @@ export function ReviewsSection({ initialReviews }: ReviewsSectionProps) {
           {/* Right Column: CTA write review & customer upload showcase placeholder */}
           <div className="lg:col-span-3 text-center lg:pl-6 space-y-4">
             <p className="text-xs text-neutral-500 leading-relaxed max-w-xs mx-auto lg:mx-0">
-              Şəxsi təcrübənizi bizimlə bölüşmək istərdiniz? Digər gözəllik axtarışında olan xanımlara kömək edin.
+              Şəxsi təcrübənizi bizimlə bölüşmək istərdiniz? Digər müştərilərimizə kömək edin.
             </p>
             <button
               onClick={() => setIsWriteReviewOpen(true)}
@@ -165,17 +163,17 @@ export function ReviewsSection({ initialReviews }: ReviewsSectionProps) {
               <span className="font-semibold uppercase tracking-wider text-[11px]">SÜZGƏCLƏR:</span>
             </div>
             
-            {/* Skin Type Filter dropdown */}
+            {/* Category Filter dropdown */}
             <select
-              value={filterSkinType}
-              onChange={(e) => setFilterSkinType(e.target.value)}
+              value={filterCategory}
+              onChange={(e) => setFilterCategory(e.target.value)}
               className="bg-white border border-neutral-200 text-neutral-800 text-[11px] px-3 py-2 uppercase tracking-wider focus:outline-none cursor-pointer"
             >
-              <option value="all">Bütün Dəri Tipləri</option>
-              <option value="quru">Quru</option>
-              <option value="yağlı">Yağlı</option>
-              <option value="normal">Normal</option>
-              <option value="qarışıq">Qarışıq</option>
+              <option value="all">Bütün Kateqoriyalar</option>
+              <option value="Notebook">Notebook</option>
+              <option value="Smartfon">Smartfon</option>
+              <option value="Planşet">Planşet</option>
+              <option value="Aksesuar">Aksesuar</option>
             </select>
           </div>
 
@@ -210,13 +208,13 @@ export function ReviewsSection({ initialReviews }: ReviewsSectionProps) {
         <Modal
           isOpen={isWriteReviewOpen}
           onClose={() => setIsWriteReviewOpen(false)}
-          title="YENİ GÖZƏLLİK RƏYİ YAZ"
+          title="YENİ RƏY YAZ"
         >
           <form onSubmit={handleWriteReviewSubmit} className="space-y-4 font-sans text-neutral-900">
             {/* Stars Selector */}
             <div>
               <label className="text-[10px] tracking-widest uppercase font-semibold text-neutral-500 block mb-2">
-                ALUNA QİYMƏTLƏNDİRİLMƏSİ *
+                MƏHSUL QİYMƏTLƏNDİRİLMƏSİ *
               </label>
               <div className="flex items-center space-x-2">
                 {[1, 2, 3, 4, 5].map((star) => (
@@ -256,7 +254,7 @@ export function ReviewsSection({ initialReviews }: ReviewsSectionProps) {
                 rows={4}
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
-                placeholder="Aluna cihazımızla bağlı təcrübənizi ətraflı şəkildə qeyd edin. Dərinizdəki dəyişikliklər necə oldu?"
+                placeholder="Məhsulla bağlı təcrübənizi ətraflı şəkildə qeyd edin."
                 className="w-full bg-white border border-neutral-200 text-xs p-4 focus:outline-none focus:border-neutral-950 focus:ring-1 focus:ring-neutral-950"
               />
             </div>
@@ -280,53 +278,37 @@ export function ReviewsSection({ initialReviews }: ReviewsSectionProps) {
             </div>
 
             {/* Select options */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <label className="text-[10px] tracking-widest uppercase font-semibold text-neutral-500 block">
-                  YAŞ REYTİNQİ
+                  MƏHSUL KATEQORİYASI
                 </label>
                 <select
-                  value={newAge}
-                  onChange={(e) => setNewAge(e.target.value)}
+                  value={newProductCategory}
+                  onChange={(e) => setNewProductCategory(e.target.value)}
                   className="w-full bg-white border border-neutral-200 text-xs px-3 py-3 focus:outline-none cursor-pointer"
                 >
-                  <option value="18-24">18-24 yaş</option>
-                  <option value="25-34">25-34 yaş</option>
-                  <option value="35-44">35-44 yaş</option>
-                  <option value="45+">45+ yaş</option>
+                  <option value="Notebook">Notebook</option>
+                  <option value="Smartfon">Smartfon</option>
+                  <option value="Planşet">Planşet</option>
+                  <option value="Aksesuar">Aksesuar</option>
+                  <option value="TV / Audio">TV / Audio</option>
                 </select>
               </div>
 
               <div className="space-y-1.5">
                 <label className="text-[10px] tracking-widest uppercase font-semibold text-neutral-500 block">
-                  DƏRİ TİPİNİZ
+                  İSTİFADƏ MƏQSƏDİ
                 </label>
                 <select
-                  value={newSkinType}
-                  onChange={(e) => setNewSkinType(e.target.value)}
+                  value={newUsagePurpose}
+                  onChange={(e) => setNewUsagePurpose(e.target.value)}
                   className="w-full bg-white border border-neutral-200 text-xs px-3 py-3 focus:outline-none cursor-pointer"
                 >
-                  <option value="Normal">Normal</option>
-                  <option value="Quru">Quru</option>
-                  <option value="Yağlı">Yağlı</option>
-                  <option value="Həssas">Həssas</option>
-                  <option value="Qarışıq">Qarışıq</option>
-                </select>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-[10px] tracking-widest uppercase font-semibold text-neutral-500 block">
-                  DƏRİ RƏNGİNİZ
-                </label>
-                <select
-                  value={newSkinTone}
-                  onChange={(e) => setNewSkinTone(e.target.value)}
-                  className="w-full bg-white border border-neutral-200 text-xs px-3 py-3 focus:outline-none cursor-pointer"
-                >
-                  <option value="Çox Açıq">Çox Açıq</option>
-                  <option value="Açıq">Açıq</option>
-                  <option value="Buğdayı">Buğdayı</option>
-                  <option value="Qaraşın">Qaraşın</option>
+                  <option value="İş / Təhsil">İş / Təhsil</option>
+                  <option value="Oyun">Oyun</option>
+                  <option value="Ev / Əyləncə">Ev / Əyləncə</option>
+                  <option value="Hədiyyə">Hədiyyə</option>
                 </select>
               </div>
             </div>

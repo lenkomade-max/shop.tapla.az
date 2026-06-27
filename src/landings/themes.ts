@@ -111,28 +111,7 @@ export const themes: Record<ThemeName, ThemeConfig> = {
     },
     borderRadius: '0.75rem',
   },
-  beautyPremium: {
-    name: 'beautyPremium',
-    label: 'Beauty Premium',
-    colors: {
-      primary: '#c026d3',
-      primaryHover: '#a21caf',
-      secondary: '#fae8ff',
-      accent: '#d946ef',
-      background: '#fdf4ff',
-      foreground: '#1a0a1e',
-      muted: '#faf5ff',
-      mutedForeground: '#6b21a8',
-      border: '#f3e8ff',
-      card: '#ffffff',
-      cardForeground: '#1a0a1e',
-    },
-    fonts: {
-      heading: "'Playfair Display', serif",
-      body: "'Inter', sans-serif",
-    },
-    borderRadius: '1rem',
-  },
+
 }
 
 export function getTheme(name: ThemeName): ThemeConfig {

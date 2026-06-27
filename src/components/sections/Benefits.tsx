@@ -36,10 +36,10 @@ export function Benefits({ benefits }: BenefitsProps) {
             MÜKƏMMƏLLİK SİYASƏTİMİZ
           </span>
           <Heading level={2} align="center" className="font-serif">
-            NİYƏ MƏHZ ALUNA?
+            NİYƏ TAPLA MARKETPLACE?
           </Heading>
           <p className="text-xs sm:text-sm text-neutral-500 font-sans max-w-lg mx-auto leading-relaxed">
-            Hər bir cihazımız unikal texnoloji struktura və dərinin sağlamlığını dərindən dəstəkləyən təhlükəsizlik sertifikatlarına malikdir.
+            Rəsmi zəmanətli məhsullar, ən aşağı qiymətlər və sürətli çatdırılma — TAPLA MARKETPLACE fərqi ilə.
           </p>
         </div>
 
