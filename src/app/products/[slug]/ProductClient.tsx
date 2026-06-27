@@ -212,7 +212,7 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
           <div className="lg:col-span-5 space-y-8">
             <div className="space-y-4">
               <span className="text-[10px] tracking-widest uppercase text-neutral-400 font-bold block">
-                {product.category} CİHAZI
+                {product.category}
               </span>
               <h1 className="text-2xl sm:text-3xl font-bold tracking-widest uppercase text-neutral-900 leading-tight font-sans">
                 {product.name}
