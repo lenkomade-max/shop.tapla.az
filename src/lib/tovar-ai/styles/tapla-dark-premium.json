@@ -1,0 +1,38 @@
+{
+  "name": "TAPLA Dark Premium",
+  "description": "Темный премиум — для флагманских товаров, luxury-сегмента, игровых устройств.",
+  "applies_to": ["flagship", "premium", "luxury", "Oyun", "Qulaqlıq"],
+  "design_spec": {
+    "background": "Dark charcoal to black gradient (#1A1A1A to #0D0D0D), subtle radial highlight behind the product. No textures.",
+    "lighting": "Dramatic single key light from top-left at 45° (beauty dish), subtle rim light from behind (15% intensity, cool white #E8E8E8). Deep shadows, high contrast. Product must be clearly visible.",
+    "color_palette": "Product retains natural colors. Accent elements in TAPLA gold #C9A96E. Text white #FFFFFF. Highlight accents in thin gold lines.",
+    "typography": {
+      "headlines": "Bold geometric sans-serif (like Montserrat 700), 28-48pt, color #FFFFFF, uppercase",
+      "body": "Light sans-serif (like Inter 200), 14-18pt, color #AAAAAA",
+      "badges": "Bold condensed, 12-16pt, gold text on transparent dark background",
+      "prices": "Bold, 24-36pt, color #FFFFFF"
+    },
+    "composition_rules": {
+      "product_zone": "Center 55% of frame",
+      "text_zone": "Top 12% headline, bottom 12% price/badges",
+      "white_space": "Minimum 20% breathing room around product"
+    },
+    "mandatory_elements": ["TAPLA logo bottom-right corner (small, 40px, gold, 20% opacity)"],
+    "forbidden": [
+      "English text anywhere",
+      "Cyrillic text anywhere",
+      "Bright neon colors",
+      "Rainbow gradients",
+      "Comic fonts",
+      "Stock watermarks",
+      "QR codes",
+      "Excessive lens flares"
+    ]
+  },
+  "text_rules": {
+    "language": "AZERBAIJANI LATIN ONLY. Never English. Never Russian. Never Cyrillic.",
+    "max_headline_chars": 30,
+    "max_subtitle_chars": 50,
+    "tone": "Elite, exclusive, flagship. Powerful and premium."
+  }
+}

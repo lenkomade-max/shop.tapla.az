@@ -1,0 +1,43 @@
+{
+  "style_lock": {
+    "color_palette": "warm tones, gold + white + grey",
+    "lighting": "studio lighting, soft shadows, 2 sources from left and top",
+    "background_style": "clean gradient, minimal, no patterns",
+    "typography_style": "bold sans-serif headlines, light body text",
+    "overall_mood": "premium, modern, clean"
+  },
+  "cards": [
+    {
+      "index": 1,
+      "purpose": "main_cover",
+      "prompt_en": "E-commerce product card for TAPLA marketplace, 1:1 square format. Showcase the massager filling 60-70% of the frame, front-facing with a hero angle. Use premium studio lighting with soft shadows from two sources, left and top. Set against a clean gradient background in warm tones. Include bold sans-serif headline text in Azerbaijani Latin script: 'ÜZ BAXIMI MASSAJERİ'. Ensure magazine-cover quality composition to capture attention.",
+      "text_overlay_az": [
+        "ÜZ BAXIMI MASSAJERİ"
+      ],
+      "composition": "Product centered, hero angle, clean gradient background",
+      "needs_model": false,
+      "reference_weight": 0.7
+    },
+    {
+      "index": 2,
+      "purpose": "usage_demo",
+      "prompt_en": "E-commerce product card for TAPLA marketplace, 1:1 square format. Depict a woman aged 20-55 using the massager naturally in a luxurious bathroom setting. Capture the scene with warm studio lighting, soft shadows from left and top. The background should be minimal and elegant, emphasizing the product's use. Highlight the ergonomic design and LED therapy feature.",
+      "text_overlay_az": [],
+      "composition": "Woman using product in bathroom, warm lighting, minimal background",
+      "needs_model": true,
+      "reference_weight": 0.5
+    },
+    {
+      "index": 3,
+      "purpose": "features_detail",
+      "prompt_en": "E-commerce product card for TAPLA marketplace, 1:1 square format. Focus on close-ups and macro shots of the massager, highlighting the ergonomic handle and LED lighting panel. Use studio lighting with soft shadows from left and top. Present an infographic style with callouts in Azerbaijani Latin script: 'LED İŞIQ TERAPİYASI', 'ERQONOMİK DİZAYN'. Ensure the background is a clean gradient in warm tones.",
+      "text_overlay_az": [
+        "LED İŞIQ TERAPİYASI",
+        "ERQONOMİK DİZAYN"
+      ],
+      "composition": "Close-ups, macro shots, infographic style",
+      "needs_model": false,
+      "reference_weight": 0.8
+    }
+  ]
+}

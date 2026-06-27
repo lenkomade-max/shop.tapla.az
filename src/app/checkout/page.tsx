@@ -454,7 +454,7 @@ export default function CheckoutPage() {
                           <span className="w-2.5 h-2.5 rounded-full border border-neutral-300" />
                         )}
                       </div>
-                      <span className="text-[10px] text-neutral-500 leading-normal font-sans">
+                      <span className="text-xs sm:text-sm text-emerald-600 font-bold tracking-wide text-center font-display">
                         Visa, MasterCard, BirKart və ya Tamkart ilə dərhal və tam təhlükəsiz ödəniş.
                       </span>
 

@@ -1,0 +1,45 @@
+[
+  {
+    "card_index": 1,
+    "passed": true,
+    "checks": {
+      "product_fidelity": true,
+      "text_readable": true,
+      "no_hallucinations": true,
+      "composition_ok": true,
+      "style_consistent": true
+    },
+    "issues": [],
+    "score": 90
+  },
+  {
+    "card_index": 2,
+    "passed": false,
+    "checks": {
+      "product_fidelity": false,
+      "text_readable": false,
+      "no_hallucinations": false,
+      "composition_ok": false,
+      "style_consistent": false
+    },
+    "issues": [
+      "extra logos",
+      "text blurred",
+      "product color changed"
+    ],
+    "score": 50
+  },
+  {
+    "card_index": 3,
+    "passed": true,
+    "checks": {
+      "product_fidelity": true,
+      "text_readable": true,
+      "no_hallucinations": true,
+      "composition_ok": true,
+      "style_consistent": true
+    },
+    "issues": [],
+    "score": 85
+  }
+]

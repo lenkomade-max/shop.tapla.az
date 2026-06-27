@@ -1,0 +1,62 @@
+{
+  "product_type": "massajer",
+  "category": "Kosmetika",
+  "subcategory": "Üz baxımı və massaj",
+  "brand": null,
+  "model": null,
+  "logo_visible": false,
+  "inscriptions": [],
+  "primary_color": "white",
+  "secondary_colors": [
+    "purple"
+  ],
+  "finish": "parlaq",
+  "shape": "erqonomik, T-şəkilli",
+  "material": "ABS-plastik",
+  "texture": "hamar",
+  "dimensions_estimated": "təxminən 15×8×5 sm",
+  "construction_features": [
+    "erqonomik tutacaq",
+    "LED işıqlandırma paneli"
+  ],
+  "controls": [
+    "düymə"
+  ],
+  "buttons": [
+    "power"
+  ],
+  "ports": [],
+  "display": null,
+  "indicators": [
+    "bənövşəyi LED işıq"
+  ],
+  "package_contents": [
+    "massajer"
+  ],
+  "accessories": [],
+  "possible_functions": [
+    "üz massajı",
+    "LED terapiyası",
+    "qırışların azaldılması",
+    "dəri gərmə"
+  ],
+  "intended_use": "üz dərisinin baxımı və gərilməsi üçün ev şəraitində istifadə",
+  "needs_human_model": true,
+  "needs_lifestyle_scene": true,
+  "recommended_scenes": [
+    "vanna otağı",
+    "yataq otağı",
+    "kosmetika masası"
+  ],
+  "needs_macro_shots": true,
+  "needs_size_comparison": false,
+  "needs_exploded_view": false,
+  "target_audience": "qadınlar 20-55",
+  "key_selling_points": [
+    "LED işıq terapiyası",
+    "Erqonomik dizayn",
+    "Asan istifadə (tək düyməli)",
+    "Kompakt ölçü"
+  ],
+  "premium_level": "mid"
+}
