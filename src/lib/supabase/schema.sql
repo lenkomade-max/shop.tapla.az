@@ -78,6 +78,8 @@ CREATE TABLE IF NOT EXISTS profiles (
   first_name TEXT,
   last_name TEXT,
   avatar_url TEXT,
+  city TEXT,                          -- город из последнего заказа
+  address TEXT,                       -- полный адрес из последнего заказа
   role TEXT NOT NULL DEFAULT 'customer' CHECK (role IN ('customer', 'admin')),
   is_guest BOOLEAN DEFAULT true,
   created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -113,8 +115,10 @@ CREATE TABLE IF NOT EXISTS orders (
   auth_user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
   customer_name TEXT NOT NULL,
   phone TEXT NOT NULL,
+  email TEXT,
   city TEXT,
   address TEXT,
+  payment_method TEXT,
   quantity INT NOT NULL DEFAULT 1,
   total DECIMAL(10,2) NOT NULL,
   status TEXT NOT NULL DEFAULT 'new' CHECK (status IN ('new', 'confirmed', 'shipped', 'delivered', 'cancelled')),

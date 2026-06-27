@@ -86,6 +86,8 @@ export interface Profile {
   first_name: string | null
   last_name: string | null
   avatar_url: string | null
+  city: string | null
+  address: string | null
   role: 'customer' | 'admin'
   is_guest: boolean
   created_at: string

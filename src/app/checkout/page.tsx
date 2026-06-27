@@ -22,8 +22,7 @@ import { Container } from '@/components/ui/Container';
 import { useAuth } from '@/components/auth/AuthContext';
 
 interface CheckoutForm {
-  firstName: string;
-  lastName: string;
+  fullName: string;
   phone: string;
   email: string;
   city: string;
@@ -45,13 +44,12 @@ export default function CheckoutPage() {
 
   // Local form state
   const [form, setForm] = useState<CheckoutForm>({
-    firstName: '',
-    lastName: '',
+    fullName: '',
     phone: '',
     email: '',
     city: 'Bakı',
     address: '',
-    paymentMethod: 'cash_delivery',
+    paymentMethod: 'online_card',
     cardNumber: '',
     cardExpiry: '',
     cardCvv: '',
@@ -69,12 +67,15 @@ export default function CheckoutPage() {
   // Авто-заполнение из профиля при загрузке (только если поля ещё пустые)
   useEffect(() => {
     if (mounted && profile) {
+      // Собираем fullName из first_name + last_name
+      const profileFullName = [profile.first_name, profile.last_name].filter(Boolean).join(' ').trim();
       setForm(prev => ({
         ...prev,
-        firstName: prev.firstName || profile.first_name || '',
-        lastName: prev.lastName || profile.last_name || '',
+        fullName: prev.fullName || profileFullName,
         phone: prev.phone || profile.phone || '',
         email: prev.email || profile.email || '',
+        city: prev.city !== 'Bakı' ? prev.city : (profile.city || prev.city),
+        address: prev.address || profile.address || '',
       }));
     }
   }, [mounted, profile]);
@@ -85,8 +86,7 @@ export default function CheckoutPage() {
 
   const validateForm = () => {
     const errors: Partial<Record<keyof CheckoutForm, string>> = {};
-    if (!form.firstName.trim()) errors.firstName = 'Adınızı daxil edin';
-    if (!form.lastName.trim()) errors.lastName = 'Soyadınızı daxil edin';
+    if (!form.fullName.trim()) errors.fullName = 'Ad və soyadınızı daxil edin';
     if (!form.phone.trim()) errors.phone = 'Əlaqə nömrənizi daxil edin';
     if (!form.address.trim()) errors.address = 'Çatdırılma ünvanını daxil edin';
     
@@ -149,8 +149,7 @@ export default function CheckoutPage() {
     const { submitOrder } = await import('@/lib/actions');
 
     const result = await submitOrder({
-      firstName: form.firstName,
-      lastName: form.lastName,
+      fullName: form.fullName,
       phone: form.phone,
       email: form.email,
       city: form.city,
@@ -215,7 +214,7 @@ export default function CheckoutPage() {
 
               <div className="flex justify-between border-b border-neutral-200/60 pb-3">
                 <span className="text-neutral-400 uppercase tracking-wider font-semibold">Müştəri:</span>
-                <span className="font-bold text-neutral-900 uppercase">{form.firstName} {form.lastName}</span>
+                <span className="font-bold text-neutral-900 uppercase">{form.fullName}</span>
               </div>
 
               <div className="flex justify-between border-b border-neutral-200/60 pb-3">
@@ -331,32 +330,17 @@ export default function CheckoutPage() {
                     <h2 className="text-xs font-bold tracking-widest uppercase text-neutral-900">1. ŞƏXSİ MƏLUMATLAR</h2>
                   </div>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <label className="text-[10px] tracking-wider uppercase font-semibold text-neutral-500">ADINIZ *</label>
-                      <input
-                        type="text"
-                        name="firstName"
-                        value={form.firstName}
-                        onChange={handleInputChange}
-                        placeholder="Məs. Aytən"
-                        className={`w-full bg-neutral-50 border ${formErrors.firstName ? 'border-red-500' : 'border-neutral-200'} text-xs px-4 py-3 focus:outline-hidden focus:border-neutral-950`}
-                      />
-                      {formErrors.firstName && <span className="text-[9px] font-semibold text-red-500 uppercase">{formErrors.firstName}</span>}
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-[10px] tracking-wider uppercase font-semibold text-neutral-500">SOYADINIZ *</label>
-                      <input
-                        type="text"
-                        name="lastName"
-                        value={form.lastName}
-                        onChange={handleInputChange}
-                        placeholder="Məs. Məmmədova"
-                        className={`w-full bg-neutral-50 border ${formErrors.lastName ? 'border-red-500' : 'border-neutral-200'} text-xs px-4 py-3 focus:outline-hidden focus:border-neutral-950`}
-                      />
-                      {formErrors.lastName && <span className="text-[9px] font-semibold text-red-500 uppercase">{formErrors.lastName}</span>}
-                    </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] tracking-wider uppercase font-semibold text-neutral-500">AD VƏ SOYADINIZ *</label>
+                    <input
+                      type="text"
+                      name="fullName"
+                      value={form.fullName}
+                      onChange={handleInputChange}
+                      placeholder="Məs. Aytən Məmmədova"
+                      className={`w-full bg-neutral-50 border ${formErrors.fullName ? 'border-red-500' : 'border-neutral-200'} text-xs px-4 py-3 focus:outline-hidden focus:border-neutral-950`}
+                    />
+                    {formErrors.fullName && <span className="text-[9px] font-semibold text-red-500 uppercase">{formErrors.fullName}</span>}
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

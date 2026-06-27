@@ -178,6 +178,8 @@ export async function createGuestProfile(data: {
   email?: string
   first_name?: string
   last_name?: string
+  city?: string
+  address?: string
 }): Promise<Profile> {
   const { data: profile, error } = await supabaseAdmin
     .from('profiles')

@@ -116,8 +116,7 @@ export async function saveProduct(formData: FormData): Promise<void> {
 }
 
 export interface CheckoutFormData {
-  firstName: string
-  lastName: string
+  fullName: string
   phone: string
   email: string
   city: string
@@ -134,23 +133,25 @@ export async function submitOrder(formData: CheckoutFormData) {
   if (existingProfile) {
     profileId = existingProfile.id
     await supabaseAdmin.from('profiles').update({
-      first_name: formData.firstName,
-      last_name: formData.lastName,
+      first_name: formData.fullName,
       email: formData.email || existingProfile.email,
+      city: formData.city,
+      address: formData.address,
     }).eq('id', profileId)
   } else {
     const newProfile = await createGuestProfile({
       phone: formData.phone,
       email: formData.email || undefined,
-      first_name: formData.firstName,
-      last_name: formData.lastName,
+      first_name: formData.fullName,
+      city: formData.city,
+      address: formData.address,
     })
     profileId = newProfile.id
   }
 
   const { data: order, error } = await supabaseAdmin.from('orders').insert({
     profile_id: profileId,
-    customer_name: `${formData.firstName} ${formData.lastName}`,
+    customer_name: formData.fullName,
     phone: formData.phone,
     email: formData.email || null,
     city: formData.city,
