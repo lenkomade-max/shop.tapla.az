@@ -1,0 +1,12 @@
+{
+  "id": "s07-exploded-view",
+  "name": "Exploded View",
+  "description": "Товар слегка разобран на основные компоненты. Парящие части. Apple Keynote стиль. Технично и чисто.",
+  "prompt_prefix": "Technical premium product presentation. Product slightly exploded into main visible components. Parts floating precisely in space maintaining their relative positions. Apple Keynote reveal style. Very clean. White or dark studio background. Ultra realistic. 8K. Professional industrial design photography.",
+  "forbidden": ["fully disassembled mess", "collages", "text", "watermarks", "logos", "chaotic arrangement"],
+  "composition": "Central component in focus, other parts floating symmetrically with equal spacing",
+  "lighting": "Clean studio lighting, each component softly lit, no harsh shadows",
+  "use_for": ["features_detail"],
+  "needs_model": false,
+  "needs_environment": false
+}

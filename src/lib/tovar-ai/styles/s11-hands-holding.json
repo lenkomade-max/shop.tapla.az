@@ -1,0 +1,12 @@
+{
+  "id": "s11-hands-holding",
+  "name": "Hands Holding Product",
+  "description": "Реалистичная рука держит товар. Премиум лайфстайл. Фокус на товаре. Мягкое размытие фона.",
+  "prompt_prefix": "Premium lifestyle product photography. Realistic human hand holding the product naturally. Focus remains on the product — hand is secondary. Natural skin texture, no airbrush. Soft blurred background. Magazine editorial quality. Ultra realistic. 8K. Commercial product photography.",
+  "forbidden": ["collages", "text", "watermarks", "logos", "both hands unless needed", "distracting jewelry", "fake nails"],
+  "composition": "Hand holding product in center frame, shallow DOF, soft bokeh background",
+  "lighting": "Soft window light, product well-lit, subtle shadow from hand",
+  "use_for": ["usage_demo", "main_cover"],
+  "needs_model": true,
+  "needs_environment": false
+}

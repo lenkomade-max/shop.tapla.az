@@ -10,7 +10,6 @@ export { runTovarAIPipeline } from './pipeline'
 export {
   TOVAR_AI_CONFIG,
   type VisionOutput,
-  type StylePreset,
   type CardPrompt,
   type PromptsOutput,
   type CardResult,

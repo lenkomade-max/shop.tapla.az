@@ -53,27 +53,6 @@ export interface VisionOutput {
   premium_level: 'budget' | 'mid' | 'premium' | 'luxury'
 }
 
-// ─── Style Preset (фиксированный дизайн из JSON, НЕ LLM) ────────────────────
-
-export interface StylePreset {
-  name: string
-  description: string
-  applies_to: string[]
-  design_spec: {
-    background: string
-    lighting: string
-    color_palette: string
-    composition: string
-    mandatory_elements: string[]
-    forbidden: string[]
-  }
-  text_rules: {
-    language: string
-    max_headline_chars: number
-    tone: string
-  }
-}
-
 // ─── Stage 2: Prompt Planner ────────────────────────────────────────────────
 
 export interface CardPrompt {

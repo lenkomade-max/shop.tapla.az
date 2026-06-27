@@ -1,0 +1,12 @@
+{
+  "id": "s04-floating-hero",
+  "name": "Floating Hero",
+  "description": "Товар парит в воздухе. Динамичная композиция, мелкие частицы, мягкий свет. Современный технологичный стиль.",
+  "prompt_prefix": "Dynamic product advertising photography. Product floating mid-air. Small floating particles or dust motes catching light. Soft cinematic lighting. Luxury commercial advertising style. Modern technology feeling. Ultra realistic. 8K. Dramatic but clean composition.",
+  "forbidden": ["collages", "split layouts", "text", "watermarks", "logos", "visible wires", "shadows on floor"],
+  "composition": "Product floating center, slightly angled, particles around, negative space around edges",
+  "lighting": "Dramatic soft key from top, subtle fill from below, rim light for separation",
+  "use_for": ["main_cover"],
+  "needs_model": false,
+  "needs_environment": false
+}

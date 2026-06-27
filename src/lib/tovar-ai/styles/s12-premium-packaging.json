@@ -1,0 +1,12 @@
+{
+  "id": "s12-premium-packaging",
+  "name": "Premium Packaging Shot",
+  "description": "Товар вместе с премиум упаковкой. Всё идеально выровнено. Роскошная коммерческая фотография.",
+  "prompt_prefix": "Luxury commercial product photography. Product displayed together with its premium packaging. Product and box perfectly aligned. Clean composition. High-end unboxing aesthetic. Ultra realistic. 8K. Premium retail display quality. Gift-worthy presentation.",
+  "forbidden": ["damaged boxes", "collages", "text", "watermarks", "logos", "messy arrangement", "tape", "shipping labels"],
+  "composition": "Product next to or emerging from open premium box, 45° angle, symmetrical",
+  "lighting": "Soft studio lighting, highlights catching packaging texture",
+  "use_for": ["main_cover", "features_detail"],
+  "needs_model": false,
+  "needs_environment": false
+}

@@ -1,0 +1,12 @@
+{
+  "id": "s02-luxury-lifestyle",
+  "name": "Luxury Lifestyle",
+  "description": "Товар в премиум интерьере где он естественно используется. Роскошно, современно, дневной свет, журнальное качество.",
+  "prompt_prefix": "Premium lifestyle product photography. Product placed naturally inside a luxurious realistic interior where it would be used. Modern design. Natural daylight through large windows. Magazine editorial quality. Ultra realistic. 8K. The environment supports the product without distracting attention.",
+  "forbidden": ["collages", "split layouts", "multiple panels", "text", "cheap plastic props", "cluttered backgrounds", "watermarks", "logos"],
+  "composition": "Product in natural position within luxurious environment, occupies 40-50% of frame",
+  "lighting": "Natural daylight, soft diffused window light, subtle warm fill",
+  "use_for": ["usage_demo"],
+  "needs_model": false,
+  "needs_environment": true
+}

@@ -1,0 +1,12 @@
+{
+  "id": "s10-before-after",
+  "name": "Before / After Usage",
+  "description": "Использование товара: до и после ожидаемого результата. Натурально, журнальная реклама. Без инфографики.",
+  "prompt_prefix": "Magazine advertisement photography showing the product being used and its expected result. Natural scene. Not infographic, not split-screen — show the moment of transformation or the result context naturally. Realistic. Premium commercial quality. Ultra realistic. 8K.",
+  "forbidden": ["collages", "split layouts", "before/after text labels", "infographic", "watermarks", "logos"],
+  "composition": "Product visible in scene, result visible contextually, natural narrative framing",
+  "lighting": "Natural warm light, consistent across the scene",
+  "use_for": ["usage_demo"],
+  "needs_model": true,
+  "needs_environment": true
+}

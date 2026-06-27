@@ -1,73 +1,139 @@
 // ============================================================================
 // Stage 2: Prompt Planner
-// Дизайн — из фиксированного style JSON (наш).
-// LLM — только контент: текст на AZ, композиция, что показать.
+// 12 стилей + авто-адаптация → в промпты. LLM → только контент и AZ текст.
 // ============================================================================
 
 import * as fs from 'node:fs'
 import * as path from 'node:path'
-import { TOVAR_AI_CONFIG, type VisionOutput, type PromptsOutput, type StylePreset } from './types'
+import { TOVAR_AI_CONFIG, type VisionOutput, type PromptsOutput } from './types'
 
-// ─── SYSTEM PROMPT (статичный, без правил дизайна) ──────────────────────────
+// ─── ФОТО-СТИЛИ (12 шт, из JSON) ───────────────────────────────────────────
+
+interface PhotoStyle {
+  id: string
+  name: string
+  prompt_prefix: string
+  forbidden: string[]
+  composition: string
+  lighting: string
+  use_for: string[]
+  needs_model: boolean
+  needs_environment: boolean
+}
+
+const STYLES_DIR = path.join(__dirname, 'styles')
+
+function loadAllPhotoStyles(): PhotoStyle[] {
+  return fs.readdirSync(STYLES_DIR)
+    .filter(f => f.startsWith('s') && f.endsWith('.json'))
+    .map(f => JSON.parse(fs.readFileSync(path.join(STYLES_DIR, f), 'utf-8')) as PhotoStyle)
+}
+
+// ─── БАЗОВЫЙ ПРОМПТ (из GPT— самая важная часть, вшивается в КАЖДЫЙ запрос) ──
+
+const BASE_PROMPT = `Create a premium marketplace product image.
+
+The image must look like a professional e-commerce product photograph suitable for Amazon, Trendyol, Temu, AliExpress Premium, Shopify or a modern online marketplace.
+
+Generate ONE image only.
+Never create collages.
+Never create split layouts.
+Never create multiple panels.
+Never create infographic grids.
+One image = one marketing message.
+
+The product must occupy approximately 60-80% of the frame.
+Use realistic premium photography.
+Luxury commercial lighting.
+Photorealistic.
+Natural materials.
+Studio quality.
+Modern advertising style.
+High-end product photography.
+Ultra realistic.
+8K.
+
+The product is always the main subject.
+Do not change the product shape.
+Do not invent new product parts.
+Remove all watermarks, stickers, logos and packaging unless requested.
+Leave enough negative space for optional text placement.
+Generate images suitable for Meta Ads and marketplace galleries.
+
+CRITICAL — Analyze the uploaded product before generating the image. Determine automatically: product category, materials, intended use, target customer, suitable environment, appropriate lighting, realistic accessories, correct hand position if applicable, realistic usage scenario, luxury commercial style.
+
+Do not reuse the same environment for every product.
+Beauty products → skincare environments.
+Electronics → modern technology environments.
+Kitchen products → premium kitchens.
+Fitness products → sports environments.
+Office products → office environments.
+Pet products → natural home settings.
+Automotive → automotive environments.`
+
+// ─── SYSTEM PROMPT ─────────────────────────────────────────────────────────
 
 const SYSTEM_PROMPT = `You are a product content writer for TAPLA MARKETPLACE (Azerbaijan).
 
-Your ONLY job: given a product analysis AND a fixed design style, create 3 product-card prompts for Nano Banana 2 image generation.
+Given: product analysis + selected photo style for each card.
+Your job: write product-specific image description + Azerbaijani text overlays.
 
-YOU DO NOT DESIGN THE STYLE. The style is FIXED and provided to you. Your task:
-1. Write product-specific content within the given style
-2. Decide what to show on each card based on the product
-3. Write text overlays in AZERBAIJANI LATIN SCRIPT
-
-## CARD PURPOSES
+## 3 CARDS
 
 Card 1 (main_cover):
 - Product hero shot, fills 60-70% of frame
-- Magazine-cover quality
-- Large headline in AZ, optional subtitle badge
-- Goal: STOP the scroll
+- Magazine-cover quality, STOP the scroll
+- Large headline in AZ, optional badge
 
 Card 2 (usage_demo):
-- Show product being used
-- If product needs human model: person using it naturally
-- If needs lifestyle scene: product in beautiful interior
-- Goal: create desire through context
+- Product being used naturally
+- If product needs human: person using it
+- If needs lifestyle: product in beautiful interior
+- Create desire through context
 
 Card 3 (features_detail):
 - Close-ups, details, macro shots
-- Infographic style: callouts, labels, highlight key features
-- Goal: communicate quality and features
+- Infographic style: callouts, labels
+- Communicate quality and features
 
 ## TEXT RULES
-- ALL visible text MUST be in AZERBAIJANI LATIN SCRIPT
+- ALL visible text: AZERBAIJANI LATIN SCRIPT ONLY
 - NEVER English. NEVER Russian. NEVER Cyrillic.
-- Short phrases: 3-5 words max per headline
-- Examples: "3 REJİM", "LED TERAPİYA", "ERQONOMİK DİZAYN", "SÜRƏTLİ QURUTMA"
-- Numbers, badges, benefit bullets are OK
+- Short: 3-5 words max per headline
+- Examples: "LED TERAPİYA", "3 REJİM", "ERQONOMİK DİZAYN"
 
 ## PROMPT RULES
-- Each prompt_en must be under 200 words
-- Write in full English sentences (Nano Banana works best with English)
-- Reference the original product photo for visual fidelity
-- Include the card purpose context
+- Each prompt_en under 250 words
+- Full English sentences
+- Reference original photo for product fidelity
 
-Output ONLY valid JSON. No markdown, no code fences.`
+Output ONLY valid JSON. No markdown.`
 
-const USER_PROMPT_TEMPLATE = `Create 3 image generation prompts for this product.
+const USER_PROMPT_TEMPLATE = `Create 3 image prompts for this product.
 
-## FIXED DESIGN STYLE (DO NOT CHANGE)
-{STYLE_BLOCK}
+## PHOTO STYLES ASSIGNED (use these exact prefixes in each card)
+
+CARD 1 STYLE: {STYLE1_NAME} — {STYLE1_PREFIX}
+
+CARD 2 STYLE: {STYLE2_NAME} — {STYLE2_PREFIX}
+
+CARD 3 STYLE: {STYLE3_NAME} — {STYLE3_PREFIX}
 
 ## Product Analysis
 {ANALYSIS}
 
-## Provider Info
-Description: {DESCRIPTION}
-Characteristics: {CHARACTERISTICS}
+## Provider Description
+{DESCRIPTION}
 
-## STYLE PICK
-Selected style: {STYLE_NAME}
-Reason: {STYLE_REASON}
+## Characteristics
+{CHARACTERISTICS}
+
+## REQUIREMENTS
+- Each card must be ONE IMAGE only. Never collages. Never split layouts. Never multiple panels. Never infographic grids.
+- Product occupies 60-80% of frame.
+- Realistic premium photography. Ultra realistic. 8K.
+- Leave negative space for text placement.
+- Remove all watermarks, stickers, logos, packaging.
 
 Return JSON:
 {
@@ -75,97 +141,81 @@ Return JSON:
     {
       "index": 1,
       "purpose": "main_cover",
-      "prompt_en": "English prompt for Nano Banana 2. Include composition, product position, what text to render.",
-      "text_overlay_az": ["HEADLINE IN AZ LATIN"],
-      "composition": "short description of composition",
-      "needs_model": false,
-      "reference_weight": 0.7
+      "prompt_en": "Product-specific scene description in English. Under 250 words. DO NOT include style prefix — it will be added automatically.",
+      "text_overlay_az": ["HEADLINE AZ"],
+      "needs_model": false
     },
     {
       "index": 2,
       "purpose": "usage_demo",
       "prompt_en": "...",
       "text_overlay_az": [],
-      "composition": "...",
-      "needs_model": true,
-      "reference_weight": 0.5
+      "needs_model": true
     },
     {
       "index": 3,
       "purpose": "features_detail",
       "prompt_en": "...",
       "text_overlay_az": ["FEATURE 1 AZ", "FEATURE 2 AZ"],
-      "composition": "...",
-      "needs_model": false,
-      "reference_weight": 0.8
+      "needs_model": false
     }
   ]
 }
 
 RULES:
-- reference_weight: 0.7-0.9 for cards showing product alone, 0.4-0.6 for lifestyle scenes
-- text_overlay_az: AZERBAIJANI LATIN ONLY. Empty array if no text needed.
-- Every prompt_en must begin with the FIXED DESIGN STYLE description above plus "E-commerce product card for TAPLA marketplace, 1:1 square format."
-- Do NOT invent new colors, fonts, or mood — use ONLY what's in the FIXED DESIGN STYLE.
+- text_overlay_az: AZERBAIJANI LATIN ONLY. Empty array if no text.
+- prompt_en: Write what to show — the style prefix is added automatically.
+- Do NOT invent style changes — use the assigned photo style for each card.
+- One image = one marketing message.
 
 Respond ONLY with the JSON.`
 
-// ─── STYLE LOADER ──────────────────────────────────────────────────────────
+// ─── ВЫБОР СТИЛЯ ДЛЯ КАЖДОЙ КАРТОЧКИ (код, не LLM) ────────────────────────
 
-const STYLES_DIR = path.join(__dirname, 'styles')
+function pickStyle(useFor: string, vision: VisionOutput, styles: PhotoStyle[]): PhotoStyle {
+  const candidates = styles.filter(s => s.use_for.includes(useFor))
 
-function loadStylePreset(name: string): StylePreset {
-  const filePath = path.join(STYLES_DIR, `${name}.json`)
-  if (!fs.existsSync(filePath)) {
-    throw new Error(`Style preset not found: ${name}.json at ${filePath}`)
-  }
-  return JSON.parse(fs.readFileSync(filePath, 'utf-8')) as StylePreset
-}
+  // Фильтруем по model/environment требованиям
+  const filtered = candidates.filter(s => {
+    if (!vision.needs_human_model && s.needs_model) return false
+    if (!vision.needs_lifestyle_scene && s.needs_environment) return false
+    return true
+  })
 
-function selectStyle(vision: VisionOutput): { preset: StylePreset; reason: string } {
-  // Выбираем стиль по категории и premium_level
-  const available = listAvailableStyles()
+  const pool = filtered.length > 0 ? filtered : candidates
 
-  // P1: exact category match
-  for (const s of available) {
-    if (s.applies_to.includes(vision.category)) {
-      return { preset: s, reason: `Category match: ${vision.category}` }
-    }
+  // s01 (white studio) — дефолт для main_cover
+  if (useFor === 'main_cover') {
+    const white = pool.find(s => s.id === 's01-white-studio')
+    if (white) return white
   }
 
-  // P2: premium_level match
-  const levelMap: Record<string, string> = {
-    luxury: 'tapla-dark-premium',
-    premium: 'tapla-premium-light',
-    mid: 'tapla-premium-light',
-    budget: 'tapla-premium-light',
-  }
-  const targetName = levelMap[vision.premium_level] || 'tapla-premium-light'
-  const fallback = available.find(s => s.name === targetName)
-  if (fallback) {
-    return { preset: fallback, reason: `Premium level: ${vision.premium_level}` }
+  // Для usage_demo с моделью — s03 (in-use) приоритет
+  if (useFor === 'usage_demo' && vision.needs_human_model) {
+    const inUse = pool.find(s => s.id === 's03-product-in-use')
+    if (inUse) return inUse
   }
 
-  // P3: дефолт
-  return { preset: available[0], reason: 'Default' }
-}
+  // Для usage_demo без модели — s02 (lifestyle)
+  if (useFor === 'usage_demo' && !vision.needs_human_model) {
+    const life = pool.find(s => s.id === 's02-luxury-lifestyle')
+    if (life) return life
+  }
 
-function listAvailableStyles(): StylePreset[] {
-  const files = fs.readdirSync(STYLES_DIR).filter(f => f.endsWith('.json'))
-  return files.map(f => JSON.parse(fs.readFileSync(path.join(STYLES_DIR, f), 'utf-8')))
-}
+  // Для features_detail с макро — s06
+  if (useFor === 'features_detail' && vision.needs_macro_shots) {
+    const macro = pool.find(s => s.id === 's06-macro-detail')
+    if (macro) return macro
+  }
 
-function styleToTextBlock(p: StylePreset): string {
-  const d = p.design_spec
-  return [
-    `COLOR PALETTE: ${d.color_palette}`,
-    `BACKGROUND: ${d.background}`,
-    `LIGHTING: ${d.lighting}`,
-    `COMPOSITION: ${d.composition}`,
-    `MANDATORY: ${d.mandatory_elements.join('; ')}.`,
-    `FORBIDDEN: ${d.forbidden.join('; ')}.`,
-    `TEXT: ${p.text_rules.language}. Tone: ${p.text_rules.tone}. Max headline ${p.text_rules.max_headline_chars} chars.`,
-  ].join(' ')
+  // Для features_detail с exploded — s07
+  if (useFor === 'features_detail' && vision.needs_exploded_view) {
+    const exp = pool.find(s => s.id === 's07-exploded-view')
+    if (exp) return exp
+  }
+
+  // Дефолт: первая подходящая
+  return pool[0] || candidates[0] || styles[0]
 }
 
 // ─── MAIN ──────────────────────────────────────────────────────────────────
@@ -176,26 +226,26 @@ export async function planCardPrompts(
   characteristics?: Record<string, string>,
 ): Promise<PromptsOutput> {
   const config = TOVAR_AI_CONFIG
+  const styles = loadAllPhotoStyles()
 
-  // 1. Выбираем стиль на основе VisionOutput (НЕ LLM!)
-  const { preset: style, reason } = selectStyle(analysis)
-  const styleBlock = styleToTextBlock(style)
+  // Выбираем стиль для каждой карточки
+  const s1 = pickStyle('main_cover', analysis, styles)
+  const s2 = pickStyle('usage_demo', analysis, styles)
+  const s3 = pickStyle('features_detail', analysis, styles)
 
-  console.log(`[Stage 2] Style: ${style.name} — ${reason}`)
+  console.log(`[Stage 2] Styles: card1=${s1.id}, card2=${s2.id}, card3=${s3.id}`)
 
-  // 2. Отправляем LLM: фиксированный стиль + анализ товара
+  // Отправляем LLM: назначенные стили + анализ товара
   const userPrompt = USER_PROMPT_TEMPLATE
-    .replace('{STYLE_BLOCK}', styleBlock)
-    .replace('{STYLE_NAME}', style.name)
-    .replace('{STYLE_REASON}', reason)
+    .replace('{STYLE1_NAME}', s1.name)
+    .replace('{STYLE1_PREFIX}', s1.prompt_prefix)
+    .replace('{STYLE2_NAME}', s2.name)
+    .replace('{STYLE2_PREFIX}', s2.prompt_prefix)
+    .replace('{STYLE3_NAME}', s3.name)
+    .replace('{STYLE3_PREFIX}', s3.prompt_prefix)
     .replace('{ANALYSIS}', JSON.stringify(analysis, null, 2))
     .replace('{DESCRIPTION}', providerDescription || 'Not provided')
-    .replace(
-      '{CHARACTERISTICS}',
-      characteristics && Object.keys(characteristics).length > 0
-        ? JSON.stringify(characteristics, null, 2)
-        : 'None provided',
-    )
+    .replace('{CHARACTERISTICS}', characteristics && Object.keys(characteristics).length > 0 ? JSON.stringify(characteristics) : 'None')
 
   const body = {
     model: config.PLANNER_MODEL,
@@ -208,43 +258,44 @@ export async function planCardPrompts(
     max_tokens: 4096,
   }
 
-  const response = await fetch(
-    `${config.OPENROUTER_BASE_URL}/chat/completions`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${config.API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
+  const response = await fetch(`${config.OPENROUTER_BASE_URL}/chat/completions`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${config.API_KEY}`,
+      'Content-Type': 'application/json',
     },
-  )
+    body: JSON.stringify(body),
+  })
 
   if (!response.ok) {
     const errText = await response.text()
-    throw new Error(
-      `Stage 2 Planner API error ${response.status}: ${errText.slice(0, 500)}`,
-    )
+    throw new Error(`Stage 2 Planner API error ${response.status}: ${errText.slice(0, 500)}`)
   }
 
   const data = await response.json()
   const raw = data.choices?.[0]?.message?.content || ''
-
   const parsed = parseJSON<{ cards: PromptsOutput['cards'] }>(raw)
 
   if (!Array.isArray(parsed.cards) || parsed.cards.length < 3) {
     throw new Error(`Stage 2: Expected 3 cards, got ${parsed.cards?.length || 0}`)
   }
 
-  // 3. ПРИНУДИТЕЛЬНО вшиваем FIXED стиль в каждый prompt_en
+  // ПРИНУДИТЕЛЬНО вшиваем: [BASE] + [стиль] + [контент LLM] в каждом промпте
+  const styleMap = [s1, s2, s3]
   for (const card of parsed.cards) {
-    if (!card.prompt_en.includes('COLOR PALETTE:')) {
-      card.prompt_en = styleBlock + '. ' + card.prompt_en
-    }
+    const style = styleMap[card.index - 1]
+    card.prompt_en = [
+      BASE_PROMPT,
+      `STYLE: ${style.name}.`,
+      style.prompt_prefix,
+      `Composition: ${style.composition}. Lighting: ${style.lighting}.`,
+      'TAPLA MARKETPLACE product card. 1:1 square format.',
+      card.prompt_en,
+    ].join(' ')
   }
 
   return {
-    style_name: style.name,
+    style_name: `${s1.id}+${s2.id}+${s3.id}`,
     cards: parsed.cards,
   }
 }
@@ -254,9 +305,7 @@ export async function planCardPrompts(
 function parseJSON<T>(raw: string): T {
   let cleaned = raw.trim()
   if (cleaned.startsWith('```')) {
-    cleaned = cleaned
-      .replace(/^```(?:json)?\s*\n?/, '')
-      .replace(/\n?```\s*$/, '')
+    cleaned = cleaned.replace(/^```(?:json)?\s*\n?/, '').replace(/\n?```\s*$/, '')
   }
   return JSON.parse(cleaned) as T
 }

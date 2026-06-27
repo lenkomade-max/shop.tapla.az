@@ -1,0 +1,12 @@
+{
+  "id": "s01-white-studio",
+  "name": "White Studio",
+  "description": "Товар на чистом белом фоне. Apple Store качество. Мягкие тени, премиум отражения. Ничего кроме товара.",
+  "prompt_prefix": "Premium e-commerce product photography. Product shot on pure white seamless background. Soft studio shadows. Subtle premium reflections on surfaces. Apple Store quality. Minimal. Product is the only subject. Ultra realistic. 8K. Commercial lighting.",
+  "forbidden": ["collages", "split layouts", "multiple panels", "infographic grids", "text", "watermarks", "logos"],
+  "composition": "Product occupies 70-80% of frame, centered, front 3/4 angle",
+  "lighting": "Even three-point studio, softbox main, subtle rim light, no harsh shadows",
+  "use_for": ["main_cover"],
+  "needs_model": false,
+  "needs_environment": false
+}
