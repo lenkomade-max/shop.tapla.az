@@ -32,6 +32,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const supabase = createClient()
 
     const ensureProfile = async (userId: string) => {
+      // 1. Проверить существующий профиль
       const { data: existing } = await supabase
         .from('profiles')
         .select('*')
@@ -43,21 +44,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return
       }
 
+      // 2. Получить метаданные пользователя из Supabase Auth
       const { data: userData } = await supabase.auth.getUser()
+      const meta = userData?.user?.user_metadata ?? {}
+
+      // 3. Вставить профиль (может упасть из-за phone UNIQUE или гонки)
       const { data: created, error } = await supabase
         .from('profiles')
         .insert({
           auth_user_id: userId,
           email: userData?.user?.email ?? undefined,
-          first_name: userData?.user?.user_metadata?.first_name ?? undefined,
-          last_name: userData?.user?.user_metadata?.last_name ?? undefined,
-          avatar_url: userData?.user?.user_metadata?.avatar_url ?? undefined,
+          first_name: meta.first_name ?? meta.given_name ?? undefined,
+          last_name: meta.last_name ?? meta.family_name ?? undefined,
+          avatar_url: meta.avatar_url ?? meta.picture ?? undefined,
+          phone: meta.phone ?? undefined,
           is_guest: false,
         })
         .select()
         .single()
 
       if (error) {
+        // Если гонка (другой клиент уже вставил) — просто перечитать
+        if (error.code === '23505') {
+          const { data: retry } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('auth_user_id', userId)
+            .maybeSingle()
+          if (retry) {
+            setProfile(retry as Profile)
+            return
+          }
+        }
         console.error('ensureProfile insert error:', error)
         return
       }
@@ -98,6 +116,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const requireAuth = useCallback((redirectTo?: string): boolean => {
+    // Читаем user напрямую из замыкания, но проверяем через getSession для актуальности
+    // isAuthenticated в зависимостях меняет ссылку при каждом логине/логауте — это ок
     if (isAuthenticated) {
       if (redirectTo) window.location.href = redirectTo
       return true

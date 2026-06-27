@@ -81,7 +81,7 @@ export interface CollectionProduct {
 export interface Profile {
   id: string
   auth_user_id: string | null
-  phone: string
+  phone: string | null
   email: string | null
   first_name: string | null
   last_name: string | null

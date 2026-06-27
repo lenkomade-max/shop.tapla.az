@@ -1,7 +1,48 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import { X } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+/** Извлечь человеко-читаемое сообщение из любого объекта ошибки Supabase */
+function extractErrorMessage(err: unknown): string {
+  if (!err) return 'Naməlum xəta baş verdi'
+  if (typeof err === 'string') return err
+  if (typeof err === 'object' && err !== null) {
+    const e = err as Record<string, unknown>
+    if (typeof e.message === 'string' && e.message.length > 0) return e.message
+    // Supabase иногда возвращает ошибку без message, но с code/details
+    if (typeof e.code === 'string') return `Xəta kodu: ${e.code}`
+    try { return JSON.stringify(err) } catch { /* fallthrough */ }
+  }
+  return String(err)
+}
+
+/** Сопоставить техническое сообщение об ошибке с азербайджанским текстом */
+function localizeAuthError(msg: string): string {
+  const lower = msg.toLowerCase()
+  if (lower.includes('invalid login credentials') || lower.includes('invalid_credentials')) return 'Email və ya şifrə yanlışdır'
+  if (lower.includes('user already registered') || lower.includes('user_already_exists')) return 'Bu email artıq qeydiyyatdan keçib'
+  if (lower.includes('signup requires a valid password') || lower.includes('weak_password')) return 'Şifrə ən azı 6 simvol olmalıdır'
+  if (lower.includes('email') && lower.includes('confirm')) return 'Email təsdiqlənməyib. Zəhmət olmasa emailinizi yoxlayın.'
+  if (lower.includes('rate') || lower.includes('limit')) return 'Çox sayda cəhd. Bir az gözləyin və təkrar yoxlayın.'
+  return msg
+}
+
+// ---------------------------------------------------------------------------
+// Constants
+// ---------------------------------------------------------------------------
+
+const PHONE_PREFIX = '+994'
+const PHONE_MIN_LENGTH = 12 // +994XXXXXXXXX (оператор + 7 цифр)
+
+// ---------------------------------------------------------------------------
+// AuthModal
+// ---------------------------------------------------------------------------
 
 interface AuthModalProps {
   isOpen: boolean
@@ -86,30 +127,36 @@ export function AuthModal({ isOpen, onClose, onGoogleSignIn, isLoading }: AuthMo
   )
 }
 
+// ---------------------------------------------------------------------------
+// LoginForm
+// ---------------------------------------------------------------------------
+
 function LoginForm({ onSuccess }: { onSuccess: () => void }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
 
-    const { createClient } = await import('@/lib/supabase/client')
-    const supabase = createClient()
-    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
+    try {
+      const supabase = createClient()
+      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
 
-    if (signInError) {
-      setError(signInError.message === 'Invalid login credentials'
-        ? 'Email və ya şifrə yanlışdır'
-        : 'Giriş zamanı xəta baş verdi')
-    } else {
-      onSuccess()
+      if (signInError) {
+        setError(localizeAuthError(extractErrorMessage(signInError)))
+      } else {
+        onSuccess()
+      }
+    } catch (err) {
+      setError(localizeAuthError(extractErrorMessage(err)))
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
-  }
+  }, [email, password, onSuccess])
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -145,6 +192,10 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
   )
 }
 
+// ---------------------------------------------------------------------------
+// RegisterForm
+// ---------------------------------------------------------------------------
+
 function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -153,14 +204,22 @@ function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhoneChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value
-    if (val.startsWith('+994') || val === '+') {
-      setPhone(val)
+    // Разрешить только цифры после +994, сохраняя префикс
+    if (val === '' || val === '+') {
+      setPhone('+994')
+      return
     }
-  }
+    if (val.startsWith(PHONE_PREFIX)) {
+      // Ограничить длину: +994 + макс 9 цифр = 13 символов
+      const digits = val.slice(PHONE_PREFIX.length).replace(/\D/g, '')
+      setPhone(PHONE_PREFIX + digits.slice(0, 9))
+    }
+    // Если пользователь стирает префикс — не даём, восстанавливаем
+  }, [])
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
@@ -170,44 +229,50 @@ function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
       const firstName = nameParts[0] || ''
       const lastName = nameParts.slice(1).join(' ') || ''
 
-      const { createClient } = await import('@/lib/supabase/client')
+      // Валидация телефона: либо оставлен по умолчанию (пропускаем), либо полный номер
+      const cleanPhone = phone.trim()
+      const phoneToSend = cleanPhone.length >= PHONE_MIN_LENGTH ? cleanPhone : undefined
+
       const supabase = createClient()
 
       const { error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: { first_name: firstName, last_name: lastName, phone: phone || undefined },
+          data: {
+            first_name: firstName,
+            last_name: lastName,
+            ...(phoneToSend ? { phone: phoneToSend } : {}),
+          },
         },
       })
 
       if (signUpError) {
-        const msg = typeof signUpError === 'object' && signUpError !== null
-          ? signUpError.message || JSON.stringify(signUpError)
-          : String(signUpError)
-        setError(msg === 'User already registered'
-          ? 'Bu email artıq qeydiyyatdan keçib'
-          : msg === 'Signup requires a valid password'
-            ? 'Şifrə tələb olunur'
-            : msg)
-      } else {
-        const { data: { session } } = await supabase.auth.getSession()
-        if (!session) {
-          const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
-          if (signInError) {
-            setError('Email təsdiqlənməyib. Zəhmət olmasa emailinizi yoxlayın.')
-            setLoading(false)
-            return
-          }
-        }
-        onSuccess()
+        setError(localizeAuthError(extractErrorMessage(signUpError)))
+        setLoading(false)
+        return
       }
+
+      // После signUp проверяем — если email confirmation включён,
+      // getSession() вернёт null и нужна дополнительная обработка
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        // Пробуем сразу залогиниться (на случай если confirmations выключены)
+        const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
+        if (signInError) {
+          setError('Email təsdiqlənməyib. Zəhmət olmasa emailinizi yoxlayın.')
+          setLoading(false)
+          return
+        }
+      }
+
+      onSuccess()
     } catch (err) {
-      const e = err as Record<string, unknown> | null
-      setError(e && typeof e === 'object' ? String(e?.message ?? e) : String(err))
+      setError(localizeAuthError(extractErrorMessage(err)))
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
-  }
+  }, [name, email, phone, password, onSuccess])
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -238,6 +303,7 @@ function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
           type="tel"
           value={phone}
           onChange={handlePhoneChange}
+          placeholder="+994 55 123 45 67"
           className="w-full border border-neutral-200 px-4 py-3 text-xs focus:outline-hidden focus:border-neutral-900"
         />
       </div>
