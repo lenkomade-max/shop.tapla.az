@@ -58,7 +58,7 @@ src/
   constants/
     data.ts                       — 4 electronics products, reviews, FAQs, steps, benefits
   lib/
-    supabase/                     — client, admin, types, queries, migrations
+    supabase/                     — client, admin, types, queries, schema.sql (единый DDL)
     utils.ts                      — cn()
     animations.ts                 — Framer Motion variants
   types/
