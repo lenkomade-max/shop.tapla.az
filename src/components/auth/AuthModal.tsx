@@ -172,8 +172,14 @@ function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
     if (signUpError) {
       setError(signUpError.message === 'User already registered'
         ? 'Bu email artıq qeydiyyatdan keçib'
-        : 'Qeydiyyat zamanı xəta baş verdi')
+        : signUpError.message === 'Signup requires a valid password'
+          ? 'Şifrə tələb olunur'
+          : signUpError.message)
     } else {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        await supabase.auth.signInWithPassword({ email, password })
+      }
       onSuccess()
     }
     setLoading(false)
