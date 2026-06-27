@@ -8,6 +8,13 @@ interface SecurePaymentTransitionProps {
   redirectUrl: string;
 }
 
+// ── Mini particles ───────────────────────────────────────────────────
+const dots = Array.from({ length: 6 }, (_, i) => ({
+  id: i,
+  x: 15 + Math.random() * 70,
+  delay: Math.random() * 1.5,
+}));
+
 export default function SecurePaymentTransition({ redirectUrl }: SecurePaymentTransitionProps) {
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -18,120 +25,96 @@ export default function SecurePaymentTransition({ redirectUrl }: SecurePaymentTr
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: 'easeOut' }}
-      className="bg-white border border-neutral-100 p-6 sm:p-8 space-y-6 text-center shadow-sm"
+      transition={{ duration: 0.35, ease: 'easeOut' }}
+      className="relative bg-white border border-neutral-200 shadow-sm overflow-hidden"
     >
-      {/* Logo + Shield */}
-      <div className="relative inline-flex items-center justify-center">
-        {/* Pulsing shield rings */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.6 }}
-          animate={{ opacity: [0, 0.15, 0], scale: [0.6, 1.4, 1.8] }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', times: [0, 0.5, 1] }}
-          className="absolute inset-0 rounded-full bg-emerald-500"
-        />
-        <motion.div
-          initial={{ opacity: 0, scale: 0.5 }}
-          animate={{ opacity: [0, 0.1, 0], scale: [0.5, 1.2, 1.5] }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', times: [0, 0.5, 1], delay: 0.4 }}
-          className="absolute inset-0 rounded-full bg-emerald-400"
-        />
-
-        {/* Logo container */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, ease: 'easeOut' }}
-          className="relative z-10 bg-white rounded-2xl p-4 shadow-lg shadow-neutral-200/50"
-        >
-          <Image
-            src="/images/pashabank-logo.svg"
-            alt="PASHA Bank"
-            width={140}
-            height={40}
-            className="h-10 w-auto"
-            priority
+      {/* Floating particles */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {dots.map((d) => (
+          <motion.div
+            key={d.id}
+            className="absolute rounded-full bg-emerald-500/30"
+            style={{ width: 3, height: 3, left: `${d.x}%`, bottom: -4 }}
+            animate={{ y: [0, -80, -160], opacity: [0, 0.6, 0] }}
+            transition={{ duration: 2, delay: d.delay, repeat: Infinity, ease: 'easeInOut' }}
           />
-        </motion.div>
-
-        {/* Animated shield checkmark */}
-        <motion.div
-          initial={{ opacity: 0, rotate: -90, scale: 0 }}
-          animate={{ opacity: 1, rotate: 0, scale: 1 }}
-          transition={{ duration: 0.6, delay: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
-          className="absolute -top-1 -right-1 z-20"
-        >
-          <svg className="w-6 h-6 sm:w-7 sm:h-7" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <motion.circle
-              cx="12" cy="12" r="11"
-              fill="#059669"
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ duration: 0.3, delay: 0.5 }}
-            />
-            <motion.path
-              d="M7 12.5L10.5 16L17 9"
-              stroke="white"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              fill="none"
-              initial={{ pathLength: 0 }}
-              animate={{ pathLength: 1 }}
-              transition={{ duration: 0.4, delay: 0.8 }}
-            />
-          </svg>
-        </motion.div>
+        ))}
       </div>
 
-      {/* Text: redirecting message */}
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.3, ease: 'easeOut' }}
-        className="space-y-1.5"
-      >
-        <p className="text-xs sm:text-sm font-bold tracking-widest uppercase text-neutral-900">
-          Təhlükəsiz ödənişə yönləndirilirsiniz
-        </p>
-        <p className="text-[10px] text-neutral-500 font-sans leading-relaxed max-w-xs mx-auto">
-          PASHA Bank tərəfindən qorunan təhlükəsiz ödəniş səhifəsinə keçid edilir
-        </p>
-      </motion.div>
-
-      {/* Progress bar */}
-      <div className="max-w-[200px] mx-auto w-full space-y-1.5">
-        <div className="h-1 bg-neutral-100 rounded-full overflow-hidden">
-          <motion.div
-            initial={{ width: '0%' }}
-            animate={{ width: '100%' }}
-            transition={{ duration: 1.8, delay: 0.6, ease: 'easeInOut' }}
-            className="h-full rounded-full"
-            style={{
-              background: 'linear-gradient(90deg, #059669, #10b981, #34d399)',
-            }}
-          />
-        </div>
-        {/* SSL badge */}
+      <div className="relative z-10 p-5 sm:p-6 space-y-5 text-center">
+        {/* Logo */}
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.4, delay: 0.5 }}
-          className="flex items-center justify-center space-x-1.5"
+          initial={{ opacity: 0, scale: 0.85 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          className="flex justify-center"
         >
-          <svg className="w-3 h-3 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
-            <path
-              fillRule="evenodd"
-              d="M2.166 4.999L10 1.154l7.834 3.845A1 1 0 0118.5 5.9v4.962a9 9 0 01-5.367 8.232l-2.766 1.155a1 1 0 01-.734 0l-2.766-1.155A9 9 0 011.5 10.862V5.9a1 1 0 01.666-.901zM10 3.146L3.5 6.257V10.76a7 7 0 004.174 6.403l2.326.97 2.326-.97a7 7 0 004.174-6.403V6.257L10 3.146zM13.707 8.707a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-              clipRule="evenodd"
+          <div className="bg-white rounded-xl px-5 py-3 shadow-sm border border-neutral-100">
+            <Image
+              src="/images/pashabank-logo.svg"
+              alt="PASHA Bank"
+              width={110}
+              height={30}
+              className="h-8 w-auto"
+              priority
             />
-          </svg>
-          <span className="text-[9px] font-bold text-neutral-400 tracking-widest uppercase">
-            PASHA Bank Acquiring · 128-bit SSL
-          </span>
+          </div>
         </motion.div>
+
+        {/* Shield checkmark */}
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
+          className="flex justify-center"
+        >
+          <motion.div
+            animate={{ boxShadow: ['0 0 0 rgba(5,150,105,0)', '0 0 20px rgba(5,150,105,0.3)', '0 0 0 rgba(5,150,105,0)'] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center"
+          >
+            <svg className="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+              <motion.path
+                d="M5 13l4 4L19 7"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ duration: 0.5, delay: 0.7 }}
+              />
+            </svg>
+          </motion.div>
+        </motion.div>
+
+        {/* Text */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.3 }}
+          className="space-y-1"
+        >
+          <p className="text-xs font-bold tracking-widest uppercase text-neutral-900">
+            Təhlükəsiz ödənişə yönləndirilirsiniz
+          </p>
+          <p className="text-[10px] text-neutral-500 font-sans">
+            PASHA Bank · 128-bit SSL şifrələmə
+          </p>
+        </motion.div>
+
+        {/* Progress bar */}
+        <div className="max-w-[220px] mx-auto w-full">
+          <div className="h-1 bg-neutral-100 rounded-full overflow-hidden">
+            <motion.div
+              initial={{ width: '0%' }}
+              animate={{ width: '100%' }}
+              transition={{ duration: 2, delay: 0.4, ease: 'easeInOut' }}
+              className="h-full rounded-full"
+              style={{ background: 'linear-gradient(90deg, #059669, #10b981, #34d399)' }}
+            />
+          </div>
+        </div>
       </div>
     </motion.div>
   );

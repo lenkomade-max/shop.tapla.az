@@ -21,6 +21,7 @@ import { useCart } from '@/store/CartContext';
 import { Container } from '@/components/ui/Container';
 import { useAuth } from '@/components/auth/AuthContext';
 import SecurePaymentTransition from '@/components/checkout/SecurePaymentTransition';
+import PashaBankCard from '@/components/checkout/PashaBankCard';
 
 interface CheckoutForm {
   fullName: string;
@@ -547,42 +548,7 @@ export default function CheckoutPage() {
                   {form.paymentMethod === 'online_card' && isRedirecting ? (
                     <SecurePaymentTransition redirectUrl={redirectUrl} />
                   ) : form.paymentMethod === 'online_card' ? (
-                    <div className="bg-neutral-50 border border-neutral-200 p-5 space-y-4 transition-all duration-300 animate-fadeIn">
-                      {/* Pasha Bank secure checkout banner */}
-                      <div className="bg-white p-3.5 border border-neutral-200/80 flex items-center justify-between">
-                        <div className="space-y-1">
-                          <p className="text-[9px] font-bold text-[#0E1E38] tracking-widest uppercase">PASHA Bank Acquiring</p>
-                          <p className="text-[9px] text-neutral-500 font-sans leading-none">128-bit SSL Şifrələmə ilə Tam Təhlükəsiz Ödəniş Sistemi</p>
-                        </div>
-                        {/* Pasha Bank elegant logo in the payment form */}
-                        <div className="flex items-center space-x-1.5 bg-neutral-950 px-2.5 py-1.5 rounded-none border border-neutral-850">
-                          <svg className="w-4.5 h-4.5" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M20 50L40 20H55L35 50L55 80H40L20 50Z" fill="#20C060" />
-                            <path d="M42 50L62 20H77L57 50L77 80H62L42 50Z" fill="#F0B800" />
-                            <path d="M64 50L84 20H99L79 50L99 80H84L64 50Z" fill="#FFFFFF" />
-                          </svg>
-                          <div className="flex flex-col leading-none">
-                            <span className="text-[8px] font-black text-white tracking-widest font-sans">PASHA</span>
-                            <span className="text-[6px] font-bold text-[#20C060] font-sans tracking-wider">Bank</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="bg-emerald-50/30 border border-emerald-200/40 p-4 space-y-2.5">
-                        <p className="text-[10px] font-bold tracking-widest uppercase text-emerald-700 flex items-center space-x-1.5">
-                          <svg className="w-3.5 h-3.5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M2.166 4.9L10 1.154l7.834 3.746A1 1 0 0118.5 5.8v4.962a9 9 0 01-5.367 8.232l-2.766 1.155a1 1 0 01-.734 0l-2.766-1.155A9 9 0 011.5 10.762V5.8a1 1 0 01.666-.9zM10 3.146L3.5 6.257V10.76a7 7 0 004.174 6.403l2.326.97 2.326-.97a7 7 0 004.174-6.403V6.257L10 3.146zM13.707 8.707a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                          </svg>
-                          <span>TƏHLÜKƏSİZ ONLAYN ÖDƏNİŞ</span>
-                        </p>
-                        <p className="text-[10px] text-neutral-600 leading-relaxed font-sans">
-                          Ödəniş səhifəsində kart məlumatlarınızı daxil edəcəksiniz. Bütün əməliyyatlar <strong>PASHA Bank</strong> tərəfindən 128-bit SSL şifrələmə ilə qorunur.
-                        </p>
-                        <p className="text-[9px] text-neutral-400 font-sans">
-                          «SİFARİŞİ TƏSDİQLƏ VƏ TAMAMLA» düyməsinə kliklədikdən sonra təhlükəsiz ödəniş səhifəsinə yönləndiriləcəksiniz.
-                        </p>
-                      </div>
-                    </div>
+                    <PashaBankCard />
                   ) : null}
                 </div>
 
