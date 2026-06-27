@@ -12,10 +12,17 @@ export const metadata: Metadata = {
 export default async function ProductsPage() {
   const products = await dbService.getProducts()
 
+  const debug = await dbService.debugProducts()
+
   return (
     <div className="min-h-screen py-20 px-4">
       <div className="container mx-auto max-w-6xl">
         <h1 className="text-4xl font-bold mb-8">Məhsullar</h1>
+        {debug && (
+          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700 whitespace-pre-wrap font-mono">
+            {debug}
+          </div>
+        )}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {products.map((product) => (
             <Link
