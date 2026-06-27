@@ -31,6 +31,7 @@ export async function deleteProduct(formData: FormData) {
   const { error } = await supabaseAdmin.from('products').delete().eq('id', id);
   if (error) console.error('Delete product error:', error);
   revalidatePath('/admin/products');
+  revalidatePath('/', 'layout');
 }
 
 export async function saveProduct(formData: FormData): Promise<void> {
@@ -108,5 +109,6 @@ export async function saveProduct(formData: FormData): Promise<void> {
 
   revalidatePath('/admin/products');
   revalidatePath('/products');
+  revalidatePath('/', 'layout');
   redirect('/admin/products');
 }
