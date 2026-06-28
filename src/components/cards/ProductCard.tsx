@@ -47,7 +47,7 @@ export function ProductCard({ product, onQuickView }: ProductCardProps) {
       <div className="absolute top-2 left-2 z-10 flex flex-col space-y-1">
         {product.isNew && <Badge variant="solid">YENİ</Badge>}
         {hasDiscount && (
-          <Badge variant="solid" className="bg-yellow-400 text-neutral-900 border-yellow-400 rounded-md">ENDİRİM</Badge>
+          <Badge variant="solid" className="bg-yellow-300 text-neutral-900 border-yellow-400 rounded-md">ENDİRİM</Badge>
         )}
       </div>
 
@@ -96,7 +96,7 @@ export function ProductCard({ product, onQuickView }: ProductCardProps) {
           <div className="flex items-center justify-between gap-2 mb-1.5">
             <div className="flex items-baseline gap-1.5 min-w-0 shrink-0 flex-wrap">
               {hasDiscount ? (
-                <span className="inline-flex items-center bg-yellow-400 rounded-lg px-2 py-0.5 text-base sm:text-xl font-bold tracking-tight text-neutral-900">
+                <span className="inline-flex items-center bg-yellow-300 rounded-lg px-2 py-0.5 text-base sm:text-xl font-bold tracking-tight text-neutral-900">
                   {product.price.toFixed(2)} ₼
                 </span>
               ) : (
