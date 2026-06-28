@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="az" className="scroll-smooth">
-      <body className={`${inter.variable} font-sans antialiased bg-white text-neutral-900 min-h-screen flex flex-col justify-between`}>
+      <body className={`${inter.variable} font-sans antialiased bg-neutral-50 text-neutral-900 min-h-screen flex flex-col justify-between`}>
         <AppProviders>
           <Header />
           <main className="flex-grow">

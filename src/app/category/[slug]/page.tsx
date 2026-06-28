@@ -120,7 +120,7 @@ export default async function CategoryPage({ params }: Props) {
       )}
 
       {/* Products Grid */}
-      <div className="bg-white">
+      <div>
         <div className="container mx-auto max-w-6xl px-2 sm:px-3 py-10">
           {products.length > 0 ? (
             <>

@@ -70,7 +70,7 @@ export function ProductGrid({ products }: ProductGridProps) {
   };
 
   return (
-    <Section id="products" py="lg">
+    <Section id="products" variant="neutral" py="lg">
       <Container className="!px-2 sm:!px-3">
         {/* Header */}
         <div className="max-w-3xl mx-auto text-center space-y-3 mb-12">
