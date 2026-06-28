@@ -33,7 +33,7 @@ export function FAQ({ faqs }: FAQProps) {
             TEZ-TEZ VERİLƏN SUALLAR
           </Heading>
           <p className="text-xs sm:text-sm text-neutral-500 font-sans max-w-lg mx-auto leading-relaxed">
-            TAPLA MARKETPLACE-də çatdırılma, zəmanət, qaytarma və ödəniş qaydaları haqqında bütün sualların cavabları.
+            Çatdırılma, qaytarma və məhsullarla bağlı ən çox verilən sualların cavabları.
           </p>
         </div>
 
@@ -43,7 +43,7 @@ export function FAQ({ faqs }: FAQProps) {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Mövzu və ya açar söz daxil edin (məs. 'Zəmanət')..."
+            placeholder="Mövzu və ya açar söz daxil edin (məs. 'Qaytarma')..."
             className="w-full bg-neutral-50 border border-neutral-200 text-xs px-5 py-4 focus:outline-none focus:border-neutral-950 focus:ring-1 focus:ring-neutral-950 pl-12"
           />
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />

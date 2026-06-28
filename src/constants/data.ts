@@ -24,7 +24,7 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
   },
   {
     label: 'HAQQIMIZDA',
-    href: '/huquqi-melumat',
+    href: '/about',
   },
   {
     label: 'FAQ / DƏSTƏK',
@@ -241,32 +241,26 @@ export const REVIEWS: Review[] = [
 export const FAQS: FAQ[] = [
   {
     id: 'faq-1',
-    question: 'TAPLA MARKETPLACE-də məhsulların zəmanəti varmı?',
-    answer: 'Bəli, bütün məhsullarımız rəsmi zəmanətlə təqdim olunur. Notebook və smartfonlar üçün 2 il, aksesuarlar üçün 1 il rəsmi zəmanət mövcuddur. İstehsal qüsuru aşkar edildikdə məhsul tamamilə yenisi ilə əvəz olunur.',
-    category: 'Zəmanət',
+    question: 'Sifarişim nə vaxt çatdırılacaq?',
+    answer: 'Sifarişiniz Bakı daxilində 24 saat, regionlara isə 2–3 iş günü ərzində çatdırılır. Çatdırılma tarifləri ünvan və çəkiyə əsasən hesablanır — dəqiq məbləğ sifariş zamanı göstərilir. Sifarişiniz hazır olduqda izləmə linki e-poçt vasitəsilə göndərilir.',
+    category: 'Çatdırılma',
   },
   {
     id: 'faq-2',
-    question: 'Məhsulu neçə günə geri qaytara bilərəm?',
-    answer: 'Məhsulu aldıqdan sonra 14 gün ərzində geri qaytarmaq mümkündür. Məhsul istifadə olunmamış, orijinal qablaşdırmada və tam dəstdə olmalıdır. Qaytarılma prosesi tamamilə ödənişsizdir və pulunuz 3-5 iş günü ərzində geri qaytarılır.',
+    question: 'Məhsulu geri qaytarmaq istəsəm, nə etməliyəm?',
+    answer: 'Məhsulu qəbul etdikdən sonra 14 gün ərzində geri qaytarmaq mümkündür. Məhsul orijinal qablaşdırmada, istifadə olunmamış və tam dəstdə olmalıdır. Geri qaytarma prosesi üçün dəstək komandamızla əlaqə saxlayın — sizə addım-addım kömək edəcəyik.',
     category: 'Qaytarma',
   },
   {
     id: 'faq-3',
-    question: 'Çatdırılma şərtləriniz necədir? Rayonlara göndəriş var?',
-    answer: 'Bakı, Sumqayıt və Xırdalan daxilində çatdırılma tamamilə PULSUZDUR və 24 saat ərzində ünvanınıza çatdırılır. Azərbaycanın bütün digər şəhər və rayonlarına sifarişiniz 2-3 iş günü ərzində çatdırılır.',
-    category: 'Çatdırılma',
+    question: 'Məhsul aldıqdan sonra hər hansı problem yaranarsa, nə etməliyəm?',
+    answer: 'Məhsulunuzla bağlı hər hansı çətinlik yarandıqda, dəstək komandamıza müraciət edin. Hər bir məhsul üzrə şərtlər fərqlənə bilər, lakin biz sizə ən qısa müddətdə kömək göstərəcək və ən uyğun həll yolunu təklif edəcəyik.',
+    category: 'Dəstək',
   },
   {
     id: 'faq-4',
-    question: 'Rəsmi zəmanət şərtləri necədir?',
-    answer: 'Bütün məhsullarımız rəsmi distribütor zəmanəti ilə təqdim olunur. Zəmanət müddəti ərzində hər hansı texniki problem yarandıqda, məhsulunuz pulsuz təmir olunur və ya dəyişdirilir. Zəmanət şərtləri hər məhsulun səhifəsində ətraflı göstərilir.',
-    category: 'Zəmanət',
-  },
-  {
-    id: 'faq-5',
     question: 'Məhsulun orijinal olduğunu necə yoxlaya bilərəm?',
-    answer: 'Bütün məhsullarımız rəsmi distribütorlardan təchiz olunur və orijinallıq zəmanəti daşıyır. Hər məhsulun üzərində unikal seriya nömrəsi mövcuddur. Bu nömrəni istehsalçının rəsmi saytında yoxlaya bilərsiniz. Orijinal olmayan məhsula görə 100% pul geri zəmanəti veririk.',
+    answer: 'Məhsulu qəbul edərkən qablaşdırmanı və seriya nömrəsini yoxlamağı tövsiyə edirik. Bütün məhsullarımız rəsmi təchizatçılardan təmin olunur. Seriya nömrəsini istehsalçının rəsmi saytında yoxlaya bilərsiniz. Əlavə məlumat üçün dəstək komandamızla əlaqə saxlayın.',
     category: 'Təhlükəsizlik',
   },
 ];

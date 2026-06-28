@@ -36,6 +36,7 @@ export function Footer() {
             <div className="space-y-4">
               <h5 className="text-[11px] font-semibold tracking-widest uppercase text-white">TAPLA HAQQINDA</h5>
               <ul className="space-y-2.5 text-xs text-neutral-400">
+                <li><Link href="/about" className="hover:text-white transition-colors">Haqqımızda</Link></li>
                 <li><Link href="/" className="hover:text-white transition-colors">Ana Səhifə</Link></li>
                 <li><Link href="/products" className="hover:text-white transition-colors">Bütün Məhsullar</Link></li>
                 <li><Link href="/collections" className="hover:text-white transition-colors">Kolleksiyalar</Link></li>
@@ -59,7 +60,7 @@ export function Footer() {
                 <li><Link href="#faq" className="hover:text-white transition-colors">Çatdırılma və Ödəniş</Link></li>
 <li><Link href="/qaytarma-siyaseti" className="hover:text-white transition-colors">Qaytarılma Siyasəti</Link></li>
                 <li><Link href="/satici-muqavilesi" className="hover:text-white transition-colors">Satıcı Müqaviləsi</Link></li>
-                <li><Link href="/huquqi-melumat" className="hover:text-white transition-colors">Dəstək Mərkəzi</Link></li>
+                <li><Link href="/about" className="hover:text-white transition-colors">Haqqımızda</Link></li>
               </ul>
             </div>
 
