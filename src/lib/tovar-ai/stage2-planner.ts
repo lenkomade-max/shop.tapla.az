@@ -52,41 +52,42 @@ interface RoleTriad {
   roles: [CardRole, CardRole, CardRole]
 }
 
+// Card 1 ВСЕГДА 'hero' — главный промо-шот. Card 2-3 = комплементарные роли.
 const ROLE_TRIADS: RoleTriad[] = [
   {
     name: 'product',
-    logic: 'Main hero shot → Real usage scene → Extreme detail close-up. Product tells its story.',
+    logic: 'Card 1 HERO: stunning first impression. Card 2: real usage scene. Card 3: extreme macro detail. Product tells its story from three angles.',
     roles: ['hero', 'usage', 'close_up'],
   },
   {
     name: 'quality',
-    logic: 'Premium hero → Craftsmanship & quality → Materials & texture. Premium feel.',
+    logic: 'Card 1 HERO: premium showcase. Card 2: craftsmanship & quality. Card 3: materials & texture celebration. Premium feel across all.',
     roles: ['hero', 'quality', 'materials'],
   },
   {
-    name: 'story',
-    logic: 'Problem context → Product as solution → Aspirational lifestyle result.',
-    roles: ['problem', 'solution', 'lifestyle'],
-  },
-  {
-    name: 'trust',
-    logic: 'Hero product → Comparison vs alternative → Social proof review. Trust-building.',
-    roles: ['hero', 'comparison', 'review'],
-  },
-  {
     name: 'features',
-    logic: 'Product hero → Feature benefits → Power & performance. Spec-driven.',
+    logic: 'Card 1 HERO: product dominant. Card 2: feature benefits cards. Card 3: power & performance specs. Spec-driven campaign.',
     roles: ['hero', 'benefits', 'power'],
   },
   {
-    name: 'promo',
-    logic: 'Special offer → Complete bundle → Strong CTA. Sales activation.',
-    roles: ['offer', 'bundle', 'cta'],
+    name: 'trust',
+    logic: 'Card 1 HERO: trust-building main shot. Card 2: comparison vs alternative. Card 3: social proof review. Trust-building through transparency.',
+    roles: ['hero', 'comparison', 'review'],
   },
   {
     name: 'premium',
-    logic: 'Luxury positioning → Lifestyle context → Gift presentation. Aspirational.',
-    roles: ['premium', 'lifestyle', 'gift'],
+    logic: 'Card 1 HERO: luxury positioning. Card 2: aspirational lifestyle context. Card 3: gift-ready presentation. Premium aspirational campaign.',
+    roles: ['hero', 'lifestyle', 'gift'],
+  },
+  {
+    name: 'offer',
+    logic: 'Card 1 HERO: product as irresistible offer. Card 2: complete bundle/all included. Card 3: strong CTA conversion. Sales activation campaign.',
+    roles: ['hero', 'bundle', 'cta'],
+  },
+  {
+    name: 'problem_solution',
+    logic: 'Card 1 HERO: the product as answer. Card 2: problem visualization (before). Card 3: aspirational result (after). Problem-solution story.',
+    roles: ['hero', 'problem', 'solution'],
   },
 ]
 
@@ -377,7 +378,7 @@ LANGUAGE: ALL visible text MUST be in Azerbaijani Latin script only. NEVER Engli
 
 NO COLOR CODES: NEVER render hex codes (#XXXXXX) as visible elements. They are metadata — invisible.
 
-NO INVENTED DATA: Never invent prices, discounts, percentages, or specs not explicitly stated.
+NO INVENTED DATA: Never invent prices, discounts, percentages, "free delivery", warranty terms, or specs not explicitly stated. Fast delivery ("SÜRƏTLİ ÇATDIRILMA") is allowed as a generic marketplace claim. But NEVER "pulsuz" (free) unless stated.
 
 NO REFERENCE COPYING: Never copy logos, brand names, shop names, price stickers, barcodes, watermarks, or packaging text from reference photo.
 
@@ -486,14 +487,14 @@ The difference between roles is WHAT the blocks contain, not whether they exist:
 - Problem / Solution / Gift / Warranty / Close-up / Dimensions: 3-5 blocks — role-specific communication.
 
 ## COMMERCIAL BLOCK TYPES
-Pick based on role + product data (MUST fill the frame):
-- Features: "3 SÜRƏT REJİMİ", "GÜCLÜ HAVA AXINI", "USB ŞARJ", "6 SAAT İŞLƏMƏ", "SƏSSİZ MOTOR"
+Pick based on role + product data (MUST fill the frame). ONLY use blocks that are supported by provider data:
+- Features (from provider description or product type): "3 SÜRƏT REJİMİ", "GÜCLÜ HAVA AXINI", "USB ŞARJ"
 - Quality: "PREMIUM MATERİAL", "ORİJİNAL KEYFİYYƏT", "YÜNGÜL DİZAYN"
-- Delivery: "PULSUZ ÇATDIRILMA", "1 GÜNƏ ÇATDIRILIR"
-- Warranty: "2 İL ZƏMANƏT", "14 GÜN GERİ QAYTARMA"
-- Price: ONLY if explicitly provided (never invent)
+- Delivery: "SÜRƏTLİ ÇATDIRILMA" (generic marketplace — allowed). NEVER "pulsuz" unless stated.
+- Warranty: ONLY if explicitly mentioned in provider description. Never invent "zəmanət".
+- Price: ONLY if explicitly provided (never invent!)
 - CTA: "İNDİ AL", "SƏBƏTƏ AT"
-- Badges: "YENİ", "BESTSELLER", "PREMIUM", "AKSİYA"
+- Badges: "YENİ", "BESTSELLER", "PREMIUM"
 
 ## CARD-PRODUCT CONNECTION
 Cards and product must form one integrated composition. Use thin connection lines from product features to cards. Cards flow around the product — not floating isolated in empty space. The product and information blocks work together as one commercial unit.
@@ -681,8 +682,13 @@ function buildUserPrompt(
     '## Provider Description',
     providerDescription || 'Not provided',
     '',
-    '## Product Price (ONLY if explicitly provided — show on price-related cards)',
-    priceAz || 'NO PRICE — do NOT invent or display any price, discount, or cost figure on any card',
+    '## Product Price (ONLY if explicitly provided)',
+    priceAz || 'NO PRICE — do NOT invent any price',
+    '',
+    '## Delivery & Warranty Rules',
+    'Fast delivery ("SÜRƏTLİ ÇATDIRILMA") is a generic marketplace claim — allowed.',
+    'NEVER claim "pulsuz çatdırılma" or "free delivery" unless provider says so.',
+    'Warranty: ONLY if provider description mentions warranty. Never invent "zəmanət".',
     '',
     '## Characteristics',
     (characteristics && Object.keys(characteristics).length > 0 ? JSON.stringify(characteristics) : 'None'),
@@ -964,6 +970,10 @@ export async function planCardPrompts(
 
     const hasProviderPrice = Boolean(priceAz)
 
+    // Гарантия — только если явно указана в описании
+    const desc = (providerDescription || '').toLowerCase()
+    const hasWarranty = /zəmanət|гарант|warranty|garanti|zemanet/i.test(desc)
+
     const densityInfo = ROLE_COMMERCIAL_DENSITY[card.role as CardRole] || { blocks: '3-5', instruction: '3-5 commercial information blocks.' }
 
     // Случайный композиционный приём — исключаем уже использованные
@@ -1015,7 +1025,9 @@ export async function planCardPrompts(
       `Motion Energy: ${motionItem?.prompt_fragment || sharedVt.motion}.`,
       `COMPOSITION VARIATION: ${variation.name} — ${variation.prompt_fragment}`,
       `COMMERCIAL DENSITY for this role: ${densityInfo.instruction} Use ${densityInfo.blocks} commercial blocks. Fill the frame — no dead zones.`,
-      hasProviderPrice ? `PRODUCT PRICE: ${priceAz}. Display this price on price-related cards (offer, bundle, hero, cta). Use it in commercial blocks.` : '⛔ NO PRICE: Do NOT invent or display any price, discount, or cost figure on any card.',
+      hasProviderPrice ? `PRODUCT PRICE: ${priceAz}. Display this price on price-related cards (offer, bundle, hero, cta). Use it in commercial blocks.` : '⛔ NO PRICE: Do NOT invent or display any price on any card.',
+      !hasWarranty ? '⛔ NO WARRANTY: Description does NOT mention warranty. Do NOT invent warranty terms ("2 il zəmanət", "14 gün geri qaytarma").' : `WARRANTY mentioned in description — can display.`,
+      'Delivery: Generic fast delivery claim is OK ("SÜRƏTLİ ÇATDIRILMA"). NEVER claim "pulsuz" or "free" unless explicitly stated.',
       `ADVERTISING ROLE: ${card.role}. ${ROLE_DESCRIPTIONS[card.role as CardRole] || card.role}.`,
       `Creative Style: ${cardCs.name}. ${cardCs.prompt_fragment}`,
       `Marketing Style: ${cardMs.name}. ${cardMs.prompt_fragment}`,
