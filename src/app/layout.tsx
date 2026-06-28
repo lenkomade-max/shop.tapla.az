@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Inter, Poppins } from 'next/font/google'
 import './globals.css'
 import { AppProviders } from '@/providers/AppProviders'
 import { Header } from '@/components/layout/Header'
@@ -7,6 +7,12 @@ import { Footer } from '@/components/layout/Footer'
 import { StickyMobileBar } from '@/components/layout/StickyMobileBar'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
+const poppins = Poppins({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  display: 'swap',
+  variable: '--font-sans',
+})
 
 export const metadata: Metadata = {
   title: {
@@ -19,7 +25,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="az" className="scroll-smooth">
-      <body className={`${inter.variable} font-sans antialiased bg-neutral-50 text-neutral-900 min-h-screen flex flex-col justify-between`}>
+      <body className={`${inter.variable} ${poppins.variable} font-sans antialiased bg-neutral-50 text-neutral-900 min-h-screen flex flex-col justify-between`}>
         <AppProviders>
           <Header />
           <main className="flex-grow">

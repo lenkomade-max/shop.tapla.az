@@ -27,6 +27,8 @@ export function ProductCard({ product, onQuickView }: ProductCardProps) {
     addToCart(product, selectedShade);
   };
 
+  const hasDiscount = product.originalPrice && product.originalPrice > product.price;
+
   return (
     <div
       id={`product-card-${product.id}`}
@@ -42,9 +44,9 @@ export function ProductCard({ product, onQuickView }: ProductCardProps) {
         setActiveImageIndex(0);
       }}
     >
-      <div className="absolute top-3 left-3 z-10 flex flex-col space-y-1">
+      <div className="absolute top-2 left-2 z-10 flex flex-col space-y-1">
         {product.isNew && <Badge variant="solid">YENİ</Badge>}
-        {product.originalPrice && product.originalPrice > product.price && (
+        {hasDiscount && (
           <Badge variant="accent">ENDİRİM</Badge>
         )}
       </div>
@@ -75,40 +77,61 @@ export function ProductCard({ product, onQuickView }: ProductCardProps) {
         </div>
       </div>
 
-      <div className="flex-1 p-4 sm:p-5 flex flex-col justify-between">
+      <div className="flex-1 p-3 sm:p-4 flex flex-col justify-between">
         <div>
-          <div className="flex items-center space-x-1 mb-2">
-            <div className="flex text-amber-400">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Star
-                  key={i}
-                  className={clsx(
-                    'h-3 w-3 fill-current',
-                    i < Math.floor(product.rating) ? 'text-amber-400' : 'text-neutral-200'
-                  )}
-                />
-              ))}
-            </div>
-            <span className="text-[10px] font-medium text-neutral-500 font-mono">
-              ({product.reviewsCount})
+          {/* Price + Stars row */}
+          <div className="flex items-center justify-between mb-1.5">
+            <span
+              className={clsx(
+                'text-sm sm:text-lg font-bold tracking-tight',
+                hasDiscount ? 'text-blue-600' : 'text-neutral-900'
+              )}
+            >
+              {product.price.toFixed(2)} ₼
             </span>
+
+            <div className="flex items-center gap-1">
+              <div className="flex text-amber-400">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star
+                    key={i}
+                    className={clsx(
+                      'h-2.5 w-2.5 sm:h-3 sm:w-3 fill-current',
+                      i < Math.floor(product.rating) ? 'text-amber-400' : 'text-neutral-200'
+                    )}
+                  />
+                ))}
+              </div>
+              <span className="text-[10px] font-medium text-neutral-500 font-[family-name:var(--font-inter)]">
+                ({product.reviewsCount})
+              </span>
+            </div>
           </div>
 
+          {/* Old price (if discounted) */}
+          {hasDiscount && (
+            <div className="mb-1.5">
+              <span className="text-[11px] text-neutral-400 line-through">
+                {product.originalPrice!.toFixed(2)} ₼
+              </span>
+            </div>
+          )}
+
           <Link href={`/products/${product.slug}`} className="block group/title">
-            <h4 className="text-xs sm:text-sm font-semibold tracking-widest uppercase text-neutral-900 mb-1 hover:text-neutral-600 transition-colors">
+            <h4 className="text-xs sm:text-sm font-semibold tracking-widest uppercase text-neutral-900 mb-0.5 hover:text-neutral-600 transition-colors">
               {product.name}
             </h4>
           </Link>
-          <p className="text-[11px] text-neutral-500 font-sans line-clamp-1 mb-3">
+          <p className="text-[11px] text-neutral-400 font-[family-name:var(--font-inter)] line-clamp-1 mb-2">
             {product.subtitle}
           </p>
 
           {product.shades && product.shades.length > 0 && (
-            <div className="mb-4">
-              <span className="text-[9px] tracking-widest uppercase font-semibold text-neutral-400 block mb-1.5">
+            <div className="mb-3">
+              <span className="text-[9px] tracking-widest uppercase font-semibold text-neutral-400 block mb-1 font-[family-name:var(--font-inter)]">
                 RƏNG SEÇİMİ: {selectedShade?.name}
               </span>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1.5">
                 {product.shades.map((shade) => (
                   <button
                     key={shade.name}
@@ -117,7 +140,7 @@ export function ProductCard({ product, onQuickView }: ProductCardProps) {
                       setSelectedShade(shade);
                     }}
                     className={clsx(
-                      'w-4 h-4 rounded-full border transition-all duration-300 relative cursor-pointer',
+                      'w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full border transition-all duration-300 relative cursor-pointer',
                       selectedShade?.name === shade.name
                         ? 'border-neutral-900 scale-110'
                         : 'border-neutral-200 hover:scale-105'
@@ -135,25 +158,12 @@ export function ProductCard({ product, onQuickView }: ProductCardProps) {
           )}
         </div>
 
-        <div>
-          <div className="flex items-baseline space-x-2 mb-4">
-            <span className="text-xs sm:text-sm font-semibold text-neutral-900 font-mono">
-              {product.price.toFixed(2)} ₼
-            </span>
-            {product.originalPrice && (
-              <span className="text-[10px] sm:text-xs text-neutral-400 line-through font-mono">
-                {product.originalPrice.toFixed(2)} ₼
-              </span>
-            )}
-          </div>
-
-          <button
-            onClick={handleAddToCart}
-            className="w-full bg-neutral-950 text-white text-[10px] tracking-widest font-semibold uppercase py-3 border border-neutral-950 hover:bg-transparent hover:text-neutral-900 transition-colors duration-300 cursor-pointer"
-          >
-            SƏBƏTƏ ƏLAVƏ ET
-          </button>
-        </div>
+        <button
+          onClick={handleAddToCart}
+          className="w-full bg-neutral-950 text-white text-[10px] tracking-widest font-semibold uppercase py-2.5 rounded-lg hover:bg-neutral-800 transition-colors duration-300 cursor-pointer"
+        >
+          SƏBƏTƏ ƏLAVƏ ET
+        </button>
       </div>
     </div>
   );
