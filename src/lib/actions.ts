@@ -22,7 +22,22 @@ export async function updateOrderStatus(formData: FormData) {
   const id = formData.get('id') as string;
   const status = formData.get('status') as string;
   if (!id || !status) return;
+
+  // Read old value for logging
+  const { data: old } = await supabaseAdmin.from('orders').select('status').eq('id', id).single();
+  const oldStatus = (old as Record<string, unknown> | null)?.status as string | undefined;
+
   await supabaseAdmin.from('orders').update({ status, updated_at: new Date().toISOString() }).eq('id', id);
+
+  // Log the change
+  await supabaseAdmin.from('order_activity_log').insert({
+    order_id: id,
+    field: 'status',
+    old_value: oldStatus || null,
+    new_value: status,
+    changed_by: 'admin',
+  });
+
   revalidatePath('/admin/orders');
 }
 
@@ -31,7 +46,22 @@ export async function updatePaymentStatus(formData: FormData) {
   const id = formData.get('id') as string;
   const payment_status = formData.get('payment_status') as string;
   if (!id || !payment_status) return;
+
+  // Read old value for logging
+  const { data: old } = await supabaseAdmin.from('orders').select('payment_status').eq('id', id).single();
+  const oldPaymentStatus = (old as Record<string, unknown> | null)?.payment_status as string | undefined;
+
   await supabaseAdmin.from('orders').update({ payment_status, updated_at: new Date().toISOString() }).eq('id', id);
+
+  // Log the change
+  await supabaseAdmin.from('order_activity_log').insert({
+    order_id: id,
+    field: 'payment_status',
+    old_value: oldPaymentStatus || null,
+    new_value: payment_status,
+    changed_by: 'admin',
+  });
+
   revalidatePath('/admin/orders');
 }
 

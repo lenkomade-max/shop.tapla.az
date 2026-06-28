@@ -207,6 +207,21 @@ ALTER TABLE orders ADD CONSTRAINT orders_status_check CHECK (status IN ('new', '
 CREATE INDEX IF NOT EXISTS idx_orders_payment_status ON orders(payment_status);
 
 -- ============================================================================
+-- 5.5 ORDER ACTIVITY LOG (аудит изменений статусов админом)
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS order_activity_log (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  order_id UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+  field TEXT NOT NULL CHECK (field IN ('status', 'payment_status')),
+  old_value TEXT,
+  new_value TEXT NOT NULL,
+  changed_by TEXT NOT NULL DEFAULT 'admin',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_order_activity_log_order ON order_activity_log(order_id);
+CREATE INDEX IF NOT EXISTS idx_order_activity_log_created ON order_activity_log(created_at DESC);
+
+-- ============================================================================
 -- 6. LEADS
 -- ============================================================================
 CREATE TABLE IF NOT EXISTS leads (
