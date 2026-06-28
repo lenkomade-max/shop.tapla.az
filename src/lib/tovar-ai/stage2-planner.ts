@@ -372,43 +372,51 @@ function loadDesignLibrary(name: string): string {
 
 const BASE_PROMPT = `Generate one premium marketplace product infographic for TAPLA.AZ. These images appear INSIDE the product detail page — not as standalone ads.
 
-## 🚫 STRICT RENDERING LIMITS
+## 🚫 STRICT RENDERING LIMITS — ABSOLUTE PRIORITY
 
 **LANGUAGE:** Azerbaijani Latin only for ALL visible text. Zero exceptions.
-**NO BUTTONS:** Never render any purchase/action/contact buttons. No "SƏBƏTƏ AT", "İNDİ AL", "ZƏNG EDİN", "BİZƏ YAZIN" or any CTA buttons whatsoever.
-**NO INVENTED DATA:** Render ONLY data from the "Text to Render" list. Never invent prices, percentages, warranty terms, free delivery, or specs.
-**NO REFERENCE COPYING:** Clean product only — no copied logos, brand names, watermarks, barcodes, or packaging text from the reference photo.
-**NO HEX CODES:** Never show any hex color codes as visible text.
-**SINGLE FRAME:** One unified image only — no split-screen, no collages, no before/after panels.
+**NO BUTTONS:** Never render any purchase/action/contact buttons. No "SƏBƏTƏ AT", "İNDİ AL", "ZƏNG EDİN", "BİZƏ YAZIN", "MAĞAZAYA KEÇ" or any CTA buttons whatsoever.
+**NO LOGOS OR WATERMARKS:** NEVER render "tap.az", "TAPLA", "tapla.az", or ANY marketplace logo, watermark, or brand name anywhere in the image — not in corners, not anywhere.
+**NO INVENTED DATA:** Render ONLY text listed in the "Text to Render" section. Never invent prices, percentages, warranty terms, or specs.
+**NO REFERENCE COPYING:** Clean product only — do NOT copy any logos, brand names, watermarks, barcodes, or packaging text visible in the reference photo.
+**NO HEX CODES:** Never render hex codes as visible text.
+**SINGLE FRAME:** One unified image — no split-screen, no collages.
 
 ## PRODUCT RULES
 
-Product dominates 65-75% of frame. Never alter product shape, color, or proportions. Product is the visual hero.
+Product dominates 65-75% of frame. Never alter product shape, color, or proportions. Product is the undisputed visual hero.
 
-## PREMIUM INFOGRAPHIC STYLE
+## LABEL STYLE — CRITICAL: READ CAREFULLY
 
-Design this like a top-tier product image from a premium brand (Apple, Samsung, Nike quality).
+The correct style for feature labels is: **floating icon + text directly on the background — NO boxes, NO panels, NO pill shapes, NO rounded rectangles, NO glassmorphism containers of any kind.**
 
-**Background:** Deep rich gradient COMPLEMENTARY to the product color. If product is white/light: deep blue, purple, or charcoal. If product is dark: slightly lighter deep gradient. Never use the same color as the product for the background. Background depth and richness makes the product pop.
+Correct anatomy of each feature label:
+1. A small clean outline/line-art icon (white or light-colored, ~24px)
+2. Next to it: short bold text in clean sans-serif, white or near-white, directly on the gradient background
+3. A thin straight horizontal or angled line (1px, white) extending from the label to a small filled dot on the product surface
 
-**Feature Badges:** Every piece of text must appear inside a styled badge:
-- Frosted glass style: semi-transparent white fill (~15% opacity), very thin 1px white/light border, soft blurred drop-shadow
-- Clean modern bold sans-serif uppercase text inside, high contrast
-- Small minimalist white outline icon on the left of the text (checkmark circle, feather, ruler, bolt, etc.)
+This is the Apple product page / tech infographic style — labels float cleanly on a gradient background with connecting lines. There are NO boxes, NO frosted glass panels, NO dark pill containers around the text. The text and icon sit directly on the gradient, connected to the product by thin lines.
 
-**Pointer Lines:** Ultra-thin 1px white straight lines with small solid circular end-dots, connecting product physical parts to their corresponding feature badges. Elegant and precise — not arrows.
+**DO NOT draw any rounded rect, card, badge, or container behind the label text. The text is NAKED on the background.**
 
-**Typography:** Headline text (outside badges) is bold, large, clean sans-serif. White on dark. Sharp and readable.
+## BACKGROUND & DEPTH
 
-**Depth Layers:** [back] gradient background → [mid] product on polished pedestal with mirror-reflection or soft shadow → [front] floating glassmorphism badges with pointer lines.
+Deep rich gradient COMPLEMENTARY to the product color. If product is white/light: deep blue, purple, or charcoal gradient. Never same color as the product.
+
+Multi-layer depth: gradient background → product on surface with soft shadow or mirror reflection → floating labels in foreground.
+
+## TYPOGRAPHY
+
+Headline (one large bold text, top area): bold, large, clean modern sans-serif, white, uppercase or sentence case.
+Feature label text: smaller, clean sans-serif, white or light gray, directly on background.
 
 ## COLOR RULE
 
-Campaign palette = ACCENT ONLY (badge borders, icon highlights, decorative lines). Background = deep complementary gradient. Badges = white/frosted glass — NOT palette color fill.
+Campaign palette = ACCENT ONLY: connecting line color, icon tint, decorative elements. Background = deep complementary gradient. Labels = text directly on background, NO colored boxes.
 
 ## DISTINCT FROM OTHER CARDS
 
-Same badge style, same lighting, same palette as the other 2 cards. DIFFERENT product angle, layout, composition.`
+Same label style, same lighting, same palette as the other 2 cards. DIFFERENT product angle, layout, label placement.`
 
 // ─── SYSTEM PROMPT — Creative Director с Campaign Brief ──────────────────────
 
