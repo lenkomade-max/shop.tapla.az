@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { User, Package, Phone, Mail, LogOut, ArrowLeft, Clock, CheckCircle2, Truck, XCircle, ShoppingBag, ChevronRight } from 'lucide-react'
 import { useAuth } from '@/components/auth/AuthContext'
 import { Container } from '@/components/ui/Container'
-import { getMyOrders } from '@/lib/actions'
+import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 
 interface OrderItem {
@@ -66,8 +66,52 @@ export default function ProfilePage() {
     if (!profile) return
     setOrdersLoading(true)
 
-    const result = await getMyOrders(profile.id, profile.phone, user?.id || null)
-    setOrders(result)
+    const supabase = createClient()
+
+    // Fetch orders by profile_id OR auth_user_id
+    const query = supabase
+      .from('orders')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(50)
+
+    if (user?.id) {
+      query.or(`profile_id.eq.${profile.id},auth_user_id.eq.${user.id}`)
+    } else {
+      query.eq('profile_id', profile.id)
+    }
+
+    const { data: orderData, error } = await query
+
+    if (error) {
+      console.error('Failed to fetch orders:', error)
+      setOrdersLoading(false)
+      return
+    }
+
+    // Fetch product info for these orders
+    const productIds = [...new Set((orderData ?? []).map((o: any) => o.product_id).filter(Boolean))] as string[]
+    let productMap = new Map<string, { name: string; image: string }>()
+
+    if (productIds.length > 0) {
+      const { data: products } = await supabase
+        .from('products')
+        .select('id, name, title, images')
+        .in('id', productIds)
+
+      for (const p of (products ?? [])) {
+        const imgs = (p.images as string[]) || []
+        productMap.set(p.id, { name: p.name || p.title, image: imgs[0] || '' })
+      }
+    }
+
+    const enriched = (orderData ?? []).map((o: any) => ({
+      ...o,
+      product_name: (o.product_id && productMap.get(o.product_id)?.name) || undefined,
+      product_image: (o.product_id && productMap.get(o.product_id)?.image) || undefined,
+    }))
+
+    setOrders(enriched)
     setOrdersLoading(false)
   }, [profile, user?.id])
 
