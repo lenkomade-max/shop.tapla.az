@@ -8,7 +8,7 @@ import { runTovarAIPipeline } from '@/lib/tovar-ai/pipeline'
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { photoUrl, providerDescription, characteristics, photoBase64 } = body
+    const { photoUrl, providerDescription, characteristics, photoBase64, priceAz } = body
 
     if (!photoUrl && !photoBase64) {
       return NextResponse.json({ error: 'photoUrl or photoBase64 required' }, { status: 400 })
@@ -19,6 +19,7 @@ export async function POST(request: Request) {
       photoBase64,
       providerDescription,
       characteristics,
+      priceAz,
     })
 
     return NextResponse.json({

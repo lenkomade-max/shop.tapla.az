@@ -229,6 +229,34 @@ const ROLE_DESCRIPTIONS: Record<CardRole, string> = {
   best_seller: 'Popular choice. Bestseller badge. Social proof through popularity. Most purchased.',
 }
 
+// ─── РОЛЬ → КОММЕРЧЕСКАЯ ПЛОТНОСТЬ ──────────────────────────────────────────
+
+const ROLE_COMMERCIAL_DENSITY: Record<CardRole, { blocks: string; instruction: string }> = {
+  hero:         { blocks: '1-2', instruction: '1-2 big impact blocks. Large headline. Product is the main story. Clean and focused.' },
+  problem:      { blocks: '1-2', instruction: '1-2 blocks. The problem visualization is the main communication. Minimal text — the image tells the story.' },
+  solution:     { blocks: '2-3', instruction: '2-3 blocks. Show the transformation. The product + result are the message. Supporting info minimal.' },
+  benefits:     { blocks: '4-6', instruction: '4-6 information blocks arranged around the product. High density. Multiple feature cards with thin connection lines. Information-rich.' },
+  usage:        { blocks: '1-3', instruction: '1-3 blocks integrated naturally into the scene. The human interaction is the message. Cards appear contextual, not dominant.' },
+  lifestyle:    { blocks: '1-2', instruction: '1-2 subtle blocks. The aspirational environment is the message. Cards minimal and elegant. Magazine quality.' },
+  offer:        { blocks: '2-3', instruction: '2-3 prominent blocks. One clear action-driving message. Promotional. Urgency feeling.' },
+  bundle:       { blocks: '3-5', instruction: '3-5 blocks showing all included items. Each accessory/component labeled. Completeness is the message.' },
+  delivery:     { blocks: '1-2', instruction: '1-2 blocks. Delivery speed is the hero message. Product remains focus. Clean and direct.' },
+  comparison:   { blocks: '2-4', instruction: '2-4 blocks. Comparison data presented cleanly. This vs That. Trust-building through transparency.' },
+  quality:      { blocks: '2-3', instruction: '2-3 small subtle blocks. The product detail is the hero. Craftsmanship labels minimal and elegant.' },
+  materials:    { blocks: '2-3', instruction: '2-3 material callout labels. The texture is the message. Subtle material tags near highlighted areas.' },
+  warranty:     { blocks: '1-2', instruction: '1-2 trust badges. Warranty seal prominent. Professional confidence. Clean.' },
+  accessories:  { blocks: '3-5', instruction: '3-5 blocks. Each accessory labeled. Perfect alignment. Complete set presentation.' },
+  close_up:     { blocks: '0-1', instruction: '0-1 small label. The macro detail is the entire message. Extreme close-up speaks for itself.' },
+  cta:          { blocks: '1-2', instruction: '1-2 blocks. Large CTA is the hero. Minimal supporting info. Designed for conversion.' },
+  dimensions:   { blocks: '1-2', instruction: '1-2 blocks. Size reference + key dimension. Clean. The scale comparison is the message.' },
+  power:        { blocks: '3-5', instruction: '3-5 spec blocks. Performance metrics prominent. Energy and speed visualized. Technology-inspired density.' },
+  premium:      { blocks: '1-2', instruction: '1-2 elegant blocks. Luxury feel. Less is more — but what is there must be premium. High-end brand aesthetic.' },
+  review:       { blocks: '2-3', instruction: '2-3 blocks. Review stars + testimonial snippet. Social proof is the message. Trust-building.' },
+  gift:         { blocks: '1-3', instruction: '1-3 blocks. Gift-ready presentation. Premium packaging visible. Occasion feeling.' },
+  new_arrival:  { blocks: '2-3', instruction: '2-3 blocks. "New" badge + key innovation. Fresh and cutting-edge message.' },
+  best_seller:  { blocks: '2-3', instruction: '2-3 blocks. Popularity badge + key selling points. Social proof through sales volume.' },
+}
+
 // ─── ЗАГРУЗКА БИБЛИОТЕК ─────────────────────────────────────────────────────
 
 const TOLER_AI_DIR = path.join(process.cwd(), 'src/lib/tovar-ai')
@@ -254,42 +282,39 @@ function loadDesignLibrary(name: string): string {
 }
 
 // ─── BASE PROMPT — рекламный + Brand Identity Lock ──────────────────────────
-// Порядок по приоритетам Nano Banana: ЗАПРЕТЫ (94% compliance) → ЦВЕТ → ПРОДУКТ → СТИЛЬ → КОМПОЗИЦИЯ
+// Порядок по приоритетам Nano Banana: ЗАПРЕТЫ (94% compliance) → КОММЕРЦИЯ → ПРОДУКТ → ЦВЕТ → СТИЛЬ
 
-const BASE_PROMPT = `Generate one photorealistic advertising image for a paid Meta Ads / Trendyol campaign. Not a catalog photo — an advertisement that makes people stop scrolling and click.
+const BASE_PROMPT = `Generate one photorealistic marketplace advertisement image for a paid Meta Ads / Trendyol campaign. Not a catalog photo, not a minimal poster — a conversion-optimized commercial advertisement.
 
 ## ⛔ CRITICAL PROHIBITIONS — IMAGE WILL BE REJECTED IF VIOLATED
 
-LANGUAGE: ALL visible text inside the image MUST be in Azerbaijani Latin script only. NEVER English. NEVER Russian. NEVER Cyrillic. If you cannot write Azerbaijani correctly, use NO text at all.
+LANGUAGE: ALL visible text MUST be in Azerbaijani Latin script only. NEVER English. NEVER Russian. NEVER Cyrillic. If you cannot write Azerbaijani correctly, use NO text.
 
-NO COLOR CODES: NEVER render hex color codes like #FFFFFF or #1A1A2E as visible text or decorative elements. Color codes are technical metadata — they must NOT appear anywhere in the image.
+NO COLOR CODES: NEVER render hex color codes (#XXXXXX) as visible text or design elements. They are metadata — invisible.
 
-NO INVENTED DATA: NEVER invent prices, discounts, percentages, or specifications that are not explicitly stated in this prompt. If no price is given, do NOT show any price. If no discount is mentioned, do NOT create one. Only use product information that is explicitly provided.
+NO INVENTED DATA: NEVER invent prices, discounts, percentages, or specifications not explicitly stated. No price → no price shown. No discount → no discount shown.
 
-NO REFERENCE COPYING: NEVER copy logos, brand names, shop names, price stickers, barcodes, watermarks, or packaging text from the reference photo. The reference photo is for product shape and color only. Create an entirely new scene.
+NO REFERENCE COPYING: NEVER copy logos, brand names, shop names, price stickers, barcodes, watermarks, or packaging text from the reference photo. Create an entirely new scene.
 
-ONE IMAGE ONLY: Never create collages. Never split layouts. Never before/after panels. One image = one message.
+ONE IMAGE ONLY: Never collages, split panels, or before/after. One image = one advertising message.
 
-## PRODUCT (what the viewer must see first)
-The product dominates the frame — it occupies 60-70% of the image area. It is the undisputed hero. Never make the product small, distant, or secondary. Do not change the product shape. Do not invent new product parts. The product is the main subject.
+## PRODUCT DOMINANCE
+The product dominates the frame (60-70% area). It is the undisputed hero. Never make the product small or secondary. Do not change the product shape. Do not invent new product parts.
 
-## COLORS (described in words — DO NOT use hex codes visually)
-The campaign color palette will be described below with color names and atmosphere. Use these colors for backgrounds, gradients, cards, text, accents, and decorative elements. Do not introduce colors outside this palette. Prefer vibrant commercial backgrounds, bold gradients, and high contrast. Avoid pale minimalist palettes.
+## MARKETPLACE FEEL
+The image must feel like a paid commercial offer — like what a customer would see on Trendyol, Amazon, or a high-performing Meta ad. Not an art poster. Not an Apple keynote. The viewer should immediately recognize this as an advertisement from a marketplace where they can buy the product.
 
-## ADVERTISING STYLE
-The image must look like a high-performing paid Meta Ads creative — not an Apple minimal poster, not a luxury editorial with empty space. The design maximizes click-through rate. It should feel promotional and commercial: premium marketplace quality but designed to sell, not to look elegant.
+## COLORS (words only — DO NOT use hex codes visually)
+Use the campaign color palette for all elements. Vibrant commercial backgrounds, bold gradients, high contrast. Avoid pale minimalist palettes.
 
 ## DEPTH & LAYERS
-Create multi-layered compositions with foreground-midground-background separation. Use soft shadows, reflections, gradient lighting, floating geometric shapes, and subtle decorative elements. Commercial visual depth — never flat minimalism.
-
-## VISUAL HIERARCHY
-Headline first → Product dominant → Benefit/info cards → CTA. Do not leave large empty areas. The image should contain enough commercial information. Use premium rounded floating cards for text and info blocks — text always goes inside visual containers, never floating bare.
+Multi-layered: foreground (product + information cards), midground (decorative elements), background (gradient/surface). Soft shadows, reflections, gradient lighting. Commercial visual depth — never flat.
 
 ## CAMPAIGN COHERENCE
-This image is one of 3 in a single advertising campaign. All 3 cards share the exact same color palette, lighting style, mood, and visual DNA. But this card must have a DISTINCT composition, product angle, and layout from the other 2 cards. Do NOT repeat the same format.
+This is one of 3 images in a single campaign. All 3 share the exact same color palette, lighting, mood, and visual DNA. But this card has a DISTINCT composition, product angle, and layout from the other 2.
 
 ## QUALITY
-Photorealistic. Studio quality. Ultra realistic. 8K. The scene, lighting and environment must be appropriate for this specific product category — do not reuse the same background for different product types.`
+Photorealistic. Studio quality. Ultra realistic. 8K. Category-appropriate environment.`
 
 // ─── SYSTEM PROMPT — Creative Director с Campaign Brief ──────────────────────
 
@@ -302,6 +327,9 @@ Maximize click-through rate (CTR). Create a CAMPAIGN of 3 images that:
 - Share ONE visual identity (colors, lighting, mood, design language)
 - Each have a DISTINCT composition, product angle, and message
 - Together tell a complete product story
+
+## CORE PRINCIPLE: COMMERCIAL COMMUNICATION ≠ MINIMALISM
+You are designing marketplace advertisements, not art posters. The objective is maximum commercial communication. The viewer has 2 seconds to understand the offer. Every major empty area should either contain useful selling information or visually support the product. The images should look like something a customer sees on Trendyol, Amazon, or a high-performing Meta ad — not an Apple keynote, not a luxury editorial.
 
 ## CAMPAIGN BRIEF — DO THIS FIRST
 Before designing individual cards, establish the CAMPAIGN-LEVEL shared identity:
@@ -330,6 +358,29 @@ Within the shared campaign identity, design 3 cards that are COMPOSITIONALLY DIF
 - Use DIFFERENT focal points
 - BUT always with the SAME color palette, SAME lighting, SAME mood
 
+## CARD ROLE → COMMERCIAL DENSITY (CRITICAL — makes cards different)
+Each role has its own commercial density. Do NOT apply the same density to all cards:
+
+- **Hero / Premium**: 1-2 big impact blocks. Large headline. Product is the main story. Clean and focused — less is more.
+- **Benefits / Features / Power / Specifications**: 4-6 information blocks. High density. Multiple feature cards arranged around/connected to the product. Information-rich — the viewer scans multiple value props.
+- **Quality / Materials / Close-up / Dimensions**: 2-3 small subtle blocks. The product detail is the hero. Supporting info minimal and elegant.
+- **Usage / Lifestyle / Problem / Solution**: 1-3 blocks integrated into the scene. Environment or human model carries the story. Cards appear naturally in context.
+- **Offer / CTA / Delivery / Warranty / Gift**: 2-3 prominent blocks. One clear action-driving message. Promotional feel.
+- **Review / Comparison / Best-seller / New-arrival**: 2-4 blocks. Social proof or comparison data. Trust-building density.
+- **Bundle / Accessories / Gift**: 3-5 blocks showing included items. Completeness is the message.
+
+## COMMERCIAL BLOCK EXAMPLES
+Selling points to use (pick based on role + provider data):
+- Product features: "3 SÜRƏT REJİMİ", "GÜCLÜ HAVA AXINI", "USB ŞARJ"
+- Quality: "PREMIUM MATERİAL", "ORİJİNAL KEYFİYYƏT"
+- Delivery: "PULSUZ ÇATDIRILMA", "1 GÜNƏ ÇATDIRILIR"
+- Warranty: "2 İL ZƏMANƏT", "14 GÜN GERİ QAYTARMA"
+- Price (ONLY IF given in product data): "29 AZN" (never invent)
+- CTA: "İNDİ AL", "SƏBƏTƏ AT"
+
+## CARD-PRODUCT CONNECTION
+Information cards should visually INTERACT with the product — use thin connection lines from product features to their cards, or arrange cards flowing naturally around the product. Cards should not float disconnected in empty space. The product and information blocks form one integrated commercial composition.
+
 ## 3-LAYER SYSTEM
 
 ### Layer 1 — Creative Style (WHAT is in the frame)
@@ -350,6 +401,7 @@ SHARED across all 3 cards — do NOT change per card.
 - ALL visible text: AZERBAIJANI LATIN SCRIPT ONLY. NEVER English. NEVER Russian. NEVER Cyrillic.
 - Short: 3-5 words per headline. Examples: "LED TERAPİYA", "3 REJİM", "PULSUZ ÇATDIRILMA"
 - Text goes inside rounded commercial blocks/cards — never floating without container
+- If the product has a REAL price provided, display it. If no price is given, do NOT invent one.
 
 ## OUTPUT FORMAT
 Return JSON with campaign-level settings + 3 cards:
@@ -393,6 +445,7 @@ function buildUserPrompt(
   analysis: VisionOutput,
   providerDescription?: string,
   characteristics?: Record<string, string>,
+  priceAz?: string,
 ): string {
   const CREATIVE_STYLES = loadCreativeStyles()
   const MARKETING_STYLES = loadMarketingStyles()
@@ -499,6 +552,9 @@ function buildUserPrompt(
     '',
     '## Provider Description',
     providerDescription || 'Not provided',
+    '',
+    '## Product Price (ONLY if explicitly provided — show on price-related cards)',
+    priceAz || 'NO PRICE — do NOT invent or display any price, discount, or cost figure on any card',
     '',
     '## Characteristics',
     (characteristics && Object.keys(characteristics).length > 0 ? JSON.stringify(characteristics) : 'None'),
@@ -686,6 +742,7 @@ export async function planCardPrompts(
   analysis: VisionOutput,
   providerDescription?: string,
   characteristics?: Record<string, string>,
+  priceAz?: string,
 ): Promise<PromptsOutput> {
   const config = TOVAR_AI_CONFIG
   const creativeStyles = loadCreativeStyles()
@@ -717,7 +774,7 @@ export async function planCardPrompts(
   console.log(`[Stage 2] Roles: ${triad.roles.join(', ')}`)
   console.log(`[Stage 2] Creative Styles: ${cs.map((s, i) => `${i + 1}=${s.id}`).join(', ')}`)
 
-  const userPrompt = buildUserPrompt(triad, cs, colorPalette, sharedVt, analysis, providerDescription, characteristics)
+  const userPrompt = buildUserPrompt(triad, cs, colorPalette, sharedVt, analysis, providerDescription, characteristics, priceAz)
 
   const body = {
     model: config.PLANNER_MODEL,
@@ -774,7 +831,9 @@ export async function planCardPrompts(
       ? marketingStyles.find(m => m.id === card.marketing_style) || ms[card.index - 1]
       : ms[card.index - 1]
 
-    const hasProviderPrice = providerDescription && /\d+\s*(AZN|₼|manat|ман|\$|USD|EUR)/i.test(providerDescription)
+    const hasProviderPrice = Boolean(priceAz)
+
+    const densityInfo = ROLE_COMMERCIAL_DENSITY[card.role as CardRole] || { blocks: '2-3', instruction: '2-3 commercial information blocks.' }
 
     const lightingItem = visualThemes.lighting.find(l => l.id === sharedVt.lighting)
     const bgItem = visualThemes.background_style.find(b => b.id === sharedVt.background_style)
@@ -816,7 +875,8 @@ export async function planCardPrompts(
       `Scene Materials: ${materialsItem?.prompt_fragment || sharedVt.materials.join(', ')}.`,
       `Spatial Depth: ${depthItem?.prompt_fragment || sharedVt.spatial_depth.join(', ')}.`,
       `Motion Energy: ${motionItem?.prompt_fragment || sharedVt.motion}.`,
-      !hasProviderPrice ? '⛔ NO PRICE: The product description does NOT contain a price. Do NOT invent or display any price, discount, or cost figure.' : '',
+      `COMMERCIAL DENSITY for this role: ${densityInfo.instruction} Use ${densityInfo.blocks} commercial blocks. Cards must visually connect to the product.`,
+      hasProviderPrice ? `PRODUCT PRICE: ${priceAz}. Display this price on price-related cards (offer, bundle, hero, cta). Use it in commercial blocks.` : '⛔ NO PRICE: Do NOT invent or display any price, discount, or cost figure on any card.',
       `ADVERTISING ROLE: ${card.role}. ${ROLE_DESCRIPTIONS[card.role as CardRole] || card.role}.`,
       `Creative Style: ${cardCs.name}. ${cardCs.prompt_fragment}`,
       `Marketing Style: ${cardMs.name}. ${cardMs.prompt_fragment}`,

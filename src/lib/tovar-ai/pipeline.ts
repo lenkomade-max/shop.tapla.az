@@ -85,6 +85,7 @@ export async function runTovarAIPipeline(
       productAnalysis,
       input.providerDescription,
       input.characteristics,
+      input.priceAz,
     )
     console.log(
       `[Pipeline] Stage 2 ✅ — ${prompts.cards.length} prompts, roles: ${prompts.roles.join(', ')}, palette: ${JSON.stringify(prompts.color_palette)}`,

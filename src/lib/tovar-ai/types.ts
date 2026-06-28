@@ -141,6 +141,7 @@ export interface PipelineInput {
   photoBase64?: string // или сразу base64 (для CLI)
   providerDescription?: string // описание поставщика
   characteristics?: Record<string, string> // доп. характеристики
+  priceAz?: string // цена (напр. "29 AZN") — только если задана юзером
 }
 
 export interface GenerationRecord {

@@ -78,6 +78,7 @@ export default function TovarAIPage() {
 
   // Описание
   const [description, setDescription] = useState('')
+  const [price, setPrice] = useState('')
 
   // ─── Drag & Drop ────────────────────────────────────────────────────────
 
@@ -134,6 +135,7 @@ export default function TovarAIPage() {
         body: JSON.stringify({
           photoBase64: photo.base64,
           providerDescription: description.trim() || undefined,
+          priceAz: price.trim() || undefined,
         }),
       })
 
@@ -152,7 +154,7 @@ export default function TovarAIPage() {
       setStage('error')
       setElapsed(((Date.now() - start) / 1000))
     }
-  }, [photo, description])
+  }, [photo, description, price])
 
   // ─── Скачать всё ────────────────────────────────────────────────────────
 
@@ -248,6 +250,24 @@ export default function TovarAIPage() {
             />
             <p className="mt-1 text-xs text-zinc-400">
               Məcburi deyil. Nə qədər çox detal — bir o qədər dəqiq kartlar.
+            </p>
+          </div>
+
+          {/* Qiymət */}
+          <div className="rounded-xl border bg-white p-6 shadow-sm">
+            <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-zinc-500">
+              3. Qiymət (ixtiyari)
+            </h3>
+            <input
+              type="text"
+              value={price}
+              onChange={e => setPrice(e.target.value)}
+              placeholder="Məsələn: 29 AZN"
+              disabled={isBusy}
+              className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black disabled:opacity-50"
+            />
+            <p className="mt-1 text-xs text-zinc-400">
+              Yalnız real qiymət varsa yazın. Boş qoysanız — qiymət göstərilməyəcək.
             </p>
           </div>
 

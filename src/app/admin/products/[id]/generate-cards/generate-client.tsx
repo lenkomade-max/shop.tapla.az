@@ -44,6 +44,7 @@ export function GenerateCardsClient({ productId, productName, mainImage }: Props
   const [cost, setCost] = useState(0)
   const [elapsed, setElapsed] = useState(0)
   const [description, setDescription] = useState('')
+  const [price, setPrice] = useState('')
 
   const generate = useCallback(async () => {
     if (!mainImage) {
@@ -65,6 +66,7 @@ export function GenerateCardsClient({ productId, productName, mainImage }: Props
           productId,
           photoUrl: mainImage,
           providerDescription: description || undefined,
+          priceAz: price.trim() || undefined,
         }),
       })
 
@@ -83,7 +85,7 @@ export function GenerateCardsClient({ productId, productName, mainImage }: Props
       setStage('error')
       setElapsed(((Date.now() - start) / 1000))
     }
-  }, [mainImage, productId, description])
+  }, [mainImage, productId, description, price])
 
   return (
     <div className="space-y-6">
@@ -120,6 +122,21 @@ export function GenerateCardsClient({ productId, productName, mainImage }: Props
               rows={5}
               className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black resize-none"
             />
+          </div>
+
+          {/* Qiymət */}
+          <div>
+            <label className="mb-1 block text-xs font-medium text-zinc-600">
+              Qiymət (ixtiyari)
+            </label>
+            <input
+              type="text"
+              value={price}
+              onChange={e => setPrice(e.target.value)}
+              placeholder="Məsələn: 29 AZN"
+              className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black"
+            />
+            <p className="mt-1 text-xs text-zinc-400">Yalnız real qiymət varsa doldurun.</p>
           </div>
         </div>
       </div>
