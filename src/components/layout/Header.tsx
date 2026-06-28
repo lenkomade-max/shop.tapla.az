@@ -124,10 +124,10 @@ export function Header() {
                 href="/"
                 className="flex flex-col items-center hover:opacity-90 transition-opacity"
               >
-                <span className="text-2xl sm:text-3xl font-serif tracking-[0.25em] font-light uppercase">
+                <span className="text-2xl sm:text-3xl font-serif tracking-[0.25em] font-light uppercase leading-none">
                   TAPLA
                 </span>
-                <span className="text-[10px] sm:text-xs tracking-[0.12em] font-sans font-medium uppercase text-neutral-500 mt-0.5">
+                <span className="text-[10px] sm:text-xs tracking-[0.12em] font-sans font-medium uppercase text-neutral-500 leading-none mt-px">
                   MARKETPLACE
                 </span>
               </Link>
