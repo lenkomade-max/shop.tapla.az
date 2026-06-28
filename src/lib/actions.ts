@@ -36,26 +36,33 @@ export async function deleteProduct(formData: FormData) {
   revalidatePath('/', 'layout');
 }
 
-export async function saveProduct(formData: FormData): Promise<void> {
-  if (!(await checkAuth())) redirect('/admin');
+export type SaveProductResult = {
+  success: boolean
+  error?: string
+  errorCode?: string
+  productId?: string
+  slug?: string
+}
 
-  const id = formData.get('id') as string | null;
-  const name = formData.get('name') as string;
-  let slug = formData.get('slug') as string;
-  const errorBase = id ? `admin/products/${id}/edit` : 'admin/products/new';
+export async function saveProduct(formData: FormData): Promise<SaveProductResult> {
+  if (!(await checkAuth())) return { success: false, error: 'İcazə yoxdur', errorCode: 'AUTH' }
+
+  const id = formData.get('id') as string | null
+  const name = formData.get('name') as string
+  let slug = formData.get('slug') as string
 
   if (!name || !slug) {
-    redirect(`/${errorBase}?error=Name+and+slug+required`);
+    return { success: false, error: 'Ad və slug mütləqdir', errorCode: 'VALIDATION' }
   }
 
-  const images = formData.getAll('images').filter(Boolean);
-  const benefits = formData.getAll('benefits').filter(Boolean);
-  const tags = formData.getAll('tags').filter(Boolean);
+  const images = formData.getAll('images').filter(Boolean) as string[]
+  const benefits = formData.getAll('benefits').filter(Boolean) as string[]
+  const tags = formData.getAll('tags').filter(Boolean) as string[]
 
-  let shades: unknown[] = [];
+  let shades: unknown[] = []
   try {
-    const raw = formData.get('shades') as string;
-    if (raw) shades = JSON.parse(raw);
+    const raw = formData.get('shades') as string
+    if (raw) shades = JSON.parse(raw)
   } catch {}
 
   // Check slug uniqueness, auto-generate unique slug if taken
@@ -63,18 +70,18 @@ export async function saveProduct(formData: FormData): Promise<void> {
     .from('products')
     .select('id')
     .eq('slug', slug)
-    .maybeSingle();
+    .maybeSingle()
   if (existing && existing.id !== id) {
-    let counter = 2;
+    let counter = 2
     while (true) {
-      const candidate = `${slug}-${counter}`;
+      const candidate = `${slug}-${counter}`
       const { data: dup } = await supabaseAdmin
         .from('products')
         .select('id')
         .eq('slug', candidate)
-        .maybeSingle();
-      if (!dup) { slug = candidate; break; }
-      counter++;
+        .maybeSingle()
+      if (!dup) { slug = candidate; break }
+      counter++
     }
   }
 
@@ -100,21 +107,46 @@ export async function saveProduct(formData: FormData): Promise<void> {
     benefits,
     tags,
     shades,
-  };
-
-  const { error } = id
-    ? await supabaseAdmin.from('products').update(payload).eq('id', id)
-    : await supabaseAdmin.from('products').insert(payload);
-
-  if (error) {
-    console.error('Save product error:', error);
-    redirect(`/${errorBase}?error=${encodeURIComponent(error.message)}`);
+    updated_at: new Date().toISOString(),
   }
 
-  revalidatePath('/admin/products');
-  revalidatePath('/products');
-  revalidatePath('/', 'layout');
-  redirect('/admin/products');
+  // Сохраняем старый slug ДО обновления (для ревалидации)
+  let oldSlug: string | null = null
+  if (id) {
+    const { data: oldProduct } = await supabaseAdmin
+      .from('products')
+      .select('slug')
+      .eq('id', id)
+      .maybeSingle()
+    oldSlug = (oldProduct as Record<string, unknown> | null)?.slug as string | null
+  }
+
+  const { data: savedProduct, error } = id
+    ? await supabaseAdmin.from('products').update(payload).eq('id', id).select('id, slug').single()
+    : await supabaseAdmin.from('products').insert(payload).select('id, slug').single()
+
+  if (error) {
+    console.error('Save product error:', error)
+    return { success: false, error: error.message, errorCode: 'DB_ERROR' }
+  }
+
+  const savedRow = savedProduct as Record<string, unknown> | null
+  const savedId = savedRow?.id as string
+  const savedSlug = savedRow?.slug as string
+
+  if (!savedId || !savedSlug) {
+    return { success: false, error: 'Məhsul yaradıla bilmədi', errorCode: 'DB_ERROR' }
+  }
+
+  // Ревалидация: все страницы где показывается товар
+  revalidatePath('/admin/products')
+  if (id) revalidatePath(`/admin/products/${id}/edit`)
+  revalidatePath('/products')
+  revalidatePath(`/products/${savedSlug}`)
+  if (oldSlug && oldSlug !== savedSlug) revalidatePath(`/products/${oldSlug}`)
+  revalidatePath('/', 'layout')
+
+  return { success: true, productId: savedId, slug: savedSlug }
 }
 
 /**
