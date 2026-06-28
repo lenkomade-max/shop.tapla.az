@@ -6,7 +6,7 @@
       "id": "cs01",
       "name": "Hero Product",
       "description": "Large product centered. Minimal premium background. Very clean composition. Large headline. Small subtitle. One CTA. The product occupies 70-80% of the frame. Commercial premium style.",
-      "prompt_fragment": "Large product centered in frame occupying 70-80% of the image. Minimal premium background. Very clean composition with large headline space, small subtitle area, and one CTA button. Commercial premium style. Product is the undisputed hero.",
+      "prompt_fragment": "Large product centered in frame occupying 70-80% of the image. Minimal premium background. Very clean composition with large headline space and small subtitle area. Commercial premium style. Product is the undisputed hero.",
       "use_for": ["main_cover"],
       "needs_model": false,
       "needs_environment": false
@@ -15,7 +15,7 @@
       "id": "cs02",
       "name": "Product + Price",
       "description": "Large product. Very noticeable price card. Small benefit list. CTA button. Perfect for discounts and promotions.",
-      "prompt_fragment": "Large product with a very noticeable price card displayed prominently. Small benefit list near the price. CTA button visible. Commercial promotion style designed for discounts and special offers.",
+      "prompt_fragment": "Large product with a very noticeable price card displayed prominently. Small benefit list near the price. Commercial promotion style designed for discounts and special offers.",
       "use_for": ["main_cover"],
       "needs_model": false,
       "needs_environment": false
@@ -204,7 +204,7 @@
       "id": "cs23",
       "name": "Strong CTA",
       "description": "Large CTA. Minimal text. Hero product. Designed for Meta Ads.",
-      "prompt_fragment": "Hero product with a large clear Call To Action button or text. Minimal supporting text — just the essential message. Designed specifically for Meta Ads (Facebook/Instagram feed). The entire composition naturally directs attention to the CTA without looking aggressive.",
+      "prompt_fragment": "Hero product with a large clear headline. Minimal supporting text — just the essential message. The entire composition naturally directs attention to the key selling message. Very clean and focused.",
       "use_for": ["main_cover"],
       "needs_model": false,
       "needs_environment": false

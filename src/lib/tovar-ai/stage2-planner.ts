@@ -220,7 +220,7 @@ const ROLE_DESCRIPTIONS: Record<CardRole, string> = {
   warranty: 'Trust and reliability message. Warranty badge prominent. Professional confidence.',
   accessories: 'All included accessories displayed. Perfect alignment. Complete set presentation.',
   close_up: 'Extreme macro detail of key feature. Texture, materials, premium reflections. Very shallow depth of field.',
-  cta: 'Large clear Call To Action. Minimal supporting text. Hero product. Designed for conversion.',
+  cta: 'Conversion-focused infographic. Urgency visual elements — "YENİ", "BESTSELLER", large price badge, limited availability badge. Product dominant.',
   dimensions: 'Show actual size and scale. Product in hand or with size reference. Portability emphasis.',
   power: 'Performance focus. Energy, speed, efficiency. Technology-inspired. Dynamic lighting.',
   premium: 'Luxury positioning. Minimal but vibrant. High-end brand aesthetic. Very expensive feeling.',
@@ -250,7 +250,7 @@ const ROLE_COMMERCIAL_DENSITY: Record<CardRole, { blocks: string; instruction: s
   warranty:     { blocks: '3-5', instruction: '3-5 blocks: warranty headline + coverage details + trust badges + support info + CTA. Trust density.' },
   accessories:  { blocks: '4-7', instruction: '4-7 blocks: each accessory labeled + usage hints + value cards. Complete set information.' },
   close_up:     { blocks: '3-5', instruction: '3-5 blocks: macro detail headline + 2-4 feature callouts pointing to specific areas of the extreme close-up + CTA. The detail is the hero but blocks explain it.' },
-  cta:          { blocks: '3-5', instruction: '3-5 blocks: CTA headline + 2-3 urgency/reason cards + action button. Conversion-focused density. Every element supports the action.' },
+  cta:          { blocks: '3-5', instruction: '3-5 blocks: urgency headline + price card (if given) + 2-3 value/trust badges + YENİ or BESTSELLER badges. No buy buttons. Conversion visual density through urgency, not buttons.' },
   dimensions:   { blocks: '3-5', instruction: '3-5 blocks: size headline + dimension specs + comparison object + portability/placement cards + CTA. Scale communicated with density.' },
   power:        { blocks: '5-8', instruction: '5-8 spec blocks. Performance metrics everywhere. Speed, power, efficiency — each gets a card. Technology-inspired maximum density.' },
   premium:      { blocks: '3-5', instruction: '3-5 blocks: premium headline + 2-4 luxury feature cards + exclusivity badge + CTA. Less than benefits but still substantially informative. High-end density, not empty minimalism.' },
@@ -370,88 +370,86 @@ function loadDesignLibrary(name: string): string {
 // ─── BASE PROMPT — рекламный + Brand Identity Lock ──────────────────────────
 // Порядок по приоритетам Nano Banana: ЗАПРЕТЫ (94% compliance) → КОММЕРЦИЯ → ПРОДУКТ → ЦВЕТ → СТИЛЬ
 
-const BASE_PROMPT = `Generate one aggressive e-commerce advertisement for Meta Ads / Trendyol. NOT a poster. NOT a catalog photo. NOT a minimal editorial.
+const BASE_PROMPT = `Generate one premium marketplace product infographic for TAPLA.AZ. These images appear INSIDE the product detail page — not as standalone ads.
 
-## ⛔ CRITICAL PROHIBITIONS
+## 🚫 STRICT RENDERING LIMITS
 
-LANGUAGE: ALL visible text MUST be in Azerbaijani Latin script only. NEVER English. NEVER Russian. NEVER Cyrillic.
+**LANGUAGE:** Azerbaijani Latin only for ALL visible text. Zero exceptions.
+**NO BUTTONS:** Never render any purchase/action/contact buttons. No "SƏBƏTƏ AT", "İNDİ AL", "ZƏNG EDİN", "BİZƏ YAZIN" or any CTA buttons whatsoever.
+**NO INVENTED DATA:** Render ONLY data from the "Text to Render" list. Never invent prices, percentages, warranty terms, free delivery, or specs.
+**NO REFERENCE COPYING:** Clean product only — no copied logos, brand names, watermarks, barcodes, or packaging text from the reference photo.
+**NO HEX CODES:** Never show any hex color codes as visible text.
+**SINGLE FRAME:** One unified image only — no split-screen, no collages, no before/after panels.
 
-NO COLOR CODES: NEVER render hex codes (#XXXXXX) as visible elements. They are metadata — invisible.
+## PRODUCT RULES
 
-NO INVENTED DATA: Never invent prices, discounts, percentages, "free delivery", warranty terms, or specs not explicitly stated. Fast delivery ("SÜRƏTLİ ÇATDIRILMA") is allowed as a generic marketplace claim. But NEVER "pulsuz" (free) unless stated.
+Product dominates 65-75% of frame. Never alter product shape, color, or proportions. Product is the visual hero.
 
-NO REFERENCE COPYING: Never copy logos, brand names, shop names, price stickers, barcodes, watermarks, or packaging text from reference photo.
+## PREMIUM INFOGRAPHIC STYLE
 
-ONE IMAGE ONLY: Never collages, split panels, or before/after.
+Design this like a top-tier product image from a premium brand (Apple, Samsung, Nike quality).
 
-## ADVERTISING SCENARIO FIRST — THEN LAYOUT
+**Background:** Deep rich gradient COMPLEMENTARY to the product color. If product is white/light: deep blue, purple, or charcoal. If product is dark: slightly lighter deep gradient. Never use the same color as the product for the background. Background depth and richness makes the product pop.
 
-Your process must be: advertising scenario → layout → visual design.
+**Feature Badges:** Every piece of text must appear inside a styled badge:
+- Frosted glass style: semi-transparent white fill (~15% opacity), very thin 1px white/light border, soft blurred drop-shadow
+- Clean modern bold sans-serif uppercase text inside, high contrast
+- Small minimalist white outline icon on the left of the text (checkmark circle, feather, ruler, bolt, etc.)
 
-NOT: "here is a product, here is text, arrange nicely."
+**Pointer Lines:** Ultra-thin 1px white straight lines with small solid circular end-dots, connecting product physical parts to their corresponding feature badges. Elegant and precise — not arrows.
 
-Ask yourself: "What advertising scenario best sells THIS product in THIS role right now?"
+**Typography:** Headline text (outside badges) is bold, large, clean sans-serif. White on dark. Sharp and readable.
 
-Only after the scenario is clear, build the layout. Then apply visual polish.
+**Depth Layers:** [back] gradient background → [mid] product on polished pedestal with mirror-reflection or soft shadow → [front] floating glassmorphism badges with pointer lines.
 
-## AGGRESSIVE E-COMMERCE STYLE — NO EMPTY ZONES
+## COLOR RULE
 
-This is a paid advertisement. Every pixel must work. No dead space. No "breathing room" minimalism. Fill the frame with commercial content: headline, product, feature cards, price cards, delivery badges, warranty seals, CTA buttons, decorative elements that support the offer. 6-10 visible information elements per image. The viewer scans and understands the full offer in 2 seconds.
+Campaign palette = ACCENT ONLY (badge borders, icon highlights, decorative lines). Background = deep complementary gradient. Badges = white/frosted glass — NOT palette color fill.
 
-## PRODUCT DOMINANCE
-Product dominates (60-70% area). The undisputed hero. Never small. Never secondary. Never change product shape.
+## DISTINCT FROM OTHER CARDS
 
-## COLORS
-Use campaign palette. Vibrant backgrounds, bold gradients, high contrast. Never pale minimal.
-
-## DEPTH
-Multi-layered: foreground (product + cards), midground (decorative), background (gradient/surface). Soft shadows, reflections, gradient lighting. Never flat.
-
-## DIFFERENT COMPOSITION FROM OTHER CARDS
-This is one of 3 campaign images. Same colors/lighting/mood. DIFFERENT composition, product position, layout. Each card = different designer's work.
-
-## QUALITY
-Photorealistic. Studio quality. Ultra realistic. 8K. Category-appropriate environment.`
+Same badge style, same lighting, same palette as the other 2 cards. DIFFERENT product angle, layout, composition.`
 
 // ─── SYSTEM PROMPT — Creative Director с Campaign Brief ──────────────────────
 
 // ─── SYSTEM PROMPT — Creative Director с Campaign Brief ──────────────────────
 
-const SYSTEM_PROMPT = `You are a Creative Director for TAPLA MARKETPLACE (Azerbaijan). You design 3-image advertising CAMPAIGNS — not isolated images, but a cohesive set that shares visual DNA.
+const SYSTEM_PROMPT = `You are a Senior Visual Designer for TAPLA MARKETPLACE (Azerbaijan). You design 3-image product infographic CAMPAIGNS — cohesive sets that share visual DNA. These images appear INSIDE the product detail page.
 
 ## YOUR GOAL
-Maximize click-through rate (CTR). Create a CAMPAIGN of 3 images that:
-- Share ONE visual identity (colors, lighting, mood, design language)
-- Each have a DISTINCT composition, product angle, and message
-- Together tell a complete product story
+Help shoppers understand and want the product. Create 3 cards that:
+- Share ONE visual identity (colors, lighting, badge style, pointer-line aesthetic)
+- Each show a DISTINCT composition, product angle, and focal benefit
+- Together tell the complete product story
 
-## THE PROCESS: SCENARIO → LAYOUT → DESIGN
+## THE PROCESS: MESSAGE → LAYOUT → DESIGN
 
-CRITICAL — follow this order for EVERY card. Never skip. Never reverse.
+CRITICAL — follow this order for EVERY card.
 
-### Step 1: ADVERTISING SCENARIO
-"What advertising scenario best sells THIS product in THIS role right now?"
-The scenario determines what the card communicates — not the visual treatment.
+### Step 1: MESSAGE
+"What product truth does this card communicate?"
+Each card highlights a different aspect: hero showcase / key features / usage/lifestyle.
 
 ### Step 2: COMPOSITION / LAYOUT
-Each card is assigned a specific composition. Execute it FAITHFULLY — do not default to "product centered + 2 cards below." The composition is the skeleton. Different cards = different skeletons.
+Execute the assigned composition FAITHFULLY. Different cards = different skeletons. Never default to "product center + 2 cards below" for all 3.
 
 ### Step 3: VISUAL DESIGN
-Apply color palette, lighting, mood, materials, effects to the already-built layout. Design serves the scenario — not the other way around.
+Apply color palette, lighting, mood, premium badge styling, pointer lines. Design serves the message.
 
 ## ⛔ BANNED PATTERNS
-- "Headline top → product center → 2 cards below" — BANNED. Each card must use a DIFFERENT composition.
-- 70% empty gradient with small product and one line of text — BANNED. Fill the frame.
-- All 3 cards sharing the same composition template — BANNED. Radically different layouts each time.
-- Posters — BANNED. Generate advertisements. A poster says "look at this." An ad says "BUY this, here is why, here is how."
+- "Headline top → product center → 2 cards below" — BANNED for all 3 cards. Each must use a DIFFERENT composition.
+- Product smaller than 60% of the frame — BANNED.
+- Any buy/action/contact buttons — BANNED. Product images are informational, not transactional.
+- Posters with no information badges — BANNED. Every card must have floating glassmorphism feature badges.
 
-## AGGRESSIVE E-COMMERCE STYLE
-Meta Ads compete with thousands of other ads in the feed. Your images must:
-- Contain 6-10 visible commercial elements (headline, price if given, features ×3-6, delivery, warranty, CTA)
-- Have ZERO dead zones — every area contains information or supporting design
-- Prominent, readable text — this is an advertisement, text drives conversion
-- Asymmetric, dynamic, varied compositions
-- Information cards that feel INTEGRATED with the product, not floating glass decorations on an empty poster
+## PREMIUM MARKETPLACE INFOGRAPHIC STYLE
+Product images on TAPLA.AZ must:
+- Contain 3-7 glassmorphism feature badges with pointer lines
+- Deep complementary gradient backgrounds (never same color as product)
+- Frosted glass badges: semi-transparent, thin 1px border, soft shadow, outline icon + bold text
+- Ultra-thin pointer lines (1px) with dot endpoints connecting product to badges
+- Asymmetric, dynamic compositions
+- Zero dead zones — every area contains product or informative badges
 
 ## CAMPAIGN BRIEF — DO THIS FIRST
 Before designing individual cards, establish the CAMPAIGN-LEVEL shared identity:
@@ -487,14 +485,14 @@ The difference between roles is WHAT the blocks contain, not whether they exist:
 - Problem / Solution / Gift / Warranty / Close-up / Dimensions: 3-5 blocks — role-specific communication.
 
 ## COMMERCIAL BLOCK TYPES
-Pick based on role + product data (MUST fill the frame). ONLY use blocks that are supported by provider data:
-- Features (from provider description or product type): "3 SÜRƏT REJİMİ", "GÜCLÜ HAVA AXINI", "USB ŞARJ"
-- Quality: "PREMIUM MATERİAL", "ORİJİNAL KEYFİYYƏT", "YÜNGÜL DİZAYN"
-- Delivery: "SÜRƏTLİ ÇATDIRILMA" (generic marketplace — allowed). NEVER "pulsuz" unless stated.
-- Warranty: ONLY if explicitly mentioned in provider description. Never invent "zəmanət".
-- Price: ONLY if provided. ALWAYS with AZN (e.g. "29 AZN", "149 AZN"). Never bare numbers.
-- CTA: "İNDİ AL", "SƏBƏTƏ AT"
-- Badges: "YENİ", "BESTSELLER", "PREMIUM"
+Pick based on role + product data. ONLY use blocks supported by actual product data:
+- Features (from description): e.g. "3 SÜRƏT REJİMİ", "GÜCLÜ HAVA AXINI", "USB ŞARJ"
+- Quality badges: "PREMIUM MATERİAL", "ORİJİNAL KEYFİYYƏT", "YÜNGÜL DİZAYN"
+- Delivery: "SÜRƏTLİ ÇATDIRILMA" (generic — allowed). NEVER "pulsuz" unless stated.
+- Warranty: ONLY if explicitly mentioned. Never invent "zəmanət".
+- Price card: ONLY if price is provided. Always with AZN (e.g. "29 AZN"). Never bare numbers.
+- Trust badges: "YENİ", "BESTSELLER", "PREMIUM"
+- NO BUY BUTTONS: Never generate "İNDİ AL", "SƏBƏTƏ AT", "MAĞAZAYA KEÇ", "ZƏNG EDİN", or any contact/purchase buttons.
 
 ## CARD-PRODUCT CONNECTION
 Cards and product must form one integrated composition. Use thin connection lines from product features to cards. Cards flow around the product — not floating isolated in empty space. The product and information blocks work together as one commercial unit.
@@ -523,8 +521,9 @@ The marketing style should fit the card's role.
 SHARED across all 3 cards — do NOT change per card.
 
 ## COLOR PALETTE RULES
-- Studio/product-only cards: build entire composition from the assigned color palette.
-- Environmental/model cards: palette colors go on GRAPHIC ELEMENTS ONLY (cards, badges, buttons, text containers). Walls, furniture, skin, nature stay natural and realistic — not palette-tinted.
+- All cards: background uses deep complementary gradient. Badge/border/icon accents use palette colors.
+- Environmental/lifestyle cards: palette colors on GRAPHIC ELEMENTS ONLY. Walls, furniture, natural elements stay realistic.
+- NEVER flood the entire scene with the palette color.
 
 ## TEXT RULES
 - ALL visible text: AZERBAIJANI LATIN SCRIPT ONLY. NEVER English. NEVER Russian. NEVER Cyrillic.
@@ -595,11 +594,10 @@ function buildUserPrompt(
   }
 
   return [
-    'Create a 3-image advertising CAMPAIGN for this product. All 3 cards must share ONE visual identity.',
+    'Create a 3-image product infographic CAMPAIGN for this product. All 3 cards must share ONE visual identity and appear inside the product detail page.',
     '',
     '## CAMPAIGN STRATEGY',
-    `Triad: "${triad.name}" — ${triad.logic}`,
-    '',
+    `Triad: "${triad.name}" — ${triad.logic}`,    '',
     '## CATEGORY ARTISTIC DIRECTION',
     `Product category: ${analysis.category}`,
     categoryAtmosphere ? `Atmosphere: ${categoryAtmosphere}` : '',
@@ -754,10 +752,11 @@ function buildUserPrompt(
     'RULES:',
     '- All 3 cards MUST share the same color palette, lighting, background_style, and mood.',
     '- Cards must have DIFFERENT product positions, layouts, and focal points.',
-    '- text_overlay_az: AZERBAIJANI LATIN ONLY. Empty array [] if no text.',
+    '- text_overlay_az: AZERBAIJANI LATIN ONLY. Empty array [] if no text needed.',
     '- Every card must have creative_director_passed = true.',
-    '- One image = one advertising message.',
-    '- The images must look like a cohesive paid Meta Ads / Trendyol campaign.',
+    '- One image = one product message/benefit cluster.',
+    '- NEVER include buy/action/contact buttons of any kind.',
+    '- Background = deep complementary gradient. Badges = frosted glass with pointer lines.',
     '',
     'Respond ONLY with the JSON.',
   ].join('\n')
@@ -992,19 +991,20 @@ export async function planCardPrompts(
     const colorInstruction = isEnvironmentalCard
       ? [
           `CAMPAIGN COLORS: ${colorPalette.name} — ${colorPalette.atmosphere}`,
-          `Use these colors for cards, badges, text overlays, and accent elements.`,
-          `Keep the environment/background colors natural and realistic — do NOT force palette colors onto walls, furniture, skin tones, or natural surroundings.`,
-          `The environment should look like a real professional photo, with palette colors appearing only in designed graphic elements (cards, badges, CTA buttons, text containers).`,
+          `Use palette colors for badge borders, icon highlights, accent lines, and decorative elements.`,
+          `Background and environment stay natural and realistic (real photo aesthetic). Palette colors appear ONLY on designed graphic elements (frosted glass badges, accent borders, icon tints).`,
           campaign?.design_language ? `Design Language: ${campaign.design_language}.` : '',
         ].filter(Boolean).join(' ')
       : [
           `CAMPAIGN COLORS: ${colorPalette.name} — ${colorPalette.atmosphere}`,
-          `Build the entire composition from this palette: backgrounds, gradients, cards, text, accents.`,
+          `Background: use a DEEP COMPLEMENTARY gradient — NOT the palette color itself. The background should be the dark, rich opposite or contrast to the product color so the product pops.`,
+          `Palette colors apply to: badge accent borders (1px), outline icon tints, decorative lines, subtle gradient layer. NOT to fill the entire background or badge body.`,
+          `Frosted glass badges: ~15% opacity white fill, 1px palette-tinted border, soft blurred drop-shadow.`,
           campaign?.design_language ? `Design Language: ${campaign.design_language}.` : '',
         ].filter(Boolean).join(' ')
 
     const commercialBlocks = Array.isArray(card.commercial_blocks) && card.commercial_blocks.length > 0
-      ? `Commercial blocks: ${card.commercial_blocks.join(', ')}. Use premium rounded cards with soft shadows in the campaign color palette.`
+      ? `Feature badges to render: ${card.commercial_blocks.join(', ')}. Each badge = frosted glassmorphism panel (semi-transparent, 1px light border, soft shadow) with a minimal white outline icon on the left and bold Azerbaijani uppercase text. Ultra-thin 1px pointer lines with circular dot endpoints connecting product parts to badges.`
       : ''
 
     const distinctNote = card.distinct_from_other_cards
@@ -1024,7 +1024,7 @@ export async function planCardPrompts(
       `Spatial Depth: ${depthItem?.prompt_fragment || sharedVt.spatial_depth.join(', ')}.`,
       `Motion Energy: ${motionItem?.prompt_fragment || sharedVt.motion}.`,
       `COMPOSITION VARIATION: ${variation.name} — ${variation.prompt_fragment}`,
-      `COMMERCIAL DENSITY for this role: ${densityInfo.instruction} Use ${densityInfo.blocks} commercial blocks. Fill the frame — no dead zones.`,
+      `COMMERCIAL DENSITY for this role: ${densityInfo.instruction} Use ${densityInfo.blocks} feature badges. Position them with pointer lines, not clustered or floating randomly.`,
       hasProviderPrice ? `PRODUCT PRICE: ${priceAz}. Display this price on price-related cards. ALWAYS include "AZN" with the number (e.g. "29 AZN", not just "29"). Use it in commercial blocks.` : '⛔ NO PRICE: Do NOT invent or display any price.',
       !hasWarranty ? '⛔ NO WARRANTY: Description does NOT mention warranty. Do NOT invent warranty terms ("2 il zəmanət", "14 gün geri qaytarma").' : `WARRANTY mentioned in description — can display.`,
       'Delivery: Generic fast delivery claim is OK ("SÜRƏTLİ ÇATDIRILMA"). NEVER claim "pulsuz" or "free" unless explicitly stated.',

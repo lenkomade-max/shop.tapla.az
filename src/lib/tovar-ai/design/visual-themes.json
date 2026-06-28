@@ -368,7 +368,7 @@
     }
   ],
   "category_matching": {
-    "Электроника": {
+    "Elektronika": {
       "lighting": ["rim_light", "dramatic_spotlight", "softbox_diffused"],
       "background_style": ["dark_studio", "abstract_tech", "metal_surface", "glass_surface"],
       "mood": ["tech_innovation", "modern_sleek", "minimal_luxury"],
@@ -377,7 +377,7 @@
       "motion": ["radial_burst", "frozen_motion", "dynamic_diagonals", "still_precision"],
       "atmosphere": "Cool sophisticated technology atmosphere. Glass, metal, precision engineering. The product feels advanced, capable, and cutting-edge."
     },
-    "Косметика": {
+    "Kosmetika": {
       "lighting": ["soft_studio", "golden_hour", "softbox_diffused"],
       "background_style": ["premium_gradient", "marble_surface", "editorial_backdrop", "glass_surface"],
       "mood": ["editorial_vogue", "minimal_luxury", "classic_luxury", "warm_cozy"],
@@ -386,7 +386,7 @@
       "motion": ["swirling_flow", "floating_ascending", "gentle_drift", "frozen_motion"],
       "atmosphere": "Soft luxurious beauty atmosphere. Liquid forms, silk-like materials, gentle diffused lighting. The product feels desirable, elegant, and transformative."
     },
-    "Бытовая техника": {
+    "Məişət texnikası": {
       "lighting": ["soft_studio", "softbox_diffused", "natural_daylight"],
       "background_style": ["pure_white", "environmental", "wood_surface", "marble_surface"],
       "mood": ["clean_clinical", "warm_cozy", "scandinavian", "modern_sleek"],
@@ -395,7 +395,7 @@
       "motion": ["still_precision", "gentle_drift", "frozen_motion"],
       "atmosphere": "Clean functional atmosphere. Polished surfaces, natural materials, organized precision. The product feels reliable, essential, and perfectly designed for daily life."
     },
-    "Кухонные товары": {
+    "Mətbəx": {
       "lighting": ["natural_daylight", "soft_studio", "golden_hour"],
       "background_style": ["wood_surface", "marble_surface", "environmental", "natural_stone"],
       "mood": ["warm_cozy", "scandinavian", "industrial_premium", "classic_luxury"],
@@ -404,7 +404,7 @@
       "motion": ["gentle_drift", "floating_ascending", "still_precision"],
       "atmosphere": "Warm inviting kitchen atmosphere. Natural wood, stone, ceramic. The product feels essential to a beautiful cooking experience. Home and hearth warmth."
     },
-    "Спортивные товары": {
+    "İdman": {
       "lighting": ["high_contrast", "dramatic_spotlight", "rim_light"],
       "background_style": ["dark_studio", "abstract_tech", "metal_surface"],
       "mood": ["dynamic_action", "industrial_premium", "tech_innovation", "modern_sleek"],
@@ -413,7 +413,7 @@
       "motion": ["dynamic_diagonals", "frozen_motion", "radial_burst", "wave_pulse"],
       "atmosphere": "Energetic dynamic atmosphere. Carbon, rubber, metal. The product feels powerful, explosive, ready for action. Frozen at peak performance."
     },
-    "Детские товары": {
+    "Uşaq malları": {
       "lighting": ["soft_studio", "natural_daylight", "softbox_diffused"],
       "background_style": ["premium_gradient", "environmental", "editorial_backdrop"],
       "mood": ["warm_cozy", "scandinavian", "modern_sleek"],
@@ -422,7 +422,7 @@
       "motion": ["floating_ascending", "gentle_drift", "swirling_flow"],
       "atmosphere": "Bright friendly atmosphere. Soft rounded forms, gentle colors, floating playful elements. The product feels safe, fun, and joy-bringing."
     },
-    "Офисные товары": {
+    "Ofis malları": {
       "lighting": ["softbox_diffused", "soft_studio", "natural_daylight"],
       "background_style": ["pure_white", "wood_surface", "metal_surface", "glass_surface"],
       "mood": ["clean_clinical", "modern_sleek", "scandinavian", "minimal_luxury"],
@@ -431,7 +431,7 @@
       "motion": ["still_precision", "gentle_drift"],
       "atmosphere": "Clean professional atmosphere. Aluminum, glass, wood. The product feels productive, organized, and essential for modern work."
     },
-    "Аксессуары": {
+    "Aksesuarlar": {
       "lighting": ["soft_studio", "golden_hour", "softbox_diffused"],
       "background_style": ["premium_gradient", "editorial_backdrop", "marble_surface", "glass_surface"],
       "mood": ["minimal_luxury", "editorial_vogue", "modern_sleek", "classic_luxury"],
@@ -440,7 +440,7 @@
       "motion": ["floating_ascending", "gentle_drift", "still_precision"],
       "atmosphere": "Premium accessory atmosphere. The product complements and enhances. Elegant supporting role with its own beauty. Fashion and lifestyle aesthetic."
     },
-    "Автотовары": {
+    "Avto": {
       "lighting": ["high_contrast", "dramatic_spotlight", "rim_light"],
       "background_style": ["dark_studio", "metal_surface", "abstract_tech"],
       "mood": ["dynamic_action", "industrial_premium", "tech_innovation", "modern_sleek"],
