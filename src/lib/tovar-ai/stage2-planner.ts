@@ -263,98 +263,44 @@ function loadDesignLibrary(name: string): string {
 }
 
 // ─── BASE PROMPT — рекламный + Brand Identity Lock ──────────────────────────
+// Порядок по приоритетам Nano Banana: ЗАПРЕТЫ (94% compliance) → ЦВЕТ → ПРОДУКТ → СТИЛЬ → КОМПОЗИЦИЯ
 
-const BASE_PROMPT = `Create a high-converting e-commerce advertisement image.
+const BASE_PROMPT = `Generate one photorealistic advertising image for a paid Meta Ads / Trendyol campaign. Not a catalog photo — an advertisement that makes people stop scrolling and click.
 
-The image must look like a paid Meta Ads creative, not a product catalog photo. It should resemble the best-performing ads on Facebook, Instagram, Trendyol, Shopify, and modern marketplaces.
+## ⛔ CRITICAL PROHIBITIONS — IMAGE WILL BE REJECTED IF VIOLATED
 
-Generate ONE image only.
-Never create collages. Never create split layouts. Never create multiple panels.
-One image = one clear advertising message.
+LANGUAGE: ALL visible text inside the image MUST be in Azerbaijani Latin script only. NEVER English. NEVER Russian. NEVER Cyrillic. If you cannot write Azerbaijani correctly, use NO text at all.
 
-## BRAND IDENTITY LOCK — CRITICAL
-This image is part of a 3-image advertising CAMPAIGN.
-All 3 images MUST share the EXACT same:
-- Color palette (provided below — use these colors and ONLY these colors)
-- Lighting style
-- Background style
-- Mood / atmosphere
-- Design language (card style, shadow type, corner rounding, typography feel)
+NO COLOR CODES: NEVER render hex color codes like #FFFFFF or #1A1A2E as visible text or decorative elements. Color codes are technical metadata — they must NOT appear anywhere in the image.
 
-The 3 images must look like they belong to the SAME campaign — like 3 slides from one brand.
-They share visual DNA but each has a DIFFERENT composition and message.
+NO INVENTED DATA: NEVER invent prices, discounts, percentages, or specifications that are not explicitly stated in this prompt. If no price is given, do NOT show any price. If no discount is mentioned, do NOT create one. Only use product information that is explicitly provided.
 
-## CAMPAIGN COLOR PALETTE (USE THESE COLORS)
-The color palette for this campaign will be specified in the prompt.
-Use it for backgrounds, cards, accents, text, gradients, and decorative elements.
-Do NOT introduce colors outside this palette.
+NO REFERENCE COPYING: NEVER copy logos, brand names, shop names, price stickers, barcodes, watermarks, or packaging text from the reference photo. The reference photo is for product shape and color only. Create an entirely new scene.
 
-## PRODUCT DOMINANCE
-The product should dominate the composition — occupy approximately 60-70% of the frame.
-It must be the undisputed hero. Never make the product small or secondary.
+ONE IMAGE ONLY: Never create collages. Never split layouts. Never before/after panels. One image = one message.
+
+## PRODUCT (what the viewer must see first)
+The product dominates the frame — it occupies 60-70% of the image area. It is the undisputed hero. Never make the product small, distant, or secondary. Do not change the product shape. Do not invent new product parts. The product is the main subject.
+
+## COLORS (described in words — DO NOT use hex codes visually)
+The campaign color palette will be described below with color names and atmosphere. Use these colors for backgrounds, gradients, cards, text, accents, and decorative elements. Do not introduce colors outside this palette. Prefer vibrant commercial backgrounds, bold gradients, and high contrast. Avoid pale minimalist palettes.
 
 ## ADVERTISING STYLE
-Do NOT generate luxury Apple-style posters.
-Do NOT create minimal premium editorials with lots of empty space.
-Prefer high-converting e-commerce advertisements over minimal catalog images.
-The design should maximize click-through rate.
-The advertisement should immediately feel promotional — like a paid Meta Ads creative.
-
-## LAYOUT & HIERARCHY
-Always build a strong visual hierarchy:
-Headline first → Product dominant → Benefits/info blocks → Offer/promotion → CTA.
-Do not leave large empty areas.
-The advertisement should contain enough commercial information.
-Prefer multiple short information cards over long paragraphs.
-
-## COMMERCIAL BLOCKS
-Use premium rounded commercial blocks for: Prices, Features, Delivery, Warranty, Discounts, Specifications, Buttons.
-Cards should have soft shadows and rounded corners.
-Cards should naturally surround the product.
-Do not leave floating text without visual containers.
-Generate floating rounded information blocks when appropriate.
-
-## COLORS
-Prefer vibrant commercial backgrounds. Use bold gradients.
-Use high contrast between background and product.
-Avoid pale minimalist color palettes.
+The image must look like a high-performing paid Meta Ads creative — not an Apple minimal poster, not a luxury editorial with empty space. The design maximizes click-through rate. It should feel promotional and commercial: premium marketplace quality but designed to sell, not to look elegant.
 
 ## DEPTH & LAYERS
-Create layered compositions with foreground and background depth.
-Use floating shapes, soft glows, reflections, gradient lighting.
-Add large geometric background elements and subtle decorative graphics.
-Achieve commercial visual depth — not flat minimalism.
+Create multi-layered compositions with foreground-midground-background separation. Use soft shadows, reflections, gradient lighting, floating geometric shapes, and subtle decorative elements. Commercial visual depth — never flat minimalism.
+
+## VISUAL HIERARCHY
+Headline first → Product dominant → Benefit/info cards → CTA. Do not leave large empty areas. The image should contain enough commercial information. Use premium rounded floating cards for text and info blocks — text always goes inside visual containers, never floating bare.
+
+## CAMPAIGN COHERENCE
+This image is one of 3 in a single advertising campaign. All 3 cards share the exact same color palette, lighting style, mood, and visual DNA. But this card must have a DISTINCT composition, product angle, and layout from the other 2 cards. Do NOT repeat the same format.
 
 ## QUALITY
-Photorealistic. Studio quality. Modern advertising style. Ultra realistic. 8K.
-The product is always the main subject.
-Do not change the product shape. Do not invent new product parts.
+Photorealistic. Studio quality. Ultra realistic. 8K. The scene, lighting and environment must be appropriate for this specific product category — do not reuse the same background for different product types.`
 
-## DO NOT COPY FROM REFERENCE PHOTO
-CRITICAL — The reference photo is for product shape/color fidelity ONLY.
-NEVER copy or reproduce from the reference photo:
-- Logos, brand names, store names, shop names
-- Price tags, price stickers, barcodes
-- Watermarks, photographer signatures
-- Packaging text, label text
-- Any text that appears on the original product or its background
-These elements MUST NOT appear in the generated image. Create a completely new scene with no branding from the original photo.
-
-## DIFFERENTIATION FROM OTHER CARDS IN CAMPAIGN
-This card has a specific role in the campaign. Its composition, product angle, and layout
-must be DISTINCT from the other 2 cards. Do NOT repeat the same format.
-
-## SELF-REVIEW
-Before finalizing: would a professional e-commerce designer approve this layout for a paid advertisement?
-Does this image share visual DNA with the other 2 campaign images?
-If the answer is no, redesign before generating.
-
-CRITICAL — Analyze the uploaded product before generating the image. Determine automatically: product category, materials, intended use, target customer, suitable environment, appropriate lighting, realistic accessories, correct hand position if applicable, realistic usage scenario.
-
-Do not reuse the same environment for every product.
-Beauty products → skincare environments. Electronics → modern technology environments.
-Kitchen products → premium kitchens. Automotive → automotive environments.
-Fitness → sports environments. Office → office environments. Pet → home environments.`
+// ─── SYSTEM PROMPT — Creative Director с Campaign Brief ──────────────────────
 
 // ─── SYSTEM PROMPT — Creative Director с Campaign Brief ──────────────────────
 
@@ -837,6 +783,8 @@ export async function planCardPrompts(
       ? marketingStyles.find(m => m.id === card.marketing_style) || ms[card.index - 1]
       : ms[card.index - 1]
 
+    const hasProviderPrice = providerDescription && /\d+\s*(AZN|₼|manat|ман|\$|USD|EUR)/i.test(providerDescription)
+
     const lightingItem = visualThemes.lighting.find(l => l.id === sharedVt.lighting)
     const bgItem = visualThemes.background_style.find(b => b.id === sharedVt.background_style)
     const moodItem = visualThemes.mood.find(m => m.id === sharedVt.mood)
@@ -845,15 +793,15 @@ export async function planCardPrompts(
     const isEnvironmentalCard = cardCs.needs_environment || card.needs_model
     const colorInstruction = isEnvironmentalCard
       ? [
-          `CAMPAIGN COLOR PALETTE: "${colorPalette.name}" — ${colorPalette.colors.join(', ')}.`,
+          `CAMPAIGN COLORS: ${colorPalette.name} — ${colorPalette.atmosphere}`,
           `Use these colors for cards, badges, text overlays, and accent elements.`,
           `Keep the environment/background colors natural and realistic — do NOT force palette colors onto walls, furniture, skin tones, or natural surroundings.`,
           `The environment should look like a real professional photo, with palette colors appearing only in designed graphic elements (cards, badges, CTA buttons, text containers).`,
           campaign?.design_language ? `Design Language: ${campaign.design_language}.` : '',
         ].filter(Boolean).join(' ')
       : [
-          `CAMPAIGN COLOR PALETTE: "${colorPalette.name}" — ${colorPalette.colors.join(', ')}.`,
-          `Use these colors for backgrounds, gradients, cards, text, accents. Build the entire composition from this palette.`,
+          `CAMPAIGN COLORS: ${colorPalette.name} — ${colorPalette.atmosphere}`,
+          `Build the entire composition from this palette: backgrounds, gradients, cards, text, accents.`,
           campaign?.design_language ? `Design Language: ${campaign.design_language}.` : '',
         ].filter(Boolean).join(' ')
 
@@ -865,11 +813,19 @@ export async function planCardPrompts(
       ? `This card differs from others in the campaign: ${card.distinct_from_other_cards}.`
       : ''
 
+    const materialsItem = visualThemes.materials.find(m => m.id === sharedVt.materials[0])
+    const depthItem = visualThemes.spatial_depth.find(d => d.id === sharedVt.spatial_depth[0])
+    const motionItem = visualThemes.motion.find(m => m.id === sharedVt.motion)
+
     const designDecisions = [
       colorInstruction,
       `CAMPAIGN SHARED IDENTITY — Lighting: ${lightingItem?.prompt_fragment || sharedVt.lighting}.`,
       `CAMPAIGN SHARED IDENTITY — Background: ${bgItem?.prompt_fragment || sharedVt.background_style}.`,
       `CAMPAIGN SHARED IDENTITY — Mood: ${moodItem?.prompt_fragment || sharedVt.mood}.`,
+      `Scene Materials: ${materialsItem?.prompt_fragment || sharedVt.materials.join(', ')}.`,
+      `Spatial Depth: ${depthItem?.prompt_fragment || sharedVt.spatial_depth.join(', ')}.`,
+      `Motion Energy: ${motionItem?.prompt_fragment || sharedVt.motion}.`,
+      !hasProviderPrice ? '⛔ NO PRICE: The product description does NOT contain a price. Do NOT invent or display any price, discount, or cost figure.' : '',
       `ADVERTISING ROLE: ${card.role}. ${ROLE_DESCRIPTIONS[card.role as CardRole] || card.role}.`,
       `Creative Style: ${cardCs.name}. ${cardCs.prompt_fragment}`,
       `Marketing Style: ${cardMs.name}. ${cardMs.prompt_fragment}`,
@@ -883,7 +839,7 @@ export async function planCardPrompts(
     ].filter(Boolean).join(' ')
 
     const textInstruction = card.text_overlay_az.length > 0
-      ? `Render this text on the image inside rounded commercial blocks (use palette colors): ${card.text_overlay_az.join(' — ')}.`
+      ? `Azerbaijani Latin text to render inside rounded commercial blocks (MUST be Azerbaijani, NEVER English/Russian): ${card.text_overlay_az.join(' — ')}.`
       : ''
 
     card.prompt_en = [
