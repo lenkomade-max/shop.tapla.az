@@ -58,6 +58,8 @@ export async function POST(request: Request) {
       // Product mode — данные товара и R2 URLs
       productData: result.productData ?? null,
       imageUrls: result.imageUrls ?? null,
+      // Stage 1.5 — AI-обогащённые данные товара (до мержа)
+      enrichedData: result.enrichedData ?? null,
     })
   } catch (err) {
     console.error('[TovarAI] API error:', err)

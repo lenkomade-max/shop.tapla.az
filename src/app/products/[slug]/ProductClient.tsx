@@ -37,7 +37,7 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
     product.shades && product.shades.length > 0 ? product.shades[0] : undefined
   );
   const [quantity, setQuantity] = useState(1);
-  const [activeTab, setActiveTab] = useState<'benefits' | 'howToUse' | 'ingredients'>('benefits');
+  const [activeTab, setActiveTab] = useState<'benefits' | 'features' | 'howToUse' | 'ingredients'>('benefits');
   const [isAdded, setIsAdded] = useState(false);
 
   // Interactive LED simulator state
@@ -267,6 +267,18 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
               {product.description}
             </p>
 
+            {/* Kimlər üçün */}
+            {product.idealFor && (
+              <div className="space-y-2 pb-2">
+                <span className="text-[10px] tracking-widest uppercase font-bold text-neutral-500 block">
+                  KIMLƏR ÜÇÜN
+                </span>
+                <p className="text-xs text-neutral-600 leading-relaxed font-sans">
+                  {product.idealFor}
+                </p>
+              </div>
+            )}
+
             {/* Color Shades Picker */}
             {product.shades && product.shades.length > 0 && (
               <div className="space-y-3">
@@ -372,17 +384,18 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
             {/* Content Tabs (Benefits / How to use / Ingredients) */}
             <div className="space-y-4">
               <div className="flex border-b border-neutral-200">
-                {(['benefits', 'howToUse', 'ingredients'] as const).map((tab) => (
+                {(['benefits', 'features', 'howToUse', 'ingredients'] as const).map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
                     className={`pb-2.5 text-[10px] font-bold tracking-widest uppercase mr-6 border-b-2 transition-all cursor-pointer ${
-                      activeTab === tab 
-                        ? 'border-neutral-950 text-neutral-950' 
+                      activeTab === tab
+                        ? 'border-neutral-950 text-neutral-950'
                         : 'border-transparent text-neutral-400 hover:text-neutral-700'
                     }`}
                   >
                     {tab === 'benefits' && 'FAYDALARI'}
+                    {tab === 'features' && 'XÜSUSİYYƏTLƏR'}
                     {tab === 'howToUse' && 'İSTİFADƏ QAYDASI'}
                     {tab === 'ingredients' && 'MATERİAL / SERTİFİKAT'}
                   </button>
@@ -400,14 +413,68 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
                     ))}
                   </ul>
                 )}
+                {activeTab === 'features' && product.features && product.features.length > 0 && (
+                  <ul className="space-y-2">
+                    {product.features.map((f, i) => (
+                      <li key={i} className="flex items-start space-x-2">
+                        <span className="text-neutral-950 font-bold mt-0.5">•</span>
+                        <span>{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
                 {activeTab === 'howToUse' && (
-                  <p className="whitespace-pre-line leading-relaxed">{product.howToUse}</p>
+                  <div className="space-y-4">
+                    <div>
+                      <p className="whitespace-pre-line leading-relaxed">{product.howToUse}</p>
+                    </div>
+                    {product.useCases && product.useCases.length > 0 && (
+                      <div>
+                        <h4 className="text-[10px] font-bold tracking-widest uppercase text-neutral-700 mb-2">ISTIFADE SSENARILERI</h4>
+                        <ul className="space-y-1">
+                          {product.useCases.map((u, i) => (
+                            <li key={i} className="flex items-start space-x-2">
+                              <span className="text-neutral-950 font-bold mt-0.5">•</span>
+                              <span>{u}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {product.careInstructions && (
+                      <div>
+                        <h4 className="text-[10px] font-bold tracking-widest uppercase text-neutral-700 mb-2">QULLUQ TƏLİMATI</h4>
+                        <p className="whitespace-pre-line leading-relaxed">{product.careInstructions}</p>
+                      </div>
+                    )}
+                  </div>
                 )}
                 {activeTab === 'ingredients' && (
                   <p className="whitespace-pre-line leading-relaxed">{product.ingredients || 'Medical grade material, CE & RoHS certified.'}</p>
                 )}
               </div>
             </div>
+            {/* FAQ Accordion */}
+            {product.faq && product.faq.length > 0 && (
+              <div className="space-y-3 pt-4 border-t border-neutral-100">
+                <span className="text-[10px] tracking-widest uppercase font-bold text-neutral-500 block">
+                  TEZ-TEZ VERILƏN SUALLAR
+                </span>
+                <div className="space-y-2">
+                  {product.faq.map((item, i) => (
+                    <details key={i} className="group border border-neutral-100 bg-white">
+                      <summary className="flex items-center justify-between px-4 py-3 text-xs font-medium text-neutral-800 cursor-pointer list-none hover:bg-neutral-50 transition-colors">
+                        {item.question}
+                        <ChevronRight className="h-3 w-3 text-neutral-400 group-open:rotate-90 transition-transform shrink-0 ml-2" />
+                      </summary>
+                      <div className="px-4 pb-3 text-xs text-neutral-500 leading-relaxed border-t border-neutral-100 pt-3">
+                        {item.answer}
+                      </div>
+                    </details>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

@@ -292,7 +292,17 @@ export default function TovarAIPage() {
     setSaving(true)
     setError('')
     try {
-      const finalData = { ...productData, images: imageUrls || [] }
+      const finalData = {
+        ...productData,
+        images: imageUrls || [],
+        features: productData.features || undefined,
+        ideal_for: productData.ideal_for || undefined,
+        use_cases: productData.use_cases || undefined,
+        care_instructions: productData.care_instructions || undefined,
+        compatibility: productData.compatibility || undefined,
+        faq: productData.faq || undefined,
+        search_keywords: productData.search_keywords || undefined,
+      }
       const id = await createProductFromAI(finalData, 'draft')
       if (id) {
         setSavedProductId(id)
@@ -311,7 +321,17 @@ export default function TovarAIPage() {
     setSaving(true)
     setError('')
     try {
-      const finalData = { ...productData, images: imageUrls || [] }
+      const finalData = {
+        ...productData,
+        images: imageUrls || [],
+        features: productData.features || undefined,
+        ideal_for: productData.ideal_for || undefined,
+        use_cases: productData.use_cases || undefined,
+        care_instructions: productData.care_instructions || undefined,
+        compatibility: productData.compatibility || undefined,
+        faq: productData.faq || undefined,
+        search_keywords: productData.search_keywords || undefined,
+      }
       const id = await createProductFromAI(finalData, 'active')
       if (id) {
         setSavedProductId(id)
@@ -819,6 +839,91 @@ export default function TovarAIPage() {
                   ))}
                 </div>
 
+                {/* Xüsusiyyətlər (Features) */}
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-zinc-600">
+                    Xüsusiyyətlər{' '}
+                    <button
+                      type="button"
+                      onClick={() => updateProductField('features', [...(productData.features || []), ''])}
+                      className="ml-2 text-xs font-normal text-zinc-400 hover:text-black"
+                    >
+                      + Əlavə et
+                    </button>
+                  </label>
+                  <div className="space-y-1">
+                    {(productData.features || []).map((f, i) => (
+                      <div key={i} className="flex items-center gap-2">
+                        <input
+                          value={f}
+                          onChange={e => {
+                            const next = [...(productData.features || [])]
+                            next[i] = e.target.value
+                            updateProductField('features', next)
+                          }}
+                          placeholder="Xüsusiyyət"
+                          className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => updateProductField('features', (productData.features || []).filter((_, j) => j !== i))}
+                          className="text-xs text-red-400 hover:text-red-600"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Kimlər üçün */}
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-zinc-600">Kimlər üçün</label>
+                  <input
+                    value={productData.ideal_for || ''}
+                    onChange={e => updateProductField('ideal_for', e.target.value || undefined)}
+                    placeholder="Bu məhsul kimlər üçün idealdır?"
+                    className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black"
+                  />
+                </div>
+
+                {/* İstifadə ssenariləri */}
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-zinc-600">
+                    İstifadə ssenariləri{' '}
+                    <button
+                      type="button"
+                      onClick={() => updateProductField('use_cases', [...(productData.use_cases || []), ''])}
+                      className="ml-2 text-xs font-normal text-zinc-400 hover:text-black"
+                    >
+                      + Əlavə et
+                    </button>
+                  </label>
+                  <div className="space-y-1">
+                    {(productData.use_cases || []).map((u, i) => (
+                      <div key={i} className="flex items-center gap-2">
+                        <input
+                          value={u}
+                          onChange={e => {
+                            const next = [...(productData.use_cases || [])]
+                            next[i] = e.target.value
+                            updateProductField('use_cases', next)
+                          }}
+                          placeholder="İstifadə ssenarisi"
+                          className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => updateProductField('use_cases', (productData.use_cases || []).filter((_, j) => j !== i))}
+                          className="text-xs text-red-400 hover:text-red-600"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
                 {/* Как использовать */}
                 <div>
                   <label className="mb-1 block text-xs font-medium text-zinc-600">İstifadə qaydası</label>
@@ -830,13 +935,23 @@ export default function TovarAIPage() {
                   />
                 </div>
 
-                {/* Ингредиенты (для косметики) */}
+                {/* İngredients + Qulluq təlimatı */}
                 <div>
                   <label className="mb-1 block text-xs font-medium text-zinc-600">Tərkibi</label>
                   <textarea
                     value={productData.ingredients || ''}
                     onChange={e => updateProductField('ingredients', e.target.value || null)}
                     rows={2}
+                    className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black resize-none"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-zinc-600">Qulluq təlimatı</label>
+                  <textarea
+                    value={productData.care_instructions || ''}
+                    onChange={e => updateProductField('care_instructions', e.target.value || null)}
+                    rows={2}
+                    placeholder="Məhsula qulluq qaydaları"
                     className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black resize-none"
                   />
                 </div>
@@ -873,6 +988,56 @@ export default function TovarAIPage() {
                         >
                           ✕
                         </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* FAQ */}
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-zinc-600">
+                    Tez-tez verilən suallar (FAQ){' '}
+                    <button
+                      type="button"
+                      onClick={() => updateProductField('faq', [...(productData.faq || []), { question: '', answer: '' }])}
+                      className="ml-2 text-xs font-normal text-zinc-400 hover:text-black"
+                    >
+                      + Sual əlavə et
+                    </button>
+                  </label>
+                  <div className="space-y-3">
+                    {(productData.faq || []).map((item, i) => (
+                      <div key={i} className="rounded-lg border border-zinc-200 p-3 space-y-2">
+                        <div className="flex items-center gap-2">
+                          <input
+                            value={item.question}
+                            onChange={e => {
+                              const next = [...(productData.faq || [])]
+                              next[i] = { ...next[i], question: e.target.value }
+                              updateProductField('faq', next)
+                            }}
+                            placeholder="Sual"
+                            className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => updateProductField('faq', (productData.faq || []).filter((_, j) => j !== i))}
+                            className="text-xs text-red-400 hover:text-red-600 shrink-0"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                        <textarea
+                          value={item.answer}
+                          onChange={e => {
+                            const next = [...(productData.faq || [])]
+                            next[i] = { ...next[i], answer: e.target.value }
+                            updateProductField('faq', next)
+                          }}
+                          placeholder="Cavab"
+                          rows={2}
+                          className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black resize-none"
+                        />
                       </div>
                     ))}
                   </div>

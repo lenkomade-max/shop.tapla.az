@@ -27,6 +27,14 @@ function mapProduct(row: Record<string, unknown>): Product {
     shades: Array.isArray(row.shades) ? row.shades as { name: string; colorHex: string; isHot?: boolean; label?: string }[] : undefined,
     isNew: Boolean(row.is_new) || undefined,
     tryOnEnabled: Boolean(row.try_on_enabled) || undefined,
+    // Stage 1.5 enrichment
+    features: Array.isArray(row.features) ? row.features as string[] : undefined,
+    idealFor: row.ideal_for as string | null ?? undefined,
+    useCases: Array.isArray(row.use_cases) ? row.use_cases as string[] : undefined,
+    careInstructions: row.care_instructions as string | null ?? undefined,
+    compatibility: row.compatibility as string | null ?? undefined,
+    faq: Array.isArray(row.faq) ? row.faq as { question: string; answer: string }[] : undefined,
+    searchKeywords: Array.isArray(row.search_keywords) ? row.search_keywords as string[] : undefined,
   };
 }
 

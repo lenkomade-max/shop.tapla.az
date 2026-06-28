@@ -170,6 +170,16 @@ export async function createProductFromAI(
     tags: string[]
     images: string[]
     supplier_url?: string
+    is_new?: boolean
+    shades?: string[]
+    try_on_enabled?: boolean
+    features?: string[]
+    ideal_for?: string | null
+    use_cases?: string[]
+    care_instructions?: string | null
+    compatibility?: string | null
+    faq?: { question: string; answer: string }[]
+    search_keywords?: string[]
   },
   status: 'active' | 'draft' = 'draft',
 ): Promise<string | null> {
@@ -214,6 +224,16 @@ export async function createProductFromAI(
       tags: productData.tags,
       images: productData.images,
       supplier_url: productData.supplier_url || null,
+      is_new: productData.is_new ?? true,
+      shades: productData.shades || [],
+      try_on_enabled: productData.try_on_enabled ?? false,
+      features: productData.features || [],
+      ideal_for: productData.ideal_for || null,
+      use_cases: productData.use_cases || [],
+      care_instructions: productData.care_instructions || null,
+      compatibility: productData.compatibility || null,
+      faq: productData.faq || [],
+      search_keywords: productData.search_keywords || [],
     })
     .select('id')
     .single()

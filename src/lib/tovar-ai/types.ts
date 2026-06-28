@@ -184,6 +184,54 @@ export interface ProductDraftData {
   tags: string[]
   images: string[]
   supplier_url?: string
+  // Stage 1.5 enrichment
+  is_new?: boolean
+  shades?: string[]
+  try_on_enabled?: boolean
+  features?: string[]             // 8-20 ключевых особенностей
+  ideal_for?: string              // для кого подходит
+  use_cases?: string[]            // сценарии использования
+  care_instructions?: string | null
+  compatibility?: string | null
+  faq?: Array<{ question: string; answer: string }>
+  search_keywords?: string[]      // 30-100 поисковых фраз (на английском)
+}
+
+/**
+ * Stage 1.5: EnricherOutput — AI-сгенерированная карточка товара.
+ * Возвращается из stage1.5-enricher.ts и мержится в ProductDraftData.
+ * Все поля на азербайджанском (кроме search_keywords_az — на английском).
+ */
+export interface EnricherOutput {
+  // ─── Заголовки ────────────────────────────────────────────────────
+  name_az: string                 // "Dyson Supersonic saç qurudan"
+  title_az: string                // ~60-70 символов, естественный, с поисковыми фразами
+  subtitle_az: string | null      // Главное преимущество, не слоган
+
+  // ─── Основной контент ─────────────────────────────────────────────
+  description_az: string          // 300-800 слов, максимум деталей, списки, абзацы
+  benefits_az: string[]           // 6-12 преимуществ, каждое — законченная мысль
+  how_to_use_az: string           // Пошаговая инструкция (если сложный товар) или советы
+  ingredients_az: string | null   // Только для косметики, иначе null
+
+  // ─── Характеристики и детали ──────────────────────────────────────
+  features_az: string[]           // 8-20 ключевых особенностей
+  ideal_for_az: string            // Кому подходит этот товар
+  use_cases_az: string[]          // 3-8 реальных сценариев использования
+  care_instructions_az: string | null  // Уход за товаром (если применимо)
+  compatibility_az: string | null      // Совместимость (если применимо)
+
+  // ─── FAQ ──────────────────────────────────────────────────────────
+  faq_az: Array<{ question: string; answer: string }>  // 3-8 частых вопросов
+
+  // ─── SEO ──────────────────────────────────────────────────────────
+  tags_az: string[]               // 15-40 тегов на азербайджанском
+  search_keywords_az: string[]    // 30-100 поисковых фраз (на АНГЛИЙСКОМ, для внутреннего поиска)
+  slug: string | null             // SEO-URL; null = стандартная генерация
+
+  // ─── Визуальные варианты ──────────────────────────────────────────
+  shades: string[]                // цвета/оттенки с фото
+  try_on_enabled: boolean         // true для косметики/очков
 }
 
 export interface PipelineResult {
@@ -196,6 +244,7 @@ export interface PipelineResult {
   cost: number
   productData?: ProductDraftData // только в product mode
   imageUrls?: string[] // R2 URLs сгенерированных карточек
+  enrichedData?: EnricherOutput // Stage 1.5 — данные до мержа с детерминированными полями
 }
 
 // ─── Конфигурация (хардкод, только ключ из .env) ────────────────────────────
@@ -203,6 +252,7 @@ export interface PipelineResult {
 export const TOVAR_AI_CONFIG = {
   /** Менять здесь при смене моделей */
   VISION_MODEL: 'google/gemma-4-31b-it' as const,   // Gemini + Vision + текст
+  ENRICHER_MODEL: 'google/gemma-4-31b-it' as const,  // Stage 1.5: Data Enricher (та же Gemma)
   PLANNER_MODEL: 'google/gemini-3.1-flash-lite' as const,
   IMAGE_MODEL: 'google/gemini-3.1-flash-image-preview' as const, // Nano Banana 2
   QA_MODEL: 'google/gemma-4-31b-it' as const, // Vision-capable, free

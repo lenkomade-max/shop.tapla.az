@@ -7,6 +7,13 @@ export interface ProductData {
   oldPrice: number | null
   category: string | null
   images: string[]
+  features?: string[]
+  idealFor?: string | null
+  useCases?: string[]
+  careInstructions?: string | null
+  compatibility?: string | null
+  faq?: { question: string; answer: string }[]
+  searchKeywords?: string[]
 }
 
 export type SectionName =
@@ -93,6 +100,14 @@ export interface Product {
   shades?: Shade[];
   isNew?: boolean;
   tryOnEnabled?: boolean;
+  // Stage 1.5 enrichment
+  features?: string[];
+  idealFor?: string | null;
+  useCases?: string[];
+  careInstructions?: string | null;
+  compatibility?: string | null;
+  faq?: { question: string; answer: string }[];
+  searchKeywords?: string[];
 }
 
 export interface Review {
