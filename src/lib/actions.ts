@@ -490,6 +490,63 @@ export async function saveCategory(formData: FormData): Promise<void> {
   redirect('/admin/categories')
 }
 
+/**
+ * Возвращает заказы текущего пользователя (server action, supabaseAdmin).
+ * Ищет по: auth_user_id, profile_id, и phone (для guest→registered линковки).
+ */
+export async function getMyOrders(profileId: string, phone: string | null, authUserId: string | null) {
+  if (!profileId) return []
+
+  // Build query: orders matching profile_id OR auth_user_id OR phone
+  let query = supabaseAdmin
+    .from('orders')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(50)
+
+  const filters: string[] = [`profile_id.eq.${profileId}`]
+  if (authUserId) filters.push(`auth_user_id.eq.${authUserId}`)
+  if (phone) filters.push(`phone.eq.${phone}`)
+
+  query = query.or(filters.join(','))
+
+  const { data: orders, error } = await query
+  if (error) {
+    console.error('getMyOrders error:', error)
+    return []
+  }
+
+  // If user is authenticated, link any unlinked orders (guest → registered)
+  if (authUserId) {
+    for (const o of (orders ?? [])) {
+      const row = o as Record<string, unknown>
+      if (!row.auth_user_id) {
+        await supabaseAdmin.from('orders')
+          .update({ auth_user_id: authUserId })
+          .eq('id', row.id)
+      }
+    }
+  }
+
+  // Fetch product names
+  const productIds = [...new Set((orders ?? []).map((o: any) => o.product_id).filter(Boolean))] as string[]
+  const { data: products } = productIds.length > 0
+    ? await supabaseAdmin.from('products').select('id, name, title, images').in('id', productIds)
+    : { data: [] }
+
+  const productMap = new Map<string, { name: string; image: string }>()
+  for (const p of (products ?? [])) {
+    const imgs = (p.images as string[]) || []
+    productMap.set(p.id, { name: p.name || p.title, image: imgs[0] || '' })
+  }
+
+  return (orders ?? []).map((o: any) => ({
+    ...o,
+    product_name: (o.product_id && productMap.get(o.product_id)?.name) || undefined,
+    product_image: (o.product_id && productMap.get(o.product_id)?.image) || undefined,
+  }))
+}
+
 export async function deleteCategory(formData: FormData) {
   if (!(await checkAuth())) return
   const id = formData.get('id') as string

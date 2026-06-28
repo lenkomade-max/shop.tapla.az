@@ -463,10 +463,25 @@ DROP POLICY IF EXISTS "anon can read media" ON media;
 CREATE POLICY "anon can read media" ON media
   FOR SELECT TO anon USING (true);
 
--- Orders: anon может создавать (чекаут) но не читать
+-- Orders: anon может создавать (чекаут), authenticated может читать свои
 DROP POLICY IF EXISTS "anon can insert orders" ON orders;
 CREATE POLICY "anon can insert orders" ON orders
   FOR INSERT TO anon WITH CHECK (true);
+
+DROP POLICY IF EXISTS "users can read own orders" ON orders;
+CREATE POLICY "users can read own orders" ON orders
+  FOR SELECT TO authenticated
+  USING (auth_user_id = auth.uid());
+
+-- Allow users to also read orders linked to their profile (guest checkout → later registration)
+DROP POLICY IF EXISTS "users can read orders by profile" ON orders;
+CREATE POLICY "users can read orders by profile" ON orders
+  FOR SELECT TO authenticated
+  USING (
+    profile_id IN (
+      SELECT id FROM profiles WHERE auth_user_id = auth.uid()
+    )
+  );
 
 -- Leads: anon может создавать но не читать
 DROP POLICY IF EXISTS "anon can insert leads" ON leads;
