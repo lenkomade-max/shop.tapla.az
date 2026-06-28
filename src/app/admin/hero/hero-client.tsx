@@ -334,8 +334,8 @@ function SlideForm({
             <div className="flex items-center gap-2">
               <label className="cursor-pointer inline-flex items-center gap-1 text-xs text-neutral-500 hover:text-neutral-900 border border-neutral-200 rounded px-3 py-1.5">
                 <ImageUp className="h-3 w-3" />
-                {uploading ? 'Загрузка...' : 'Загрузить фото'}
-                <input type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
+                {uploadingDesktop ? 'Загрузка...' : 'Загрузить фото'}
+                <input type="file" accept="image/*" className="hidden" onChange={handleDesktopUpload} />
               </label>
               <span className="text-[10px] text-neutral-400">или вставьте URL</span>
             </div>
