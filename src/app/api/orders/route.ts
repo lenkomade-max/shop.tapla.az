@@ -45,10 +45,13 @@ export async function POST(request: Request) {
         product_id: productId,
         customer_name,
         phone,
+        email: body.email || null,
         city: city || null,
         address: address || null,
         quantity: quantity || 1,
         total: total || 0,
+        payment_method: body.payment_method || null,
+        payment_status: 'pending',
         notes: notes || null,
         status: 'new',
       })
@@ -63,12 +66,12 @@ export async function POST(request: Request) {
       product_id: productId,
       name: customer_name,
       phone,
-      source: 'essential-lash-serum',
+      source: body.source || 'api',
     })
 
     return NextResponse.json({
       success: true,
-      orderId: `TS-${String(order.id).slice(0, 6).toUpperCase()}`,
+      orderId: `TPL-${String(order.id).slice(0, 6).toUpperCase()}`,
     })
   } catch (err) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

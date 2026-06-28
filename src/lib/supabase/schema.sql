@@ -185,7 +185,8 @@ CREATE TABLE IF NOT EXISTS orders (
   payment_method TEXT,
   quantity INT NOT NULL DEFAULT 1,
   total DECIMAL(10,2) NOT NULL,
-  status TEXT NOT NULL DEFAULT 'new' CHECK (status IN ('new', 'confirmed', 'shipped', 'delivered', 'cancelled')),
+  status TEXT NOT NULL DEFAULT 'new' CHECK (status IN ('new', 'paid', 'confirmed', 'shipped', 'delivered', 'cancelled')),
+  payment_status TEXT NOT NULL DEFAULT 'pending' CHECK (payment_status IN ('pending', 'paid', 'failed', 'refunded')),
   notes TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -193,6 +194,17 @@ CREATE TABLE IF NOT EXISTS orders (
 CREATE INDEX IF NOT EXISTS idx_orders_product_id ON orders(product_id);
 CREATE INDEX IF NOT EXISTS idx_orders_profile ON orders(profile_id);
 CREATE INDEX IF NOT EXISTS idx_orders_auth_user ON orders(auth_user_id);
+
+-- Миграция: добавляем payment_status если колонки ещё нет (должна быть ДО индекса!)
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS payment_status TEXT NOT NULL DEFAULT 'pending';
+ALTER TABLE orders DROP CONSTRAINT IF EXISTS orders_payment_status_check;
+ALTER TABLE orders ADD CONSTRAINT orders_payment_status_check CHECK (payment_status IN ('pending', 'paid', 'failed', 'refunded'));
+
+-- Миграция: добавляем 'paid' в status CHECK (было без него)
+ALTER TABLE orders DROP CONSTRAINT IF EXISTS orders_status_check;
+ALTER TABLE orders ADD CONSTRAINT orders_status_check CHECK (status IN ('new', 'paid', 'confirmed', 'shipped', 'delivered', 'cancelled'));
+
+CREATE INDEX IF NOT EXISTS idx_orders_payment_status ON orders(payment_status);
 
 -- ============================================================================
 -- 6. LEADS
@@ -315,6 +327,38 @@ CREATE INDEX IF NOT EXISTS idx_tovar_ai_gen_mode ON tovar_ai_generations(mode);
 DROP TRIGGER IF EXISTS tovar_ai_gen_updated_at ON tovar_ai_generations;
 CREATE TRIGGER tovar_ai_gen_updated_at BEFORE UPDATE ON tovar_ai_generations
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+-- ============================================================================
+-- 12. PAYMENT TRANSACTIONS (Pasha Bank gateway — tapla.az)
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS payment_transactions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
+  provider TEXT NOT NULL DEFAULT 'pasha-bank',
+  purchase_type TEXT NOT NULL DEFAULT 'shop_order',
+  amount_minor INT NOT NULL,
+  currency TEXT DEFAULT '944',
+  status TEXT NOT NULL DEFAULT 'redirected'
+    CHECK (status IN ('redirected', 'completed', 'declined', 'failed', 'cancelled')),
+  provider_trans_id TEXT,
+  idempotency_key TEXT,
+  request_payload JSONB DEFAULT '{}'::jsonb,
+  response_payload JSONB DEFAULT '{}'::jsonb,
+  effects_state TEXT DEFAULT 'pending'
+    CHECK (effects_state IN ('pending', 'processing', 'applied', 'failed')),
+  effects_claimed_at TIMESTAMPTZ,
+  effects_error TEXT,
+  effects_applied_at TIMESTAMPTZ,
+  provider_result_code TEXT,
+  result_code TEXT,
+  provider_approval_code TEXT,
+  rrn TEXT,
+  completed_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_payment_trans_provider_trans ON payment_transactions(provider_trans_id);
+CREATE INDEX IF NOT EXISTS idx_payment_trans_status ON payment_transactions(status);
 
 -- ============================================================================
 -- 13. HERO SLIDES (управление слайдером на главной)

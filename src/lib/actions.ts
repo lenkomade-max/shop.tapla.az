@@ -26,6 +26,15 @@ export async function updateOrderStatus(formData: FormData) {
   revalidatePath('/admin/orders');
 }
 
+export async function updatePaymentStatus(formData: FormData) {
+  if (!(await checkAuth())) return;
+  const id = formData.get('id') as string;
+  const payment_status = formData.get('payment_status') as string;
+  if (!id || !payment_status) return;
+  await supabaseAdmin.from('orders').update({ payment_status, updated_at: new Date().toISOString() }).eq('id', id);
+  revalidatePath('/admin/orders');
+}
+
 export async function deleteProduct(formData: FormData) {
   if (!(await checkAuth())) return;
   const id = formData.get('id') as string;
@@ -328,6 +337,7 @@ export async function submitOrder(formData: CheckoutFormData) {
 
   const { data: order, error } = await supabaseAdmin.from('orders').insert({
     profile_id: profileId,
+    product_id: formData.items[0]?.productId || null,
     customer_name: formData.fullName,
     phone: formData.phone,
     email: formData.email || null,
@@ -336,6 +346,7 @@ export async function submitOrder(formData: CheckoutFormData) {
     payment_method: formData.paymentMethod,
     total: formData.total,
     status: 'new',
+    payment_status: 'pending',
     quantity: formData.items.reduce((s, i) => s + i.quantity, 0),
   }).select().single()
 
