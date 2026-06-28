@@ -39,7 +39,7 @@ export function Input({
         type={type}
         className={twMerge(
           clsx(
-            'w-full px-4 py-3.5 text-xs font-sans tracking-wide transition-all duration-300 focus:outline-none border rounded-none',
+            'w-full px-4 py-3.5 text-xs font-sans tracking-wide transition-all duration-300 focus:outline-none border rounded-xl',
             dark
               ? 'bg-neutral-900 border-neutral-800 text-white placeholder-neutral-500 focus:border-white focus:ring-1 focus:ring-white'
               : 'bg-white border-neutral-200 text-neutral-900 placeholder-neutral-400 focus:border-neutral-950 focus:ring-1 focus:ring-neutral-950',

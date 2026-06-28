@@ -155,7 +155,7 @@ export function Hero() {
           <button
             key={idx}
             onClick={() => setIndex(idx)}
-            className={`h-1.5 transition-all duration-500 rounded-none cursor-pointer ${
+            className={`h-1.5 transition-all duration-500 rounded-full cursor-pointer ${
               idx === index ? 'w-8 bg-white' : 'w-2 bg-white/30'
             }`}
             aria-label={`Slayd ${idx + 1}`}

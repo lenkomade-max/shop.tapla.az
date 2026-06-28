@@ -191,7 +191,7 @@ export default function CheckoutPage() {
     return (
       <div className="pt-32 pb-20 bg-[#FAF9F6] min-h-screen flex items-center">
         <Container>
-          <div className="max-w-2xl mx-auto bg-white border border-neutral-100 p-8 sm:p-12 text-center space-y-8 shadow-sm">
+          <div className="max-w-2xl mx-auto bg-white border border-neutral-100 p-8 sm:p-12 text-center space-y-8 shadow-sm rounded-2xl">
             <div className="flex justify-center">
               <div className="relative">
                 <CheckCircle2 className="h-16 w-16 text-emerald-600 animate-bounce" />
@@ -209,7 +209,7 @@ export default function CheckoutPage() {
             </div>
 
             {/* Receipt Summary Box */}
-            <div className="bg-neutral-50 p-6 border border-neutral-100 text-left space-y-4 font-sans text-xs">
+            <div className="bg-neutral-50 p-6 border border-neutral-100 text-left space-y-4 font-sans text-xs rounded-xl">
               <div className="flex justify-between border-b border-neutral-200/60 pb-3">
                 <span className="text-neutral-400 uppercase tracking-wider font-semibold">Sifariş nömrəsi:</span>
                 <span className="font-bold text-neutral-900 font-mono">{generatedOrderNumber}</span>
@@ -263,7 +263,7 @@ export default function CheckoutPage() {
               </p>
               
               {!user && (
-                <div className="border border-neutral-200 bg-neutral-50 p-5 space-y-3">
+                <div className="border border-neutral-200 bg-neutral-50 p-5 space-y-3 rounded-xl">
                   <p className="text-[10px] font-bold tracking-widest uppercase text-neutral-900">
                     Sifarişlərinizi izləmək üçün hesab yaradın
                   </p>
@@ -309,7 +309,7 @@ export default function CheckoutPage() {
         </h1>
 
         {cartItems.length === 0 ? (
-          <div className="text-center bg-white border border-neutral-100 p-12 py-20 space-y-6 max-w-md mx-auto">
+          <div className="text-center bg-white border border-neutral-100 p-12 py-20 space-y-6 max-w-md mx-auto rounded-xl">
             <ShoppingBag className="h-12 w-12 text-neutral-200 mx-auto stroke-1" />
             <div className="space-y-1">
               <h3 className="text-xs font-bold tracking-widest uppercase text-neutral-900">Səbətiniz boşdur</h3>
@@ -324,7 +324,7 @@ export default function CheckoutPage() {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
             {/* Left: Input Form details */}
-            <div className="lg:col-span-7 bg-white border border-neutral-100 p-6 sm:p-8 space-y-8 shadow-xs">
+            <div className="lg:col-span-7 bg-white border border-neutral-100 p-6 sm:p-8 space-y-8 shadow-xs rounded-xl">
               <form onSubmit={handleSubmit} className="space-y-8">
                 {/* Section 1: Customer Details */}
                 <div className="space-y-4">
@@ -341,7 +341,7 @@ export default function CheckoutPage() {
                       value={form.fullName}
                       onChange={handleInputChange}
                       placeholder="Məs. Aytən Məmmədova"
-                      className={`w-full bg-neutral-50 border ${formErrors.fullName ? 'border-red-500' : 'border-neutral-200'} text-xs px-4 py-3 focus:outline-hidden focus:border-neutral-950`}
+                      className={`w-full bg-neutral-50 border ${formErrors.fullName ? 'border-red-500' : 'border-neutral-200'} text-xs px-4 py-3 focus:outline-hidden focus:border-neutral-950 rounded-xl`}
                     />
                     {formErrors.fullName && <span className="text-[9px] font-semibold text-red-500 uppercase">{formErrors.fullName}</span>}
                   </div>
@@ -357,7 +357,7 @@ export default function CheckoutPage() {
                           value={form.phone}
                           onChange={handleInputChange}
                           placeholder="+994 (55) 123-45-67"
-                          className={`w-full bg-neutral-50 border ${formErrors.phone ? 'border-red-500' : 'border-neutral-200'} text-xs pl-10 pr-4 py-3 focus:outline-hidden focus:border-neutral-950`}
+                          className={`w-full bg-neutral-50 border ${formErrors.phone ? 'border-red-500' : 'border-neutral-200'} text-xs pl-10 pr-4 py-3 focus:outline-hidden focus:border-neutral-950 rounded-xl`}
                         />
                       </div>
                       {formErrors.phone && <span className="text-[9px] font-semibold text-red-500 uppercase">{formErrors.phone}</span>}
@@ -373,7 +373,7 @@ export default function CheckoutPage() {
                           value={form.email}
                           onChange={handleInputChange}
                           placeholder="ayten@gmail.com"
-                          className="w-full bg-neutral-50 border border-neutral-200 text-xs pl-10 pr-4 py-3 focus:outline-hidden focus:border-neutral-950"
+                          className="w-full bg-neutral-50 border border-neutral-200 text-xs pl-10 pr-4 py-3 focus:outline-hidden focus:border-neutral-950 rounded-xl"
                         />
                       </div>
                     </div>
@@ -394,7 +394,7 @@ export default function CheckoutPage() {
                         name="city"
                         value={form.city}
                         onChange={handleInputChange}
-                        className="w-full bg-neutral-50 border border-neutral-200 text-xs px-3 py-3 focus:outline-hidden focus:border-neutral-950 cursor-pointer"
+                        className="w-full bg-neutral-50 border border-neutral-200 text-xs px-3 py-3 focus:outline-hidden focus:border-neutral-950 cursor-pointer rounded-xl"
                       >
                         <option value="Bakı">Bakı (Pulsuz)</option>
                         <option value="Sumqayıt">Sumqayıt (Pulsuz)</option>
@@ -415,7 +415,7 @@ export default function CheckoutPage() {
                         value={form.address}
                         onChange={handleInputChange}
                         placeholder="Məs. Yasamal r., Mətbuat pr. ev 15, m. 42"
-                        className={`w-full bg-neutral-50 border ${formErrors.address ? 'border-red-500' : 'border-neutral-200'} text-xs px-4 py-3 focus:outline-hidden focus:border-neutral-950`}
+                        className={`w-full bg-neutral-50 border ${formErrors.address ? 'border-red-500' : 'border-neutral-200'} text-xs px-4 py-3 focus:outline-hidden focus:border-neutral-950 rounded-xl`}
                       />
                       {formErrors.address && <span className="text-[9px] font-semibold text-red-500 uppercase">{formErrors.address}</span>}
                     </div>
@@ -431,7 +431,7 @@ export default function CheckoutPage() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {/* Online payment */}
-                    <label className={`border p-5 flex flex-col justify-between space-y-3 cursor-pointer transition-all duration-300 relative ${
+                    <label className={`border p-5 flex flex-col justify-between space-y-3 cursor-pointer transition-all duration-300 relative rounded-xl ${
                       form.paymentMethod === 'online_card'
                         ? 'border-neutral-950 bg-neutral-50/50 shadow-xs sm:col-span-2'
                         : 'border-neutral-200 hover:border-neutral-400'
@@ -496,7 +496,7 @@ export default function CheckoutPage() {
                     </label>
 
                     {/* COD Cash */}
-                    <label className={`border p-5 flex flex-col justify-between space-y-3 cursor-pointer transition-all duration-300 relative ${
+                    <label className={`border p-5 flex flex-col justify-between space-y-3 cursor-pointer transition-all duration-300 relative rounded-xl ${
                       form.paymentMethod === 'cash_delivery' ? 'border-neutral-950 bg-neutral-50/50 shadow-xs' : 'border-neutral-200 hover:border-neutral-400'
                     }`}>
                       <input
@@ -533,7 +533,7 @@ export default function CheckoutPage() {
 
                   {/* Cash Delivery Beh Info Block */}
                   {form.paymentMethod === 'cash_delivery' && (
-                    <div className="bg-amber-50/30 border border-amber-200/40 p-5 space-y-3.5 transition-all duration-300 animate-fadeIn">
+                    <div className="bg-amber-50/30 border border-amber-200/40 p-5 space-y-3.5 transition-all duration-300 animate-fadeIn rounded-xl">
                       <p className="text-[10px] font-bold tracking-widest uppercase text-amber-800 flex items-center space-x-1.5">
                         <span className="bg-amber-100 px-1.5 py-0.5 rounded-sm">⚠️</span>
                         <span>SİFARİŞİN REZERVASİYASI (5 AZN BEH) SİSTEMİ</span>
@@ -567,7 +567,7 @@ export default function CheckoutPage() {
                 </div>
 
                 {orderError && (
-                  <div className="bg-red-50 border border-red-200 p-4">
+                  <div className="bg-red-50 border border-red-200 p-4 rounded-xl">
                     <p className="text-[10px] font-semibold text-red-600 uppercase tracking-wider">{orderError}</p>
                   </div>
                 )}
@@ -591,7 +591,7 @@ export default function CheckoutPage() {
             </div>
 
             {/* Right: Cart Summary Column */}
-            <div className="lg:col-span-5 bg-white border border-neutral-100 p-6 space-y-6 shadow-xs sticky top-28">
+            <div className="lg:col-span-5 bg-white border border-neutral-100 p-6 space-y-6 shadow-xs sticky top-28 rounded-xl">
               <h2 className="text-xs font-bold tracking-widest uppercase text-neutral-900 border-b border-neutral-100 pb-3">
                 SƏBƏTİNİZİN XÜLASƏSİ
               </h2>
@@ -660,7 +660,7 @@ export default function CheckoutPage() {
               </div>
 
               {/* Secure Checkout Banner */}
-              <div className="bg-[#FAF9F6] p-4 border border-neutral-150/60 flex items-start space-x-3 text-[11px] text-neutral-500 leading-relaxed font-sans">
+              <div className="bg-[#FAF9F6] p-4 border border-neutral-150/60 flex items-start space-x-3 text-[11px] text-neutral-500 leading-relaxed font-sans rounded-xl">
                 <ShieldCheck className="h-5 w-5 text-neutral-800 flex-shrink-0 mt-0.5" />
                 <div className="space-y-1">
                   <p className="font-semibold text-neutral-800">100% GÜVƏNLİ ALIŞ-VERİŞ</p>

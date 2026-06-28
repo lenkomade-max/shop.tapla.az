@@ -51,7 +51,7 @@ export function Benefits({ benefits }: BenefitsProps) {
               className="bg-white p-6 sm:p-8 border border-neutral-100 hover:border-neutral-900 shadow-xs hover:shadow-xl transition-all duration-500 flex flex-col items-center text-center space-y-4 group"
             >
               {/* Icon Container */}
-              <div className="p-4 bg-neutral-50 group-hover:bg-neutral-900 group-hover:text-white transition-colors duration-500 rounded-none">
+              <div className="p-4 bg-neutral-50 group-hover:bg-neutral-900 group-hover:text-white transition-colors duration-500 rounded-xl">
                 <div className="group-hover:scale-110 group-hover:rotate-6 transition-transform duration-500 text-neutral-900 group-hover:text-white">
                   {getIcon(benefit.iconName)}
                 </div>

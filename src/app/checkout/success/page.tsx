@@ -35,7 +35,7 @@ function CheckoutSuccessContent() {
                 </p>
               </div>
 
-              <div className="bg-white border border-neutral-100 p-6 sm:p-8 shadow-sm space-y-4 text-left">
+              <div className="bg-white border border-neutral-100 p-6 sm:p-8 shadow-sm space-y-4 text-left rounded-xl">
                 <div className="flex justify-between border-b border-neutral-200/60 pb-3">
                   <span className="text-neutral-400 uppercase tracking-wider font-semibold text-[10px]">Sifariş nömrəsi:</span>
                   <span className="font-bold text-neutral-900 font-mono text-xs">{orderId ? `TPL-${orderId.slice(0, 6).toUpperCase()}` : '—'}</span>
@@ -78,7 +78,7 @@ function CheckoutSuccessContent() {
           <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
             <Link
               href="/"
-              className="inline-flex items-center justify-center space-x-2 bg-neutral-950 text-white text-[10px] tracking-widest font-bold uppercase px-8 py-4 border border-neutral-950 hover:bg-transparent hover:text-neutral-900 transition-all duration-300"
+              className="inline-flex items-center justify-center space-x-2 bg-neutral-950 text-white text-[10px] tracking-widest font-bold uppercase px-8 py-4 border border-neutral-950 hover:bg-transparent hover:text-neutral-900 transition-all duration-300 rounded-full"
             >
               <span>ANA SƏHİFƏYƏ QAYIT</span>
               <ArrowRight className="h-3.5 w-3.5" />

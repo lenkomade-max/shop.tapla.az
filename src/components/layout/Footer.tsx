@@ -136,7 +136,7 @@ export function Footer() {
                     required
                     checked={promoCheckbox}
                     onChange={(e) => setPromoCheckbox(e.target.checked)}
-                    className="mt-1 h-3.5 w-3.5 bg-neutral-900 border-neutral-800 text-neutral-950 focus:ring-neutral-800 rounded-none accent-white cursor-pointer"
+                    className="mt-1 h-3.5 w-3.5 bg-neutral-900 border-neutral-800 text-neutral-950 focus:ring-neutral-800 rounded accent-white cursor-pointer"
                   />
                   <label htmlFor="promo-updates" className="text-[10px] text-neutral-400 leading-normal font-sans cursor-pointer">
                     Mən TAPLA MARKETPLACE haqqında xəbərləri, xüsusi promo-kodları və yenilikləri e-mail və SMS vasitəsilə almağa razıyam.

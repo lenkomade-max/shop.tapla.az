@@ -135,7 +135,7 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
 
             {/* Interactive Try-On Simulator Block */}
             {product.tryOnEnabled && (
-              <div className="border border-neutral-200/60 bg-white p-6 rounded-none space-y-4 shadow-xs">
+              <div className="border border-neutral-200/60 bg-white p-6 rounded-xl space-y-4 shadow-xs">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <Sparkles className="h-4 w-4 text-neutral-800 animate-pulse" />

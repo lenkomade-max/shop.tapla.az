@@ -51,7 +51,7 @@ export function FeaturesStep({ steps }: FeaturesStepProps) {
                 <div
                   key={step.stepNumber}
                   onClick={() => setActiveStep(idx)}
-                  className={`group flex items-start space-x-5 p-5 border cursor-pointer transition-all duration-500 rounded-none ${
+                  className={`group flex items-start space-x-5 p-5 border cursor-pointer transition-all duration-500 rounded-xl ${
                     isSelected
                       ? 'border-white bg-neutral-900 text-white shadow-xl'
                       : 'border-neutral-900 bg-neutral-950 text-neutral-400 hover:border-neutral-700 hover:text-neutral-200'

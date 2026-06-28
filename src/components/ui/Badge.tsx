@@ -30,7 +30,7 @@ export function Badge({
     <span
       className={twMerge(
         clsx(
-          'inline-flex items-center justify-center rounded-none font-sans',
+          'inline-flex items-center justify-center rounded-full font-sans',
           variantClasses[variant],
           sizeClasses[size]
         ),

@@ -107,7 +107,7 @@ export function ReviewsSection({ initialReviews }: ReviewsSectionProps) {
               </div>
             </div>
 
-            <div className="bg-emerald-50/50 border border-emerald-100 p-4 flex items-center space-x-3 text-emerald-800 rounded-none">
+            <div className="bg-emerald-50/50 border border-emerald-100 p-4 flex items-center space-x-3 text-emerald-800 rounded-xl">
               <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0" />
               <p className="text-xs font-semibold leading-relaxed">
                 Müştərilərimizin <span className="underline decoration-2">95%-i</span> TAPLA MARKETPLACE-i dostlarına tövsiyə edir.
@@ -127,7 +127,7 @@ export function ReviewsSection({ initialReviews }: ReviewsSectionProps) {
               ].map((bar) => (
                 <div key={bar.stars} className="flex items-center space-x-3 text-xs">
                   <span className="w-12 text-neutral-500 font-medium">{bar.stars} Ulduz</span>
-                  <div className="flex-1 h-2 bg-neutral-100 rounded-none overflow-hidden relative">
+                  <div className="flex-1 h-2 bg-neutral-100 rounded-full overflow-hidden relative">
                     <div
                       className="absolute top-0 bottom-0 left-0 bg-neutral-950 transition-all duration-500"
                       style={{ width: bar.pct }}
