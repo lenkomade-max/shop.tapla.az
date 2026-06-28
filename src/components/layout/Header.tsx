@@ -230,13 +230,9 @@ export function Header() {
             </div>
           ))}
           <div className="pt-6">
-            <Link
-              href="/#about"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="text-xs uppercase tracking-widest font-semibold text-neutral-500 block mb-2"
-            >
+            <p className="text-xs uppercase tracking-widest font-semibold text-neutral-500 block mb-2">
               Azərbaycan (AZN) | Bakı daxili pulsuz
-            </Link>
+            </p>
           </div>
         </div>
       </Drawer>

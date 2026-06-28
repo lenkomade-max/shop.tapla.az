@@ -14,13 +14,9 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
   },
   {
     label: 'KAMPANİYALAR',
-    href: '/#promo',
+    href: '/#products',
     isBadge: true,
     badgeText: 'ENDİRİM',
-  },
-  {
-    label: 'BLOQ',
-    href: '/#blog',
   },
   {
     label: 'RƏYLƏR',
@@ -28,7 +24,7 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
   },
   {
     label: 'HAQQIMIZDA',
-    href: '/#about',
+    href: '/huquqi-melumat',
   },
   {
     label: 'FAQ / DƏSTƏK',

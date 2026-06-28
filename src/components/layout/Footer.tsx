@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Globe, ExternalLink, CirclePlay, ShieldCheck, HelpCircle } from 'lucide-react';
+import { ShieldCheck } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import Link from 'next/link';
 
@@ -38,19 +38,17 @@ export function Footer() {
               <ul className="space-y-2.5 text-xs text-neutral-400">
                 <li><Link href="/" className="hover:text-white transition-colors">Ana Səhifə</Link></li>
                 <li><Link href="/products" className="hover:text-white transition-colors">Bütün Məhsullar</Link></li>
+                <li><Link href="/collections" className="hover:text-white transition-colors">Kolleksiyalar</Link></li>
                 <li><Link href="#benefits" className="hover:text-white transition-colors">Niyə TAPLA?</Link></li>
                 <li><Link href="#faq" className="hover:text-white transition-colors">FAQ</Link></li>
-                <li><Link href="#about" className="hover:text-white transition-colors">Karyera</Link></li>
               </ul>
             </div>
 
             <div className="space-y-4">
               <h5 className="text-[11px] font-semibold tracking-widest uppercase text-white">ŞƏXSİ KABİNET</h5>
               <ul className="space-y-2.5 text-xs text-neutral-400">
-                <li><Link href="#" className="hover:text-white transition-colors">Şəxsi Kabinet</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors">Sifarişlərim</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors">İstək Siyahısı</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors">Hədiyyə Balansı</Link></li>
+                <li><Link href="/profile" className="hover:text-white transition-colors">Şəxsi Kabinet</Link></li>
+                <li><Link href="/profile" className="hover:text-white transition-colors">Sifarişlərim</Link></li>
               </ul>
             </div>
 
@@ -59,9 +57,9 @@ export function Footer() {
               <ul className="space-y-2.5 text-xs text-neutral-400">
                 <li><Link href="#faq" className="hover:text-white transition-colors">Tez-tez Verilən Suallar</Link></li>
                 <li><Link href="#faq" className="hover:text-white transition-colors">Çatdırılma və Ödəniş</Link></li>
-                <li><Link href="#faq" className="hover:text-white transition-colors">2 İllik Zəmanət</Link></li>
-                <li><Link href="/qaytarma-siyaseti" className="hover:text-white transition-colors">Qaytarılma Siyasəti</Link></li>
-                <li><Link href="#about" className="hover:text-white transition-colors">Dəstək Mərkəzi</Link></li>
+<li><Link href="/qaytarma-siyaseti" className="hover:text-white transition-colors">Qaytarılma Siyasəti</Link></li>
+                <li><Link href="/satici-muqavilesi" className="hover:text-white transition-colors">Satıcı Müqaviləsi</Link></li>
+                <li><Link href="/huquqi-melumat" className="hover:text-white transition-colors">Dəstək Mərkəzi</Link></li>
               </ul>
             </div>
 
@@ -71,8 +69,8 @@ export function Footer() {
                 <li className="font-semibold text-white">+994702453060</li>
                 <li className="text-neutral-500 text-[10px]">Dəstək saatı: 09:00 - 21:00 (Hər gün)</li>
                 <li><a href="mailto:support@tapla.az" className="hover:text-white transition-colors">support@tapla.az</a></li>
-                <li><Link href="#faq" className="hover:text-white transition-colors">Texniki Dəstək</Link></li>
-                <li><Link href="#about" className="hover:text-white transition-colors">Rəsdi Mağazalar</Link></li>
+                <li><Link href="/huquqi-melumat" className="hover:text-white transition-colors">Texniki Dəstək</Link></li>
+                <li><Link href="/huquqi-melumat" className="hover:text-white transition-colors">Hüquqi Məlumat</Link></li>
               </ul>
             </div>
           </div>
@@ -154,39 +152,15 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="pt-10 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center space-x-5">
-            <a href="#" className="text-neutral-400 hover:text-white transition-colors" aria-label="Instagram">
-              <Globe className="h-5 w-5" />
-            </a>
-            <a href="#" className="text-neutral-400 hover:text-white transition-colors" aria-label="Twitter">
-              <Globe className="h-5 w-5" />
-            </a>
-            <a href="#" className="text-neutral-400 hover:text-white transition-colors" aria-label="Facebook">
-              <ExternalLink className="h-5 w-5" />
-            </a>
-            <a href="#" className="text-neutral-400 hover:text-white transition-colors" aria-label="YouTube">
-              <CirclePlay className="h-5 w-5" />
-            </a>
-          </div>
 
-          <div className="flex items-center space-x-2 text-xs text-neutral-400">
-            <span>ÖLKƏ / REGİON:</span>
-            <select className="bg-neutral-900 border border-neutral-800 text-white text-xs px-2.5 py-1.5 focus:outline-none cursor-pointer">
-              <option value="AZ">AZƏRBAYCAN (AZN ₼)</option>
-              <option value="TR">TÜRKİYƏ (TRY ₺)</option>
-              <option value="AE">BƏƏ (AED)</option>
-              <option value="EN">BƏYƏNLƏŞMİŞ REGİON (USD $)</option>
-            </select>
-          </div>
-        </div>
-
-        <div className="pt-8 mt-8 border-t border-neutral-900 flex flex-col md:flex-row items-center justify-between gap-4 text-[10px] text-neutral-500">
+        <div className="pt-10 mt-8 border-t border-neutral-900 flex flex-col md:flex-row items-center justify-between gap-4 text-[10px] text-neutral-500">
           <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-6 gap-y-2">
             <span>&copy; {new Date().getFullYear()} TAPLA TECHNOLOGIES M.M.C. BÜTÜN HÜQUQLAR QORUNUR.</span>
             <Link href="/mexfilik-siyaseti" className="hover:text-white transition-colors">MƏXFİLİK SİYASƏTİ</Link>
             <Link href="/istifade-sertleri" className="hover:text-white transition-colors">İSTİFADƏ ŞƏRTLƏRİ</Link>
-            <Link href="/kuki-siyaseti" className="hover:text-white transition-colors">KUKİ Siyasəti</Link>
+            <Link href="/kuki-siyaseti" className="hover:text-white transition-colors">KUKİ SİYASƏTİ</Link>
+            <Link href="/satici-muqavilesi" className="hover:text-white transition-colors">SATICI MÜQAVİLƏSİ</Link>
+            <Link href="/huquqi-melumat" className="hover:text-white transition-colors">HÜQUQİ MƏLUMAT</Link>
           </div>
 
           <div className="flex items-center space-x-1.5 text-[9px] text-neutral-600">
