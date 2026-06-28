@@ -3,17 +3,17 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { 
-  Star, 
-  ChevronRight, 
-  ShieldCheck, 
-  Truck, 
-  RotateCcw, 
-  Sparkles, 
-  Plus, 
-  Minus, 
-  ShoppingBag, 
-  Check, 
+import {
+  Star,
+  ChevronRight,
+  Shield,
+  Truck,
+  BadgeCheck,
+  Sparkles,
+  Plus,
+  Minus,
+  ShoppingBag,
+  Check,
   Info,
   HelpCircle,
   ArrowRight
@@ -366,18 +366,18 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
             </div>
 
             {/* Quick Guarantees Row */}
-            <div className="grid grid-cols-3 gap-2 text-center border-t border-b border-neutral-100 py-4 text-neutral-500">
+            <div className="grid grid-cols-3 gap-2 text-center border-t border-b border-neutral-100 py-4 text-blue-600">
               <div className="flex flex-col items-center space-y-1">
-                <ShieldCheck className="h-4 w-4 text-neutral-700" />
-                <span className="text-[9px] tracking-wider uppercase font-semibold">2 İllik Zəmanət</span>
+                <BadgeCheck className="h-4 w-4 text-blue-600" />
+                <span className="text-[9px] tracking-wider uppercase font-semibold">Orijinal Məhsul</span>
               </div>
               <div className="flex flex-col items-center space-y-1">
-                <Truck className="h-4 w-4 text-neutral-700" />
-                <span className="text-[9px] tracking-wider uppercase font-semibold">Pulsuz Kuryer</span>
+                <Truck className="h-4 w-4 text-blue-600" />
+                <span className="text-[9px] tracking-wider uppercase font-semibold">Sürətli Çatdırılma</span>
               </div>
               <div className="flex flex-col items-center space-y-1">
-                <RotateCcw className="h-4 w-4 text-neutral-700" />
-                <span className="text-[9px] tracking-wider uppercase font-semibold">14 Günlük İadə</span>
+                <Shield className="h-4 w-4 text-blue-600" />
+                <span className="text-[9px] tracking-wider uppercase font-semibold">Təhlükəsiz Alış-veriş</span>
               </div>
             </div>
 
