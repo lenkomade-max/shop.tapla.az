@@ -136,12 +136,16 @@ export type GenerationStatus =
   | 'done'
   | 'failed'
 
+export type PipelineMode = 'test' | 'product'
+
 export interface PipelineInput {
   photoUrl: string // URL загруженного фото
   photoBase64?: string // или сразу base64 (для CLI)
   providerDescription?: string // описание поставщика
   characteristics?: Record<string, string> // доп. характеристики
   priceAz?: string // цена (напр. "29 AZN") — только если задана юзером
+  mode?: PipelineMode // 'test' (по умолч.) | 'product'
+  supplierUrl?: string // URL поставщика (только в product mode)
 }
 
 export interface GenerationRecord {
@@ -155,8 +159,29 @@ export interface GenerationRecord {
   status: GenerationStatus
   error: string | null
   cost: number
+  mode: PipelineMode
+  supplier_url: string | null
+  product_data: Record<string, unknown> | null
+  image_urls: string[]
+  ready_for_publish: boolean
   created_at: string
   updated_at: string
+}
+
+export interface ProductDraftData {
+  name: string
+  slug: string
+  title: string
+  subtitle: string
+  description: string
+  category: string
+  price: number
+  benefits: string[]
+  how_to_use: string
+  ingredients: string | null
+  tags: string[]
+  images: string[]
+  supplier_url?: string
 }
 
 export interface PipelineResult {
@@ -167,6 +192,8 @@ export interface PipelineResult {
   cards: CardResult[]
   qa_results: QAResult[]
   cost: number
+  productData?: ProductDraftData // только в product mode
+  imageUrls?: string[] // R2 URLs сгенерированных карточек
 }
 
 // ─── Конфигурация (хардкод, только ключ из .env) ────────────────────────────

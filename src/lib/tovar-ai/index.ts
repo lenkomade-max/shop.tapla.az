@@ -7,6 +7,8 @@ export { planCardPrompts } from './stage2-planner'
 export { generateSingleCard, generateAllCards } from './stage3-generate'
 export { checkCardQuality } from './stage4-qa'
 export { runTovarAIPipeline } from './pipeline'
+export { visionToProductData } from './vision-to-product'
+export type { ProductDraftData } from './vision-to-product'
 export {
   TOVAR_AI_CONFIG,
   type VisionOutput,
@@ -16,6 +18,7 @@ export {
   type QACheck,
   type QAResult,
   type GenerationStatus,
+  type PipelineMode,
   type PipelineInput,
   type PipelineResult,
   type GenerationRecord,

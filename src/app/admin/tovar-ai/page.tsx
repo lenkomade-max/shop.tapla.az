@@ -1,9 +1,15 @@
 'use client'
 
 import React, { useState, useCallback, useRef, DragEvent } from 'react'
-import { Loader2, CheckCircle2, XCircle, Upload, RefreshCw, Download, X, RotateCcw } from 'lucide-react'
+import {
+  Loader2, CheckCircle2, XCircle, Upload, RefreshCw,
+  Download, X, RotateCcw, Sparkles, ShoppingBag
+} from 'lucide-react'
+import { createProductFromAI, publishProduct } from '@/lib/actions'
+import type { ProductDraftData } from '@/lib/tovar-ai'
 
 type Stage = 'idle' | 'uploading' | 'analyzing' | 'planning' | 'generating' | 'done' | 'error'
+type Mode = 'test' | 'product'
 
 interface CardData {
   index: number
@@ -12,7 +18,6 @@ interface CardData {
   attempt: number
 }
 
-/** Данные промпта для регенерации одной карточки (возвращается из API) */
 interface CardPromptData {
   index: number
   role: string
@@ -86,7 +91,13 @@ const ROLE_DESC: Record<string, string> = {
   best_seller: 'Populyar seçim, bestseller',
 }
 
+function slugify(text: string): string {
+  return text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim()
+}
+
 export default function TovarAIPage() {
+  // ─── Общие состояния ──────────────────────────────────────────────────
+  const [mode, setMode] = useState<Mode>('test')
   const [stage, setStage] = useState<Stage>('idle')
   const [cards, setCards] = useState<CardData[]>([])
   const [cardPrompts, setCardPrompts] = useState<CardPromptData[]>([])
@@ -100,11 +111,18 @@ export default function TovarAIPage() {
   const [dragOver, setDragOver] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
-  // Описание
+  // Описание + цена + supplier URL
   const [description, setDescription] = useState('')
   const [price, setPrice] = useState('')
+  const [supplierUrl, setSupplierUrl] = useState('')
 
-  // ─── Drag & Drop ────────────────────────────────────────────────────────
+  // ─── Product mode — данные товара ─────────────────────────────────────
+  const [productData, setProductData] = useState<ProductDraftData | null>(null)
+  const [imageUrls, setImageUrls] = useState<string[] | null>(null)
+  const [savedProductId, setSavedProductId] = useState<string | null>(null)
+  const [saving, setSaving] = useState(false)
+
+  // ─── Drag & Drop ──────────────────────────────────────────────────────
 
   const handleFile = useCallback((file: File) => {
     if (!file.type.startsWith('image/')) {
@@ -139,7 +157,7 @@ export default function TovarAIPage() {
     if (fileRef.current) fileRef.current.value = ''
   }
 
-  // ─── Генерация ──────────────────────────────────────────────────────────
+  // ─── Генерация ────────────────────────────────────────────────────────
 
   const generate = useCallback(async () => {
     if (!photo) {
@@ -151,6 +169,9 @@ export default function TovarAIPage() {
     setError('')
     setCards([])
     setCardPrompts([])
+    setProductData(null)
+    setImageUrls(null)
+    setSavedProductId(null)
     const start = Date.now()
 
     try {
@@ -161,6 +182,8 @@ export default function TovarAIPage() {
           photoBase64: photo.base64,
           providerDescription: description.trim() || undefined,
           priceAz: price.trim() || undefined,
+          mode: mode,
+          supplierUrl: supplierUrl.trim() || undefined,
         }),
       })
 
@@ -174,15 +197,23 @@ export default function TovarAIPage() {
       setCardPrompts(data.cardPrompts || [])
       setCost(data.cost || 0)
       setElapsed(((Date.now() - start) / 1000))
+
+      if (data.productData) {
+        setProductData(data.productData)
+      }
+      if (data.imageUrls) {
+        setImageUrls(data.imageUrls)
+      }
+
       setStage(data.success ? 'done' : 'error')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Naməlum xəta')
       setStage('error')
       setElapsed(((Date.now() - start) / 1000))
     }
-  }, [photo, description, price])
+  }, [photo, description, price, mode, supplierUrl])
 
-  // ─── Регенерация одной карточки ─────────────────────────────────────────
+  // ─── Регенерация одной карточки ───────────────────────────────────────
 
   const regenerateCard = useCallback(async (index: number) => {
     if (!photo || regeneratingIndex !== null) return
@@ -226,7 +257,47 @@ export default function TovarAIPage() {
     }
   }, [photo, cardPrompts, regeneratingIndex])
 
-  // ─── Скачать всё ────────────────────────────────────────────────────────
+  // ─── Сохранение товара (product mode) ─────────────────────────────────
+
+  const handleSaveDraft = useCallback(async () => {
+    if (!productData || saving) return
+    setSaving(true)
+    setError('')
+    try {
+      const finalData = { ...productData, images: imageUrls || [] }
+      const id = await createProductFromAI(finalData, 'draft')
+      if (id) {
+        setSavedProductId(id)
+      } else {
+        setError('Məhsul yaradıla bilmədi')
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Xəta')
+    } finally {
+      setSaving(false)
+    }
+  }, [productData, imageUrls, saving])
+
+  const handlePublish = useCallback(async () => {
+    if (!productData || saving) return
+    setSaving(true)
+    setError('')
+    try {
+      const finalData = { ...productData, images: imageUrls || [] }
+      const id = await createProductFromAI(finalData, 'active')
+      if (id) {
+        setSavedProductId(id)
+      } else {
+        setError('Məhsul yaradıla bilmədi')
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Xəta')
+    } finally {
+      setSaving(false)
+    }
+  }, [productData, imageUrls, saving])
+
+  // ─── Скачать всё ──────────────────────────────────────────────────────
 
   const downloadAll = () => {
     cards.forEach(card => {
@@ -237,6 +308,19 @@ export default function TovarAIPage() {
     })
   }
 
+  // ─── Обновление полей productData ─────────────────────────────────────
+
+  const updateProductField = <K extends keyof ProductDraftData>(
+    key: K,
+    value: ProductDraftData[K],
+  ) => {
+    setProductData(prev => prev ? { ...prev, [key]: value } : prev)
+    // Авто-slug при изменении названия
+    if (key === 'name' && typeof value === 'string') {
+      setProductData(prev => prev ? { ...prev, slug: slugify(value) } : prev)
+    }
+  }
+
   const isBusy = stage === 'analyzing' || stage === 'planning' || stage === 'generating' || stage === 'uploading'
 
   return (
@@ -244,12 +328,42 @@ export default function TovarAIPage() {
       <div className="mb-6">
         <h2 className="text-xl font-bold">Tovar.AI</h2>
         <p className="text-sm text-zinc-500 mt-0.5">
-          Bir foto → 3 professional kart şəkli
+          {mode === 'test'
+            ? 'Bir foto → 3 professional kart şəkli'
+            : 'Foto + AI → hazır məhsul kartı'}
         </p>
+
+        {/* ─── Табы режимов ──────────────────────────────────────── */}
+        <div className="mt-4 flex gap-1 rounded-lg bg-zinc-100 p-1 w-fit">
+          <button
+            onClick={() => setMode('test')}
+            className={`inline-flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+              mode === 'test'
+                ? 'bg-white text-black shadow-sm'
+                : 'text-zinc-500 hover:text-zinc-700'
+            }`}
+          >
+            <RefreshCw className="h-3.5 w-3.5" />
+            Test
+          </button>
+          <button
+            onClick={() => setMode('product')}
+            className={`inline-flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+              mode === 'product'
+                ? 'bg-white text-black shadow-sm'
+                : 'text-zinc-500 hover:text-zinc-700'
+            }`}
+          >
+            <ShoppingBag className="h-3.5 w-3.5" />
+            Məhsul
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-6">
-        {/* ─── ЛЕВАЯ КОЛОНКА: загрузка + описание ──────────────────────── */}
+        {/* ══════════════════════════════════════════════════════════════════
+            ЛЕВАЯ КОЛОНКА: загрузка + параметры
+           ══════════════════════════════════════════════════════════════════ */}
         <div className="space-y-6">
           {/* Drag & Drop фото */}
           <div className="rounded-xl border bg-white p-6 shadow-sm">
@@ -323,7 +437,7 @@ export default function TovarAIPage() {
             </p>
           </div>
 
-          {/* Qiymət */}
+          {/* Цена */}
           <div className="rounded-xl border bg-white p-6 shadow-sm">
             <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-zinc-500">
               3. Qiymət (ixtiyari)
@@ -341,7 +455,25 @@ export default function TovarAIPage() {
             </p>
           </div>
 
-          {/* Кнопка */}
+          {/* Supplier URL (всегда показываем, но особенно важно для product mode) */}
+          <div className="rounded-xl border bg-white p-6 shadow-sm">
+            <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-zinc-500">
+              4. Təchizatçı linki (URL)
+            </h3>
+            <input
+              type="url"
+              value={supplierUrl}
+              onChange={e => setSupplierUrl(e.target.value)}
+              placeholder="https://..."
+              disabled={isBusy}
+              className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black disabled:opacity-50"
+            />
+            <p className="mt-1 text-xs text-zinc-400">
+              Link saxlanılır, AI analiz etmir. Əl ilə əlavə edirsiniz.
+            </p>
+          </div>
+
+          {/* Кнопка генерации */}
           <button
             onClick={generate}
             disabled={!photo || isBusy}
@@ -351,18 +483,22 @@ export default function TovarAIPage() {
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : stage === 'done' ? (
               <RefreshCw className="h-4 w-4" />
-            ) : (
-              <span>3 kart şəkli yarat</span>
-            )}
+            ) : mode === 'product' ? (
+              <Sparkles className="h-4 w-4" />
+            ) : null}
             {isBusy ? (
               stage === 'analyzing' ? 'Analiz edilir...' :
               stage === 'planning' ? 'Promtlar hazırlanır...' :
               'Şəkillər yaradılır...'
-            ) : stage === 'done' ? 'Yenidən yarat' : null}
+            ) : stage === 'done' ? 'Yenidən yarat' : (
+              mode === 'product' ? 'Məhsul yarat' : '3 kart şəkli yarat'
+            )}
           </button>
         </div>
 
-        {/* ─── ПРАВАЯ КОЛОНКА: результат ───────────────────────────────── */}
+        {/* ══════════════════════════════════════════════════════════════════
+            ПРАВАЯ КОЛОНКА: результат
+           ══════════════════════════════════════════════════════════════════ */}
         <div className="space-y-6">
           {/* Статус */}
           {isBusy && (
@@ -408,6 +544,17 @@ export default function TovarAIPage() {
             </div>
           )}
 
+          {/* Успешно сохранён */}
+          {savedProductId && (
+            <div className="rounded-lg bg-green-50 p-4 text-sm text-green-700 flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 shrink-0" />
+              Məhsul yaradıldı!{' '}
+              <a href={`/admin/products/${savedProductId}/edit`} className="underline font-medium">
+                Redaktə et →
+              </a>
+            </div>
+          )}
+
           {/* Карточки */}
           {cards.length > 0 && (
             <div className="rounded-xl border bg-white p-6 shadow-sm">
@@ -427,16 +574,18 @@ export default function TovarAIPage() {
               <div className="space-y-4">
                 {cards.map(card => {
                   const isRegenerating = regeneratingIndex === card.index
+                  const imgSrc = (imageUrls && imageUrls[card.index - 1])
+                    ? imageUrls[card.index - 1]
+                    : `data:image/png;base64,${card.imageBase64}`
                   return (
                     <div key={card.index} className="relative flex gap-4 rounded-lg border bg-zinc-50 overflow-hidden p-3">
                       {/* Картинка */}
                       <div className="relative w-28 h-28 shrink-0">
                         <img
-                          src={`data:image/png;base64,${card.imageBase64}`}
+                          src={imgSrc}
                           alt={`Kart ${card.index}`}
                           className="w-full h-full rounded-md object-cover border"
                         />
-                        {/* Оверлей при регенерации */}
                         {isRegenerating && (
                           <div className="absolute inset-0 rounded-md bg-white/70 flex items-center justify-center">
                             <Loader2 className="h-6 w-6 animate-spin text-black" />
@@ -454,6 +603,9 @@ export default function TovarAIPage() {
                         </p>
                         <p className="text-xs text-zinc-400 mt-1">
                           Cəhd {card.attempt} • 1K (1024×1024)
+                          {imageUrls && imageUrls[card.index - 1] && (
+                            <span className="ml-2 text-green-600">• R2-da</span>
+                          )}
                         </p>
 
                         {/* Кнопка регенерации */}
@@ -469,7 +621,7 @@ export default function TovarAIPage() {
 
                       {/* Кнопка скачать */}
                       <a
-                        href={`data:image/png;base64,${card.imageBase64}`}
+                        href={imgSrc}
                         download={`tapla_card_${card.index}_${card.role}.png`}
                         className="absolute bottom-3 right-3 text-xs text-black underline"
                       >
@@ -485,6 +637,203 @@ export default function TovarAIPage() {
                   {elapsed.toFixed(0)} saniyə • ~${cost.toFixed(3)}
                 </p>
               )}
+            </div>
+          )}
+
+          {/* ════════════════════════════════════════════════════════════════
+              PRODUCT MODE: Форма редактирования данных товара
+             ════════════════════════════════════════════════════════════════ */}
+          {mode === 'product' && productData && stage === 'done' && !savedProductId && (
+            <div className="rounded-xl border bg-white p-6 shadow-sm">
+              <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-zinc-500">
+                Məhsul məlumatları (AI-dən)
+              </h3>
+              <p className="mb-4 text-xs text-zinc-400">
+                AI məhsul şəklindən bu məlumatları çıxardı. Redaktə edib yayımlaya bilərsiniz.
+              </p>
+
+              <div className="space-y-4">
+                {/* Название */}
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-zinc-600">Ad</label>
+                  <input
+                    value={productData.name}
+                    onChange={e => updateProductField('name', e.target.value)}
+                    className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black"
+                  />
+                </div>
+
+                {/* Slug */}
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-zinc-600">Slug</label>
+                  <input
+                    value={productData.slug}
+                    onChange={e => updateProductField('slug', e.target.value)}
+                    className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm font-mono outline-none focus:border-black"
+                  />
+                </div>
+
+                {/* Подзаголовок */}
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-zinc-600">Alt başlıq</label>
+                  <input
+                    value={productData.subtitle}
+                    onChange={e => updateProductField('subtitle', e.target.value)}
+                    className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black"
+                  />
+                </div>
+
+                {/* Категория */}
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-zinc-600">Kateqoriya</label>
+                  <input
+                    value={productData.category}
+                    onChange={e => updateProductField('category', e.target.value)}
+                    className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black"
+                  />
+                </div>
+
+                {/* Описание */}
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-zinc-600">Təsvir</label>
+                  <textarea
+                    value={productData.description}
+                    onChange={e => updateProductField('description', e.target.value)}
+                    rows={5}
+                    className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black resize-none"
+                  />
+                </div>
+
+                {/* Цена */}
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-zinc-600">Qiymət (AZN)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={productData.price}
+                    onChange={e => updateProductField('price', parseFloat(e.target.value) || 0)}
+                    className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black"
+                  />
+                </div>
+
+                {/* Преимущества */}
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-zinc-600">
+                    Üstünlüklər{' '}
+                    <button
+                      type="button"
+                      onClick={() => updateProductField('benefits', [...productData.benefits, ''])}
+                      className="ml-2 text-xs font-normal text-zinc-400 hover:text-black"
+                    >
+                      + Əlavə et
+                    </button>
+                  </label>
+                  {productData.benefits.map((b, i) => (
+                    <div key={i} className="flex items-center gap-2 mt-1">
+                      <input
+                        value={b}
+                        onChange={e => {
+                          const next = [...productData.benefits]
+                          next[i] = e.target.value
+                          updateProductField('benefits', next)
+                        }}
+                        placeholder="Üstünlük"
+                        className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => updateProductField('benefits', productData.benefits.filter((_, j) => j !== i))}
+                        className="text-xs text-red-400 hover:text-red-600"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Как использовать */}
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-zinc-600">İstifadə qaydası</label>
+                  <textarea
+                    value={productData.how_to_use}
+                    onChange={e => updateProductField('how_to_use', e.target.value)}
+                    rows={3}
+                    className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black resize-none"
+                  />
+                </div>
+
+                {/* Ингредиенты (для косметики) */}
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-zinc-600">Tərkibi</label>
+                  <textarea
+                    value={productData.ingredients || ''}
+                    onChange={e => updateProductField('ingredients', e.target.value || null)}
+                    rows={2}
+                    className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black resize-none"
+                  />
+                </div>
+
+                {/* Теги */}
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-zinc-600">
+                    Teqlər{' '}
+                    <button
+                      type="button"
+                      onClick={() => updateProductField('tags', [...productData.tags, ''])}
+                      className="ml-2 text-xs font-normal text-zinc-400 hover:text-black"
+                    >
+                      + Əlavə et
+                    </button>
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {productData.tags.map((t, i) => (
+                      <div key={i} className="flex items-center gap-1">
+                        <input
+                          value={t}
+                          onChange={e => {
+                            const next = [...productData.tags]
+                            next[i] = e.target.value
+                            updateProductField('tags', next)
+                          }}
+                          placeholder="Teq"
+                          className="w-36 rounded-lg border border-zinc-300 px-3 py-1.5 text-sm outline-none focus:border-black"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => updateProductField('tags', productData.tags.filter((_, j) => j !== i))}
+                          className="text-xs text-red-400 hover:text-red-600"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Кнопки */}
+                <div className="flex items-center gap-3 pt-4 border-t">
+                  <button
+                    onClick={handlePublish}
+                    disabled={saving}
+                    className="inline-flex items-center gap-2 rounded-lg bg-black px-6 py-2.5 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
+                  >
+                    {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                    Dərc et
+                  </button>
+                  <button
+                    onClick={handleSaveDraft}
+                    disabled={saving}
+                    className="inline-flex items-center gap-2 rounded-lg border border-zinc-300 px-6 py-2.5 text-sm font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-50"
+                  >
+                    Qaralama saxla
+                  </button>
+                  {elapsed > 0 && (
+                    <span className="text-xs text-zinc-400 ml-auto">
+                      {elapsed.toFixed(0)}s • ~${cost.toFixed(3)}
+                    </span>
+                  )}
+                </div>
+              </div>
             </div>
           )}
         </div>

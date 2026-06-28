@@ -6,6 +6,8 @@ import { analyzeProductImage } from './stage1-vision'
 import { planCardPrompts } from './stage2-planner'
 import { generateAllCards } from './stage3-generate'
 import { checkCardQuality } from './stage4-qa'
+import { visionToProductData } from './vision-to-product'
+import type { ProductDraftData } from './vision-to-product'
 import {
   TOVAR_AI_CONFIG,
   type PipelineInput,
@@ -60,6 +62,10 @@ export async function runTovarAIPipeline(
   let cards: CardResult[] = []
   let qaResults: QAResult[] = []
   let totalCost = 0
+  let productData: ProductDraftData | undefined
+  let imageUrls: string[] | undefined
+
+  const isProductMode = input.mode === 'product'
 
   try {
     // ─── STAGE 1: Vision Analysis ────────────────────────────────────
@@ -75,6 +81,19 @@ export async function runTovarAIPipeline(
     console.log(
       `[Pipeline] Stage 1 ✅ — type: ${productAnalysis.product_type}, category: ${productAnalysis.category}`,
     )
+
+    // В product mode: конвертируем VisionOutput → данные товара
+    if (isProductMode) {
+      productData = visionToProductData(
+        productAnalysis,
+        input.providerDescription,
+        input.priceAz,
+        input.supplierUrl,
+      )
+      console.log(
+        `[Pipeline] Product mode — data prepared: "${productData.name}", cat: ${productData.category}`,
+      )
+    }
 
     // ─── STAGE 2: Prompt Planning ────────────────────────────────────
     status = 'planning'
@@ -104,6 +123,21 @@ export async function runTovarAIPipeline(
 
     if (cards.length === 0) {
       throw new Error('All card generations failed')
+    }
+
+    // В product mode: загружаем карточки в R2
+    if (isProductMode && productData) {
+      try {
+        const { uploadCardImages } = await import('@/lib/r2/upload')
+        imageUrls = await uploadCardImages(cards, productData.slug)
+        console.log(`[Pipeline] R2 upload ✅ — ${imageUrls.length} cards uploaded`)
+      } catch (r2Err) {
+        console.warn(
+          '[Pipeline] ⚠️ R2 upload failed, continuing without R2 URLs:',
+          r2Err instanceof Error ? r2Err.message : String(r2Err),
+        )
+        // Не фейлим пайплайн — карточки доступны как base64
+      }
     }
 
     // ─── STAGE 4: Quality Check ──────────────────────────────────────
@@ -146,6 +180,8 @@ export async function runTovarAIPipeline(
       cards,
       qa_results: qaResults,
       cost: totalCost,
+      ...(productData ? { productData } : {}),
+      ...(imageUrls ? { imageUrls } : {}),
     }
   } catch (err) {
     status = 'failed'
@@ -161,6 +197,8 @@ export async function runTovarAIPipeline(
       cards,
       qa_results: qaResults,
       cost: totalCost,
+      ...(productData ? { productData } : {}),
+      ...(imageUrls ? { imageUrls } : {}),
     }
   }
 }

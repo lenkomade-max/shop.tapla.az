@@ -6,7 +6,7 @@ import { DeleteButton } from './delete-button';
 export default async function ProductsPage() {
   const { data: products, error } = await supabaseAdmin
     .from('products')
-    .select('id, name, slug, title, price, status, category, created_at')
+    .select('id, name, slug, title, price, status, category, supplier_url, created_at')
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -53,7 +53,14 @@ export default async function ProductsPage() {
             )}
             {(products ?? []).map(p => (
               <tr key={p.id} className="border-b last:border-0 hover:bg-zinc-50">
-                <td className="px-4 py-3 font-medium">{p.name || p.title}</td>
+                <td className="px-4 py-3 font-medium">
+                  {p.name || p.title}
+                  {(p as any).supplier_url && (
+                    <span className="ml-1.5 inline-flex items-center rounded-full bg-purple-100 px-1.5 py-0.5 text-[10px] font-medium text-purple-700" title="AI ilə yaradılıb">
+                      AI
+                    </span>
+                  )}
+                </td>
                 <td className="px-4 py-3 font-mono text-xs text-zinc-400">{p.slug}</td>
                 <td className="px-4 py-3">{p.price ? p.price.toLocaleString() + ' ₼' : '—'}</td>
                 <td className="px-4 py-3 text-zinc-500">{p.category || '—'}</td>

@@ -25,6 +25,7 @@ export function ProductForm({ product, error }: Props) {
   const [category, setCategory] = useState((product?.category as string) || '');
   const [howToUse, setHowToUse] = useState((product?.how_to_use as string) || '');
   const [ingredients, setIngredients] = useState((product?.ingredients as string) || '');
+  const [supplierUrl, setSupplierUrl] = useState((product?.supplier_url as string) || '');
 
   const [images, setImages] = useState<string[]>(
     Array.isArray(product?.images) ? (product?.images as string[]) : ['']
@@ -80,6 +81,12 @@ export function ProductForm({ product, error }: Props) {
           <div className="col-span-2">
             <label className="mb-1 block text-xs font-medium text-zinc-600">Описание</label>
             <textarea name="description" value={description} onChange={e => setDescription(e.target.value)} rows={4}
+              className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black" />
+          </div>
+          <div className="col-span-2">
+            <label className="mb-1 block text-xs font-medium text-zinc-600">URL поставщика</label>
+            <input name="supplierUrl" value={supplierUrl} onChange={e => setSupplierUrl(e.target.value)}
+              placeholder="https://..."
               className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black" />
           </div>
         </div>
@@ -164,6 +171,7 @@ export function ProductForm({ product, error }: Props) {
       {benefits.filter(Boolean).map((v, i) => <input key={`ben-${i}`} type="hidden" name="benefits" value={v} />)}
       {tags.filter(Boolean).map((v, i) => <input key={`tag-${i}`} type="hidden" name="tags" value={v} />)}
       <input type="hidden" name="shades" value={JSON.stringify(shades.filter(s => s.name))} />
+      <input type="hidden" name="supplierUrl" value={supplierUrl} />
     </form>
   );
 }
