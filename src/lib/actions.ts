@@ -415,6 +415,7 @@ export interface HeroSlideData {
   subtitle: string
   description: string
   image: string
+  image_mobile: string
   action_text: string
   href: string
   overlay: boolean
@@ -433,6 +434,7 @@ export async function saveHeroSlide(formData: FormData): Promise<{ ok: true } | 
     subtitle: (formData.get('subtitle') as string) || '',
     description: (formData.get('description') as string) || '',
     image: (formData.get('image') as string) || '',
+    image_mobile: (formData.get('image_mobile') as string) || '',
     action_text: (formData.get('action_text') as string) || 'MƏHSULLARI GÖR',
     href: (formData.get('href') as string) || '/#products',
     overlay: formData.get('overlay') === 'on',

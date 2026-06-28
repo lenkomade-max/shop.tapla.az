@@ -36,6 +36,7 @@ export default async function Home() {
           actionText: (s.action_text as string) || 'MƏHSULLARI GÖR',
           href: (s.href as string) || '/#products',
           overlay: s.overlay !== false,
+          image_mobile: (s.image_mobile as string) || '',
         }))
       ),
   ]);

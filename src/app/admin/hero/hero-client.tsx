@@ -12,6 +12,7 @@ interface HeroSlide {
   subtitle: string;
   description: string;
   image: string;
+  image_mobile: string;
   action_text: string;
   href: string;
   overlay: boolean;
@@ -106,9 +107,12 @@ export function AdminHeroClient({ slides: initialSlides, products }: { slides: H
             {/* Card header */}
             <div className="flex items-center gap-3 px-4 py-3 bg-neutral-50 border-b border-neutral-200">
               <GripVertical className="h-4 w-4 text-neutral-300 flex-shrink-0" />
-              <div className="w-14 h-10 rounded overflow-hidden bg-neutral-200 flex-shrink-0">
+              <div className="w-14 h-10 rounded overflow-hidden bg-neutral-200 flex-shrink-0 relative">
                 {slide.image && (
                   <img src={slide.image} alt="" className="w-full h-full object-cover" />
+                )}
+                {slide.image_mobile && (
+                  <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-[8px] px-1 rounded-full">M</span>
                 )}
               </div>
               <div className="flex-1 min-w-0">
@@ -240,14 +244,17 @@ function SlideForm({
   products: ProductItem[];
   onSaved: () => void;
 }) {
-  const [uploading, setUploading] = useState(false);
+  const [uploadingDesktop, setUploadingDesktop] = useState(false);
+  const [uploadingMobile, setUploadingMobile] = useState(false);
   const [imagePreview, setImagePreview] = useState(slide?.image || '');
+  const [mobilePreview, setMobilePreview] = useState(slide?.image_mobile || '');
   const [href, setHref] = useState(slide?.href || '/#products');
   const [productSearch, setProductSearch] = useState('');
   const [showProductList, setShowProductList] = useState(false);
 
-  const uploadImage = async (file: File) => {
-    setUploading(true);
+  const uploadImage = async (file: File, field: 'desktop' | 'mobile'): Promise<string | null> => {
+    if (field === 'desktop') setUploadingDesktop(true);
+    else setUploadingMobile(true);
     const formData = new FormData();
     formData.append('file', file);
     formData.append('folder', 'hero');
@@ -258,15 +265,23 @@ function SlideForm({
     } catch {
       return null;
     } finally {
-      setUploading(false);
+      if (field === 'desktop') setUploadingDesktop(false);
+      else setUploadingMobile(false);
     }
   };
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDesktopUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const url = await uploadImage(file);
+    const url = await uploadImage(file, 'desktop');
     if (url) setImagePreview(url);
+  };
+
+  const handleMobileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = await uploadImage(file, 'mobile');
+    if (url) setMobilePreview(url);
   };
 
   const filtered = productSearch
@@ -321,6 +336,39 @@ function SlideForm({
                 <ImageUp className="h-3 w-3" />
                 {uploading ? 'Загрузка...' : 'Загрузить фото'}
                 <input type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
+              </label>
+              <span className="text-[10px] text-neutral-400">или вставьте URL</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Image */}
+      <div>
+        <label className="block text-[10px] tracking-wider font-semibold text-neutral-500 mb-1.5">
+          Фото для мобильных <span className="text-neutral-300 font-normal">(9:16, опционально)</span>
+        </label>
+        <div className="flex gap-3">
+          <div className="w-20 h-32 rounded-lg overflow-hidden bg-neutral-100 border border-neutral-200 flex-shrink-0">
+            {mobilePreview ? (
+              <img src={mobilePreview} alt="" className="w-full h-full object-cover" />
+            ) : (
+              <div className="flex items-center justify-center h-full text-neutral-300 text-[10px] px-1 text-center">Нет фото</div>
+            )}
+          </div>
+          <div className="flex-1 space-y-2">
+            <input
+              name="image_mobile"
+              value={mobilePreview}
+              onChange={(e) => setMobilePreview(e.target.value)}
+              placeholder="https://example.com/mobile.jpg"
+              className="w-full border border-neutral-200 rounded px-2 py-1.5 text-xs font-mono"
+            />
+            <div className="flex items-center gap-2">
+              <label className="cursor-pointer inline-flex items-center gap-1 text-xs text-neutral-500 hover:text-neutral-900 border border-neutral-200 rounded px-3 py-1.5">
+                <ImageUp className="h-3 w-3" />
+                {uploadingMobile ? 'Загрузка...' : 'Загрузить фото'}
+                <input type="file" accept="image/*" className="hidden" onChange={handleMobileUpload} />
               </label>
               <span className="text-[10px] text-neutral-400">или вставьте URL</span>
             </div>

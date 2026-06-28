@@ -339,6 +339,9 @@ DROP TRIGGER IF EXISTS hero_slides_updated_at ON hero_slides;
 CREATE TRIGGER hero_slides_updated_at BEFORE UPDATE ON hero_slides
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
+-- image_mobile для 9:16 на мобильных
+ALTER TABLE hero_slides ADD COLUMN IF NOT EXISTS image_mobile TEXT DEFAULT '';
+
 -- RLS: аноним может читать активные слайды
 DROP POLICY IF EXISTS "anon can read active hero_slides" ON hero_slides;
 CREATE POLICY "anon can read active hero_slides" ON hero_slides

@@ -14,6 +14,7 @@ const HERO_FALLBACK = [
     subtitle: 'RƏSMİ ZƏMANƏT, ƏN UCUZ QİYMƏTLƏR',
     description: 'Notebook, telefon, planşet və aksesuarlar ən sərfəli qiymətlərlə. Zəmanətli məhsullar, sürətli çatdırılma.',
     image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&q=80&w=1200&h=1600',
+    image_mobile: '',
     actionText: 'MƏHSULLARI GÖR',
     href: '/#products',
     overlay: true,
@@ -25,6 +26,7 @@ const HERO_FALLBACK = [
     subtitle: 'M3 ÇIP İLƏ SUPER SÜRƏT',
     description: '18 saat batareya ömrü, Liquid Retina displey, fanless dizayn. İş və təhsil üçün mükəmməl notebook.',
     image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&q=80&w=1200&h=1600',
+    image_mobile: '',
     actionText: 'KƏŞF ET',
     href: '/products/macbook-air-m3',
     overlay: true,
@@ -36,6 +38,7 @@ const HERO_FALLBACK = [
     subtitle: '200MP KAMERA, S PEN DƏSTƏYİ',
     description: 'Ən güclü flagship smartfon. Snapdragon 8 Elite, 6.9" Dynamic AMOLED, S Pen ilə birlikdə.',
     image: 'https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?auto=format&fit=crop&q=80&w=1200&h=1600',
+    image_mobile: '',
     actionText: 'ƏTRAFLI BAX',
     href: '/products/samsung-galaxy-s25-ultra',
     overlay: true,
@@ -74,12 +77,21 @@ export function Hero({ slides: propSlides }: { slides?: typeof HERO_FALLBACK }) 
             transition={{ duration: 0.8, ease: 'easeOut' }}
             className="relative w-full h-full"
           >
+            {/* Desktop: 16:9, скрыто на md- */}
             <Image
               src={slides[index].image}
               alt={slides[index].title}
               fill
               priority
-              className="object-cover object-center"
+              className="hidden md:block object-cover object-center"
+            />
+            {/* Mobile: 9:16, скрыто на md+, fallback на image */}
+            <Image
+              src={slides[index].image_mobile || slides[index].image}
+              alt={slides[index].title}
+              fill
+              priority
+              className="block md:hidden object-cover object-center"
             />
           </motion.div>
         </AnimatePresence>

@@ -12,6 +12,7 @@ interface HeroSlide {
   subtitle: string;
   description: string;
   image: string;
+  image_mobile: string;
   action_text: string;
   href: string;
   overlay: boolean;
