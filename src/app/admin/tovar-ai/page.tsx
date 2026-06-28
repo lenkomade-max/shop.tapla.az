@@ -14,7 +14,6 @@ interface CardData {
 
 const ROLE_LABELS: Record<string, string> = {
   hero: 'Hero — Əsas örtük',
-  price: 'Qiymət',
   problem: 'Problem',
   solution: 'Həll',
   benefits: 'Üstünlüklər',
@@ -41,7 +40,6 @@ const ROLE_LABELS: Record<string, string> = {
 
 const ROLE_DESC: Record<string, string> = {
   hero: 'Məhsul iri planda, scroll-stopper, başlıq',
-  price: 'Qiymət əsasdır, aksiya, endirim',
   problem: 'Problemi göstərir, məhsul cavabdır',
   solution: 'Məhsul həll kimi, transformasiya',
   benefits: 'Üstünlük kartları məhsul ətrafında',

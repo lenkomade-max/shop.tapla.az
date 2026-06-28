@@ -57,7 +57,7 @@ export interface VisionOutput {
 
 /** Рекламная роль карточки — что она продаёт в этом креативе */
 export type CardRole =
-  | 'hero' | 'price' | 'problem' | 'solution' | 'benefits' | 'usage'
+  | 'hero' | 'problem' | 'solution' | 'benefits' | 'usage'
   | 'lifestyle' | 'offer' | 'bundle' | 'delivery' | 'comparison' | 'quality'
   | 'materials' | 'warranty' | 'accessories' | 'close_up' | 'cta'
   | 'dimensions' | 'power' | 'premium' | 'review' | 'gift'
@@ -175,7 +175,7 @@ export const TOVAR_AI_CONFIG = {
   VISION_MODEL: 'google/gemma-4-31b-it' as const,   // Gemini + Vision + текст
   PLANNER_MODEL: 'google/gemini-3.1-flash-lite' as const,
   IMAGE_MODEL: 'google/gemini-3.1-flash-image-preview' as const, // Nano Banana 2
-  QA_MODEL: 'openai/gpt-4o-mini' as const,
+  QA_MODEL: 'google/gemma-4-31b-it' as const, // Vision-capable, free
 
   // Настройки генерации
   DEFAULT_CARD_COUNT: 3,

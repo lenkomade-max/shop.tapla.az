@@ -59,11 +59,6 @@ const ROLE_TRIADS: RoleTriad[] = [
     roles: ['hero', 'usage', 'close_up'],
   },
   {
-    name: 'commercial',
-    logic: 'Hero product → Large price/promotion → Special offer CTA. Conversion-focused.',
-    roles: ['hero', 'price', 'offer'],
-  },
-  {
     name: 'quality',
     logic: 'Premium hero → Craftsmanship & quality → Materials & texture. Premium feel.',
     roles: ['hero', 'quality', 'materials'],
@@ -125,7 +120,6 @@ const COLOR_PALETTES: Record<string, Array<{ name: string; colors: string[]; atm
 
 const ROLE_CREATIVE_STYLES: Record<CardRole, string[]> = {
   hero:         ['cs01', 'cs12', 'cs25', 'cs37', 'cs27'],
-  price:        ['cs02', 'cs15'],
   problem:      ['cs09'],
   solution:     ['cs09', 'cs01'],
   benefits:     ['cs04', 'cs05', 'cs22'],
@@ -154,7 +148,6 @@ const ROLE_CREATIVE_STYLES: Record<CardRole, string[]> = {
 
 const ROLE_MARKETING_STYLES: Record<CardRole, string[]> = {
   hero:         ['ms27', 'ms04', 'ms06'],
-  price:        ['ms01', 'ms02', 'ms28'],
   problem:      ['ms21'],
   solution:     ['ms21', 'ms22'],
   benefits:     ['ms03', 'ms04', 'ms05'],
@@ -184,7 +177,6 @@ const ROLE_MARKETING_STYLES: Record<CardRole, string[]> = {
 // Роли задают только lighting/background_style/mood. Материалы/глубина/движение — из категории.
 const ROLE_VISUAL_THEMES: Record<CardRole, Pick<VisualTheme, 'lighting' | 'background_style' | 'mood'>> = {
   hero:         { lighting: 'soft_studio', background_style: 'premium_gradient', mood: 'minimal_luxury' },
-  price:        { lighting: 'high_contrast', background_style: 'pure_white', mood: 'dynamic_action' },
   problem:      { lighting: 'dark_moody', background_style: 'environmental', mood: 'industrial_premium' },
   solution:     { lighting: 'golden_hour', background_style: 'environmental', mood: 'warm_cozy' },
   benefits:     { lighting: 'softbox_diffused', background_style: 'dark_studio', mood: 'tech_innovation' },
@@ -213,7 +205,6 @@ const ROLE_VISUAL_THEMES: Record<CardRole, Pick<VisualTheme, 'lighting' | 'backg
 
 const ROLE_DESCRIPTIONS: Record<CardRole, string> = {
   hero: 'Stunning first impression. Scroll-stopper. Magazine quality. Product dominant with headline.',
-  price: 'Price is the hero. Large price card. Product supports the attractive price. Promotional.',
   problem: 'Show a common problem visually. The product is the answer. Creates recognition.',
   solution: 'The product as the immediate solution. Visible transformation or benefit.',
   benefits: 'Product centered with feature/benefit cards arranged around it. Icons and thin connection lines.',
@@ -531,7 +522,7 @@ function buildUserPrompt(
     `      "creative_director_passed": true,`,
     `      "prompt_en": "<300 words. Full advertising scene. Use color palette ${colorPalette.name}. Different composition from cards 2 and 3.>",`,
     `      "text_overlay_az": ["HEADLINE AZ"],`,
-    `      "commercial_blocks": ["price card", "delivery badge"],`,
+    `      "commercial_blocks": ["feature card", "delivery badge"],`,
     `      "needs_model": ${String(cs[0].needs_model)},`,
     `      "distinct_from_other_cards": "How this card differs from cards 2 and 3"`,
     `    },`,

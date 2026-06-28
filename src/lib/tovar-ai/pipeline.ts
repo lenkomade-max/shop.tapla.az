@@ -180,7 +180,7 @@ function estimateCost(cardCount: number, totalAttempts: number): number {
   // Gemma 4 31B free: $0
   // DeepSeek chat: prompt $0.20/M, completion $0.80/M
   // Nano Banana 2 (gemini-3.1-flash-image-preview): prompt $0.50/M, completion $3/M
-  // GPT-4o-mini: prompt $0.15/M, completion $0.60/M
+  // Gemma 4 31B free (Vision): $0
   //
   // Примерный расход токенов на пайплайн:
   const VISION_PROMPT = 0        // Gemma free

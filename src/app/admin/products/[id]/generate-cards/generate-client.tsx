@@ -19,7 +19,7 @@ interface Props {
 }
 
 const ROLE_LABELS: Record<string, string> = {
-  hero: 'Hero', price: 'Qiymət', problem: 'Problem', solution: 'Həll',
+  hero: 'Hero', problem: 'Problem', solution: 'Həll',
   benefits: 'Üstünlüklər', usage: 'İstifadə', lifestyle: 'Lifestyle',
   offer: 'Təklif', bundle: 'Komplekt', delivery: 'Çatdırılma',
   comparison: 'Müqayisə', quality: 'Keyfiyyət', materials: 'Materiallar',
