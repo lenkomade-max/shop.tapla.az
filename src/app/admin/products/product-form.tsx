@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, DragEvent, useRef } from 'react';
 import { saveProduct, fetchActiveCategories } from '@/lib/actions';
+import { Upload, Loader2, X, Image as ImageIcon } from 'lucide-react';
 
 interface Props {
   product?: Record<string, unknown>;
@@ -45,6 +46,69 @@ export function ProductForm({ product, error }: Props) {
   const [shades, setShades] = useState<typeof emptyShade[]>(
     Array.isArray(product?.shades) ? (product?.shades as typeof emptyShade[]) : [emptyShade]
   );
+
+  // ─── File Upload to R2 ────────────────────────────────────────────────
+  const [uploading, setUploading] = useState(false)
+  const [uploadDragOver, setUploadDragOver] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const uploadToR2 = useCallback(async (file: File): Promise<string | null> => {
+    if (!file.type.startsWith('image/')) return null
+    if (file.size > 20 * 1024 * 1024) return null
+    setUploading(true)
+    try {
+      const fd = new FormData()
+      fd.append('file', file)
+      fd.append('folder', 'products')
+      const resp = await fetch('/api/upload-image', { method: 'POST', body: fd })
+      if (!resp.ok) { console.error('[Upload] HTTP', resp.status); return null }
+      const data = await resp.json()
+      if (data.success && data.url) return data.url as string
+      console.error('[Upload] API error:', data.error)
+      return null
+    } catch (err) {
+      console.error('[Upload] Network error:', err)
+      return null
+    } finally {
+      setUploading(false)
+    }
+  }, [])
+
+  const handleFileDrop = useCallback(async (e: DragEvent) => {
+    e.preventDefault()
+    setUploadDragOver(false)
+    const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'))
+    for (const file of files) {
+      const url = await uploadToR2(file)
+      if (url) setImages(prev => [...prev.filter(Boolean), url])
+    }
+  }, [uploadToR2, setImages])
+
+  const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || [])
+    for (const file of files) {
+      const url = await uploadToR2(file)
+      if (url) setImages(prev => [...prev.filter(Boolean), url])
+    }
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }, [uploadToR2, setImages])
+
+  // ─── Вставка из буфера (Ctrl+V / Cmd+V) ──────────────────────────────
+  const handlePaste = useCallback(async (e: React.ClipboardEvent) => {
+    const items = e.clipboardData?.items
+    if (!items) return
+    for (const item of Array.from(items)) {
+      if (item.type.startsWith('image/')) {
+        e.preventDefault()
+        const blob = item.getAsFile()
+        if (blob) {
+          const url = await uploadToR2(blob)
+          if (url) setImages(prev => [...prev.filter(Boolean), url])
+        }
+        break
+      }
+    }
+  }, [uploadToR2, setImages])
 
   function onNameChange(v: string) {
     setName(v);
@@ -163,7 +227,69 @@ export function ProductForm({ product, error }: Props) {
       </section>
 
       {/* Изображения */}
-      <ArraySection label="Изображения (URL)" items={images} setItems={setImages} placeholder="https://example.com/photo.jpg" />
+      <section className="rounded-xl border bg-white p-6 shadow-sm">
+        <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-zinc-500">
+          Şəkillər
+          <button type="button" onClick={() => setImages([...images, ''])}
+            className="ml-3 text-xs font-normal text-zinc-400 hover:text-black">+ URL</button>
+        </h3>
+
+        {/* Drag & Drop зона */}
+        <div
+          onDrop={handleFileDrop}
+          onDragOver={e => { e.preventDefault(); setUploadDragOver(true) }}
+          onDragLeave={() => setUploadDragOver(false)}
+          onPaste={handlePaste}
+          tabIndex={0}
+          onClick={() => fileInputRef.current?.click()}
+          className={`flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 cursor-pointer transition mb-4 outline-none focus:border-black ${
+            uploadDragOver ? 'border-black bg-zinc-50' : 'border-zinc-300 hover:border-zinc-400'
+          }`}
+        >
+          {uploading ? (
+            <Loader2 className="h-6 w-6 animate-spin text-black mb-2" />
+          ) : (
+            <Upload className={`h-6 w-6 mb-2 ${uploadDragOver ? 'text-black' : 'text-zinc-300'}`} />
+          )}
+          <p className="text-sm font-medium text-zinc-600">
+            {uploading ? 'Yüklənir...' : 'Şəkili buraxın və ya klikləyin'}
+          </p>
+          <p className="text-xs text-zinc-400 mt-1">JPG, PNG, WebP • max 20 MB</p>
+        </div>
+        <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleFileSelect} className="hidden" />
+
+        {/* Существующие URL + превью */}
+        <div className="space-y-2">
+          {images.map((url, i) => (
+            <div key={i} className="flex items-center gap-3 rounded-lg border bg-zinc-50 p-2">
+              {url ? (
+                <img src={url} alt="" className="h-12 w-12 rounded-md object-cover border shrink-0" />
+              ) : (
+                <div className="h-12 w-12 rounded-md border bg-zinc-100 flex items-center justify-center shrink-0">
+                  <ImageIcon className="h-4 w-4 text-zinc-300" />
+                </div>
+              )}
+              <input
+                value={url}
+                onChange={e => {
+                  const next = [...images]
+                  next[i] = e.target.value
+                  setImages(next)
+                }}
+                placeholder="https://... və ya yuxarıdan şəkil yükləyin"
+                className="flex-1 rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black"
+              />
+              <button type="button" onClick={() => setImages(images.filter((_, j) => j !== i))}
+                className="text-xs text-red-400 hover:text-red-600 shrink-0 p-1">✕</button>
+            </div>
+          ))}
+        </div>
+        {images.some(u => u) && (
+          <p className="mt-2 text-xs text-zinc-400">
+            {images.filter(Boolean).length} şəkil • R2-ə yüklənmiş URL-lər avtomatik saxlanılır
+          </p>
+        )}
+      </section>
 
       {/* Преимущества */}
       <ArraySection label="Преимущества" items={benefits} setItems={setBenefits} placeholder="Преимущество" />

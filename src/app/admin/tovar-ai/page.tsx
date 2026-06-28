@@ -155,6 +155,20 @@ export default function TovarAIPage() {
     if (file) handleFile(file)
   }, [handleFile])
 
+  // ─── Вставка из буфера (Ctrl+V / Cmd+V) ──────────────────────────────
+  const onPaste = useCallback((e: React.ClipboardEvent) => {
+    const items = e.clipboardData?.items
+    if (!items) return
+    for (const item of Array.from(items)) {
+      if (item.type.startsWith('image/')) {
+        e.preventDefault()
+        const blob = item.getAsFile()
+        if (blob) handleFile(blob)
+        break
+      }
+    }
+  }, [handleFile])
+
   const onDragOver = (e: DragEvent) => { e.preventDefault(); setDragOver(true) }
   const onDragLeave = () => setDragOver(false)
 
@@ -400,8 +414,10 @@ export default function TovarAIPage() {
                 onDrop={onDrop}
                 onDragOver={onDragOver}
                 onDragLeave={onDragLeave}
+                onPaste={onPaste}
+                tabIndex={0}
                 onClick={() => fileRef.current?.click()}
-                className={`flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-12 cursor-pointer transition ${
+                className={`flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-12 cursor-pointer transition outline-none focus:border-black ${
                   dragOver
                     ? 'border-black bg-zinc-50'
                     : 'border-zinc-300 hover:border-zinc-400'
