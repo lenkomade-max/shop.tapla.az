@@ -1,12 +1,12 @@
 // ============================================================================
-// Stage 2: Creative Director + Prompt Planner
-// Рекламная философия: Meta Ads креативы, а не «красивые карточки»
-// 3-слойная система + 24 рекламные роли + 8 design-библиотек
+// Stage 2: Creative Director + Campaign Planner
+// Brand Identity Lock — все 3 карточки = единая рекламная кампания
+// 3-слойная система + 8 триад ролей + общий Visual Theme + color palette
 // ============================================================================
 
 import * as fs from 'node:fs'
 import * as path from 'node:path'
-import { TOVAR_AI_CONFIG, type VisionOutput, type PromptsOutput, type CardRole } from './types'
+import { TOVAR_AI_CONFIG, type VisionOutput, type PromptsOutput, type CardRole, type VisualTheme } from './types'
 
 // ─── ТИПЫ ДЛЯ БИБЛИОТЕК ─────────────────────────────────────────────────────
 
@@ -32,15 +32,82 @@ interface VisualThemeCatalog {
   mood: VisualThemeItem[]
 }
 
-// ─── ВСЕ РЕКЛАМНЫЕ РОЛИ ─────────────────────────────────────────────────────
+// ─── КОМПЛЕМЕНТАРНЫЕ ТРИАДЫ РОЛЕЙ ──────────────────────────────────────────
 
-const ALL_ROLES: CardRole[] = [
-  'hero', 'price', 'problem', 'solution', 'benefits', 'usage',
-  'lifestyle', 'offer', 'bundle', 'delivery', 'comparison', 'quality',
-  'materials', 'warranty', 'accessories', 'close_up', 'cta',
-  'dimensions', 'power', 'premium', 'review', 'gift',
-  'new_arrival', 'best_seller',
+interface RoleTriad {
+  name: string
+  logic: string
+  roles: [CardRole, CardRole, CardRole]
+}
+
+const ROLE_TRIADS: RoleTriad[] = [
+  {
+    name: 'product',
+    logic: 'Main hero shot → Real usage scene → Extreme detail close-up. Product tells its story.',
+    roles: ['hero', 'usage', 'close_up'],
+  },
+  {
+    name: 'commercial',
+    logic: 'Hero product → Large price/promotion → Special offer CTA. Conversion-focused.',
+    roles: ['hero', 'price', 'offer'],
+  },
+  {
+    name: 'quality',
+    logic: 'Premium hero → Craftsmanship & quality → Materials & texture. Premium feel.',
+    roles: ['hero', 'quality', 'materials'],
+  },
+  {
+    name: 'story',
+    logic: 'Problem context → Product as solution → Aspirational lifestyle result.',
+    roles: ['problem', 'solution', 'lifestyle'],
+  },
+  {
+    name: 'trust',
+    logic: 'Hero product → Comparison vs alternative → Social proof review. Trust-building.',
+    roles: ['hero', 'comparison', 'review'],
+  },
+  {
+    name: 'features',
+    logic: 'Product hero → Feature benefits → Power & performance. Spec-driven.',
+    roles: ['hero', 'benefits', 'power'],
+  },
+  {
+    name: 'promo',
+    logic: 'Special offer → Complete bundle → Strong CTA. Sales activation.',
+    roles: ['offer', 'bundle', 'cta'],
+  },
+  {
+    name: 'premium',
+    logic: 'Luxury positioning → Lifestyle context → Gift presentation. Aspirational.',
+    roles: ['premium', 'lifestyle', 'gift'],
+  },
 ]
+
+// ─── ЦВЕТОВЫЕ ПАЛИТРЫ (по premium_level) ────────────────────────────────────
+
+const COLOR_PALETTES: Record<string, Array<{ name: string; colors: string[] }>> = {
+  luxury: [
+    { name: 'Dark Gold', colors: ['#0D0D0D', '#D4AF37', '#1A1A2E', '#FFFFFF', '#C9A84C'] },
+    { name: 'Midnight Sapphire', colors: ['#0A0E27', '#3B82F6', '#1E1B4B', '#F8FAFC', '#6366F1'] },
+    { name: 'Emerald Prestige', colors: ['#022C22', '#10B981', '#064E3B', '#F0FDF4', '#34D399'] },
+    { name: 'Platinum', colors: ['#18181B', '#E4E4E7', '#27272A', '#FAFAFA', '#A1A1AA'] },
+  ],
+  premium: [
+    { name: 'Electric Blue', colors: ['#0F172A', '#3B82F6', '#1E293B', '#FFFFFF', '#60A5FA'] },
+    { name: 'Crimson Bold', colors: ['#1C0000', '#DC2626', '#450A0A', '#FEF2F2', '#F87171'] },
+    { name: 'Violet Impact', colors: ['#1E1B4B', '#8B5CF6', '#2E1065', '#F5F3FF', '#A78BFA'] },
+    { name: 'Teal Modern', colors: ['#042F2E', '#14B8A6', '#134E4A', '#F0FDFA', '#5EEAD4'] },
+  ],
+  mid: [
+    { name: 'Orange Fresh', colors: ['#1C1917', '#F97316', '#431407', '#FFF7ED', '#FB923C'] },
+    { name: 'Sky Blue', colors: ['#0C1929', '#0EA5E9', '#1E3A5F', '#F0F9FF', '#38BDF8'] },
+    { name: 'Green Natural', colors: ['#052E16', '#22C55E', '#14532D', '#F0FDF4', '#4ADE80'] },
+  ],
+  budget: [
+    { name: 'Clean Blue', colors: ['#1E293B', '#2563EB', '#1E40AF', '#EFF6FF', '#60A5FA'] },
+    { name: 'Warm Red', colors: ['#292524', '#EA580C', '#9A3412', '#FFF7ED', '#FB923C'] },
+  ],
+}
 
 // ─── РОЛЬ → CREATIVE STYLES ─────────────────────────────────────────────────
 
@@ -100,9 +167,9 @@ const ROLE_MARKETING_STYLES: Record<CardRole, string[]> = {
   best_seller:  ['ms06', 'ms29'],
 }
 
-// ─── РОЛЬ → VISUAL THEME ────────────────────────────────────────────────────
+// ─── РОЛЬ → VISUAL THEME (дефолт, будет переопределён общим кампанией) ─────
 
-const ROLE_VISUAL_THEMES: Record<CardRole, { lighting: string; background_style: string; mood: string }> = {
+const ROLE_VISUAL_THEMES: Record<CardRole, VisualTheme> = {
   hero:         { lighting: 'soft_studio', background_style: 'premium_gradient', mood: 'minimal_luxury' },
   price:        { lighting: 'high_contrast', background_style: 'pure_white', mood: 'dynamic_action' },
   problem:      { lighting: 'dark_moody', background_style: 'environmental', mood: 'industrial_premium' },
@@ -127,320 +194,6 @@ const ROLE_VISUAL_THEMES: Record<CardRole, { lighting: string; background_style:
   gift:         { lighting: 'golden_hour', background_style: 'editorial_backdrop', mood: 'warm_cozy' },
   new_arrival:  { lighting: 'rim_light', background_style: 'abstract_tech', mood: 'tech_innovation' },
   best_seller:  { lighting: 'soft_studio', background_style: 'premium_gradient', mood: 'minimal_luxury' },
-}
-
-// ─── ЗАГРУЗКА БИБЛИОТЕК ─────────────────────────────────────────────────────
-
-const TOLER_AI_DIR = path.join(process.cwd(), 'src/lib/tovar-ai')
-const DESIGN_DIR = path.join(TOLER_AI_DIR, 'design')
-
-function loadCreativeStyles(): CreativeStyle[] {
-  const raw = fs.readFileSync(path.join(DESIGN_DIR, 'creative-styles.json'), 'utf-8')
-  return (JSON.parse(raw) as { styles: CreativeStyle[] }).styles
-}
-
-function loadMarketingStyles(): MarketingStyle[] {
-  const raw = fs.readFileSync(path.join(DESIGN_DIR, 'marketing-styles.json'), 'utf-8')
-  return (JSON.parse(raw) as { styles: MarketingStyle[] }).styles
-}
-
-function loadVisualThemes(): VisualThemeCatalog {
-  const raw = fs.readFileSync(path.join(DESIGN_DIR, 'visual-themes.json'), 'utf-8')
-  return JSON.parse(raw) as VisualThemeCatalog
-}
-
-function loadDesignLibrary(name: string): string {
-  return fs.readFileSync(path.join(DESIGN_DIR, name), 'utf-8')
-}
-
-// ─── BASE PROMPT — рекламный, не каталожный ─────────────────────────────────
-
-const BASE_PROMPT = `Create a high-converting e-commerce advertisement image.
-
-The image must look like a paid Meta Ads creative, not a product catalog photo. It should resemble the best-performing ads on Facebook, Instagram, Trendyol, Shopify, and modern marketplaces.
-
-Generate ONE image only.
-Never create collages.
-Never create split layouts.
-Never create multiple panels.
-Never create infographic grids.
-One image = one clear advertising message.
-
-## PRODUCT DOMINANCE
-The product should dominate the composition — occupy approximately 60-70% of the frame.
-It must be the undisputed hero. Never make the product small or secondary.
-
-## ADVERTISING STYLE
-Do NOT generate luxury Apple-style posters.
-Do NOT create minimal premium editorials with lots of empty space.
-Prefer high-converting e-commerce advertisements over minimal catalog images.
-The design should maximize click-through rate.
-The advertisement should immediately feel promotional — like a paid Meta Ads creative.
-
-## LAYOUT & HIERARCHY
-Always build a strong visual hierarchy:
-Headline first → Product dominant → Benefits/info blocks → Offer/promotion → CTA.
-Do not leave large empty areas.
-The advertisement should contain enough commercial information.
-Prefer multiple short information cards over long paragraphs.
-
-## COMMERCIAL BLOCKS
-Use premium rounded commercial blocks for: Prices, Features, Delivery, Warranty, Discounts, Specifications, Buttons.
-Cards should have soft shadows and rounded corners.
-Cards should naturally surround the product.
-Do not leave floating text without visual containers.
-Generate floating rounded information blocks when appropriate.
-
-## COLORS
-Prefer vibrant commercial backgrounds.
-Use bold gradients.
-Use high contrast between background and product.
-Avoid pale minimalist color palettes.
-
-## DEPTH & LAYERS
-Create layered compositions with foreground and background depth.
-Use floating shapes, soft glows, reflections, gradient lighting.
-Add large geometric background elements and subtle decorative graphics.
-Achieve commercial visual depth — not flat minimalism.
-
-## QUALITY
-Photorealistic. Studio quality. Modern advertising style. Ultra realistic. 8K.
-The product is always the main subject.
-Do not change the product shape. Do not invent new product parts.
-Remove all watermarks, stickers, logos and packaging unless requested.
-
-## SELF-REVIEW
-Before finalizing: would a professional e-commerce designer approve this layout for a paid advertisement?
-If the answer is no, redesign the composition before generating.
-
-CRITICAL — Analyze the uploaded product before generating the image. Determine automatically: product category, materials, intended use, target customer, suitable environment, appropriate lighting, realistic accessories, correct hand position if applicable, realistic usage scenario.
-
-Do not reuse the same environment for every product.
-Beauty products → skincare environments.
-Electronics → modern technology environments.
-Kitchen products → premium kitchens.
-Automotive → automotive environments.
-Fitness → sports environments.
-Office → office environments.
-Pet → home environments.`
-
-// ─── SYSTEM PROMPT — Creative Director как рекламщик ─────────────────────────
-
-const SYSTEM_PROMPT = `You are a Creative Director for TAPLA MARKETPLACE (Azerbaijan). You design high-converting advertising creatives for e-commerce — not just product photos, but paid social media advertisements.
-
-## YOUR GOAL
-Maximize click-through rate (CTR). Every image should make someone STOP scrolling and CLICK.
-The image must feel like a professional Meta Ads / Trendyol / Shopify promotional creative.
-
-## 3-LAYER SYSTEM
-
-### Layer 1 — Creative Style (WHAT is in the frame)
-You are ASSIGNED one creative style per card — execute it faithfully.
-
-### Layer 2 — Marketing Style (WHAT message we communicate)
-Pick ONE per card. The marketing style defines the primary selling message.
-
-### Layer 3 — Visual Theme (HOW it looks)
-Pick ONE lighting + ONE background style + ONE mood per card.
-
-## CARD ROLES
-Each card has an ASSIGNED advertising role (e.g., "hero", "price", "lifestyle", "offer", "benefits", etc.).
-The role determines what the card is selling. Your job is to bring that role to life:
-- hero → stunning first impression, scroll-stopper
-- price → price is the hero, product supports it
-- offer → discount/promotion, urgency
-- benefits → feature cards around product
-- usage → real person using the product
-- lifestyle → aspirational beautiful context
-- quality → materials and craftsmanship
-- comparison → product vs alternative
-- close_up → extreme detail shot
-- cta → direct action, buy now
-- And others... Each role = one clear advertising task.
-
-## TEXT RULES
-- ALL visible text: AZERBAIJANI LATIN SCRIPT ONLY. NEVER English. NEVER Russian. NEVER Cyrillic.
-- Short: 3-5 words per headline. Examples: "LED TERAPİYA", "3 REJİM", "PULSUZ ÇATDIRILMA"
-- Text goes inside rounded commercial blocks/cards — never floating without container
-
-## PROCESS
-1. Understand the assigned role for each card
-2. Execute the assigned Creative Style
-3. Pick ONE Marketing Style per card
-4. Select lighting + background style + mood per card
-5. Pick layout, position, background, visual effects
-6. Design commercial information blocks (price cards, feature cards, delivery badges, etc.)
-7. Run Creative Director self-review (all 6 questions MUST be YES)
-8. If any question = NO, redesign and try again
-9. Write the final image description
-
-## PROMPT RULES
-- Each prompt_en under 300 words
-- Full English sentences for Nano Banana 2
-- Reference original photo for product shape/color fidelity
-- CREATE A NEW IMAGE — do not edit the reference photo
-- The prompt must describe a commercial advertisement, not a product catalog photo
-
-Output ONLY valid JSON. No markdown.`
-
-// ─── USER PROMPT ────────────────────────────────────────────────────────────
-
-function buildUserPrompt(
-  roles: CardRole[],
-  cs: CreativeStyle[],
-  analysis: VisionOutput,
-  providerDescription?: string,
-  characteristics?: Record<string, string>,
-): string {
-  const CREATIVE_STYLES = loadCreativeStyles()
-  const MARKETING_STYLES = loadMarketingStyles()
-  const VISUAL_THEMES = loadVisualThemes()
-
-  const DESIGN = {
-    layouts: loadDesignLibrary('layouts.json'),
-    positions: loadDesignLibrary('positions.json'),
-    backgrounds: loadDesignLibrary('backgrounds.json'),
-    visual_effects: loadDesignLibrary('visual-effects.json'),
-    composition_rules: loadDesignLibrary('composition-rules.json'),
-    marketplace_rules: loadDesignLibrary('marketplace-rules.json'),
-    creative_director: loadDesignLibrary('creative-director.json'),
-  }
-
-  // Собираем роли в читаемый формат
-  const roleDescriptions = roles.map((r, i) =>
-    `CARD ${i + 1} ROLE: "${r}" — ${ROLE_DESCRIPTIONS[r]}`
-  ).join('\n')
-
-  return [
-    'Create 3 advertising image prompts for this product. Act as Creative Director using the 3-layer system with assigned advertising roles.',
-    '',
-    '## ASSIGNED ADVERTISING ROLES (do NOT change)',
-    roleDescriptions,
-    '',
-    '## LAYER 1 — Creative Style Library (40 styles — WHAT is in frame)',
-    JSON.stringify(CREATIVE_STYLES, null, 2),
-    '',
-    '## LAYER 2 — Marketing Style Library (30 styles — WHAT message we sell)',
-    JSON.stringify(MARKETING_STYLES, null, 2),
-    '',
-    '## LAYER 3 — Visual Theme Library (HOW it looks)',
-    JSON.stringify(VISUAL_THEMES, null, 2),
-    '',
-    '## SUPPORTING DESIGN LIBRARIES',
-    '',
-    '### Layouts (pick ONE per card)',
-    DESIGN.layouts,
-    '',
-    '### Product Positions',
-    DESIGN.positions,
-    '',
-    '### Backgrounds',
-    DESIGN.backgrounds,
-    '',
-    '### Visual Effects',
-    DESIGN.visual_effects,
-    '',
-    '### Composition Rules (MUST follow)',
-    DESIGN.composition_rules,
-    '',
-    '### Marketplace Rules (MUST follow)',
-    DESIGN.marketplace_rules,
-    '',
-    '### Creative Director Self-Review (MUST pass all 6)',
-    DESIGN.creative_director,
-    '',
-    '## CREATIVE STYLES ASSIGNED (do NOT change)',
-    ...cs.map((s, i) => `CARD ${i + 1} CREATIVE STYLE: ${s.id} — ${s.name} — ${s.prompt_fragment}`),
-    '',
-    '## Product Analysis',
-    JSON.stringify(analysis, null, 2),
-    '',
-    '## Provider Description',
-    providerDescription || 'Not provided',
-    '',
-    '## Characteristics',
-    (characteristics && Object.keys(characteristics).length > 0 ? JSON.stringify(characteristics) : 'None'),
-    '',
-    'Return JSON:',
-    '{',
-    '  "cards": [',
-    `    {`,
-    `      "index": 1,`,
-    `      "role": "${roles[0]}",`,
-    `      "creative_style": "${cs[0].id}",`,
-    `      "marketing_style": "ms04",`,
-    `      "visual_theme": {`,
-    `        "lighting": "soft_studio",`,
-    `        "background_style": "premium_gradient",`,
-    `        "mood": "minimal_luxury"`,
-    `      },`,
-    `      "layout": "C",`,
-    `      "product_position": "Center front",`,
-    `      "background": "Soft white studio",`,
-    `      "visual_effects": ["soft_glow"],`,
-    `      "creative_director_passed": true,`,
-    `      "prompt_en": "Full advertising scene description in English. Under 300 words. Describe a commercial ad, not a catalog photo.",`,
-    `      "text_overlay_az": ["HEADLINE AZ"],`,
-    `      "commercial_blocks": ["price card", "delivery badge"],`,
-    `      "needs_model": ${String(cs[0].needs_model)}`,
-    `    },`,
-    `    {`,
-    `      "index": 2,`,
-    `      "role": "${roles[1]}",`,
-    `      "creative_style": "${cs[1].id}",`,
-    `      "marketing_style": "ms20",`,
-    `      "visual_theme": {`,
-    `        "lighting": "natural_daylight",`,
-    `        "background_style": "environmental",`,
-    `        "mood": "warm_cozy"`,
-    `      },`,
-    `      "layout": "G",`,
-    `      "product_position": "In hand",`,
-    `      "background": "Modern bathroom",`,
-    `      "visual_effects": [],`,
-    `      "creative_director_passed": true,`,
-    `      "prompt_en": "...",`,
-    `      "text_overlay_az": [],`,
-    `      "commercial_blocks": [],`,
-    `      "needs_model": ${String(cs[1].needs_model)}`,
-    `    },`,
-    `    {`,
-    `      "index": 3,`,
-    `      "role": "${roles[2]}",`,
-    `      "creative_style": "${cs[2].id}",`,
-    `      "marketing_style": "ms03",`,
-    `      "visual_theme": {`,
-    `        "lighting": "softbox_diffused",`,
-    `        "background_style": "dark_studio",`,
-    `        "mood": "tech_innovation"`,
-    `      },`,
-    `      "layout": "features_row",`,
-    `      "product_position": "Macro close-up (partial)",`,
-    `      "background": "Dark premium studio",`,
-    `      "visual_effects": ["luxury_highlights"],`,
-    `      "creative_director_passed": true,`,
-    `      "prompt_en": "...",`,
-    `      "text_overlay_az": ["FEATURE 1 AZ", "FEATURE 2 AZ"],`,
-    `      "commercial_blocks": ["feature cards", "spec badges"],`,
-    `      "needs_model": ${String(cs[2].needs_model)}`,
-    `    }`,
-    '  ]',
-    '}',
-    '',
-    'RULES:',
-    '- role: use the ASSIGNED role — do not change it.',
-    '- creative_style: use the ASSIGNED id — do not change it.',
-    '- marketing_style: pick from the Marketing Style Library (ms01-ms30).',
-    '- visual_theme: pick lighting, background_style, mood from Visual Theme Library.',
-    '- text_overlay_az: AZERBAIJANI LATIN ONLY. Empty array [] if no text.',
-    '- commercial_blocks: list which commercial blocks to include (price cards, delivery badges, feature cards, warranty badge, CTA button, etc.).',
-    '- Every card must have creative_director_passed = true.',
-    '- One image = one advertising message.',
-    '- prompt_en writes the full advertising scene — style prefix, design libraries, and rules are added automatically.',
-    '- The image must look like a paid Meta Ads / Trendyol creative, NOT a catalog photo.',
-    '',
-    'Respond ONLY with the JSON.',
-  ].join('\n')
 }
 
 // ─── ОПИСАНИЯ РОЛЕЙ ─────────────────────────────────────────────────────────
@@ -472,45 +225,419 @@ const ROLE_DESCRIPTIONS: Record<CardRole, string> = {
   best_seller: 'Popular choice. Bestseller badge. Social proof through popularity. Most purchased.',
 }
 
-// ─── ВЫБОР РОЛЕЙ (случайно, с учётом VisionOutput) ───────────────────────────
+// ─── ЗАГРУЗКА БИБЛИОТЕК ─────────────────────────────────────────────────────
 
-function selectRoles(count: number, vision: VisionOutput): CardRole[] {
-  // Роли, требующие модель — исключаем если товар без неё
-  const availableRoles = ALL_ROLES.filter(role => {
-    if (!vision.needs_human_model && ['usage', 'lifestyle'].includes(role)) {
-      // lifestyle без модели — ок (cs11, cs29), usage — нет
-      if (role === 'usage') return false
-    }
-    if (!vision.needs_macro_shots && ['close_up', 'materials', 'quality'].includes(role)) {
-      // всё ещё доступны, просто меньше стилей подходит
+const TOLER_AI_DIR = path.join(process.cwd(), 'src/lib/tovar-ai')
+const DESIGN_DIR = path.join(TOLER_AI_DIR, 'design')
+
+function loadCreativeStyles(): CreativeStyle[] {
+  const raw = fs.readFileSync(path.join(DESIGN_DIR, 'creative-styles.json'), 'utf-8')
+  return (JSON.parse(raw) as { styles: CreativeStyle[] }).styles
+}
+
+function loadMarketingStyles(): MarketingStyle[] {
+  const raw = fs.readFileSync(path.join(DESIGN_DIR, 'marketing-styles.json'), 'utf-8')
+  return (JSON.parse(raw) as { styles: MarketingStyle[] }).styles
+}
+
+function loadVisualThemes(): VisualThemeCatalog {
+  const raw = fs.readFileSync(path.join(DESIGN_DIR, 'visual-themes.json'), 'utf-8')
+  return JSON.parse(raw) as VisualThemeCatalog
+}
+
+function loadDesignLibrary(name: string): string {
+  return fs.readFileSync(path.join(DESIGN_DIR, name), 'utf-8')
+}
+
+// ─── BASE PROMPT — рекламный + Brand Identity Lock ──────────────────────────
+
+const BASE_PROMPT = `Create a high-converting e-commerce advertisement image.
+
+The image must look like a paid Meta Ads creative, not a product catalog photo. It should resemble the best-performing ads on Facebook, Instagram, Trendyol, Shopify, and modern marketplaces.
+
+Generate ONE image only.
+Never create collages. Never create split layouts. Never create multiple panels.
+One image = one clear advertising message.
+
+## BRAND IDENTITY LOCK — CRITICAL
+This image is part of a 3-image advertising CAMPAIGN.
+All 3 images MUST share the EXACT same:
+- Color palette (provided below — use these colors and ONLY these colors)
+- Lighting style
+- Background style
+- Mood / atmosphere
+- Design language (card style, shadow type, corner rounding, typography feel)
+
+The 3 images must look like they belong to the SAME campaign — like 3 slides from one brand.
+They share visual DNA but each has a DIFFERENT composition and message.
+
+## CAMPAIGN COLOR PALETTE (USE THESE COLORS)
+The color palette for this campaign will be specified in the prompt.
+Use it for backgrounds, cards, accents, text, gradients, and decorative elements.
+Do NOT introduce colors outside this palette.
+
+## PRODUCT DOMINANCE
+The product should dominate the composition — occupy approximately 60-70% of the frame.
+It must be the undisputed hero. Never make the product small or secondary.
+
+## ADVERTISING STYLE
+Do NOT generate luxury Apple-style posters.
+Do NOT create minimal premium editorials with lots of empty space.
+Prefer high-converting e-commerce advertisements over minimal catalog images.
+The design should maximize click-through rate.
+The advertisement should immediately feel promotional — like a paid Meta Ads creative.
+
+## LAYOUT & HIERARCHY
+Always build a strong visual hierarchy:
+Headline first → Product dominant → Benefits/info blocks → Offer/promotion → CTA.
+Do not leave large empty areas.
+The advertisement should contain enough commercial information.
+Prefer multiple short information cards over long paragraphs.
+
+## COMMERCIAL BLOCKS
+Use premium rounded commercial blocks for: Prices, Features, Delivery, Warranty, Discounts, Specifications, Buttons.
+Cards should have soft shadows and rounded corners.
+Cards should naturally surround the product.
+Do not leave floating text without visual containers.
+Generate floating rounded information blocks when appropriate.
+
+## COLORS
+Prefer vibrant commercial backgrounds. Use bold gradients.
+Use high contrast between background and product.
+Avoid pale minimalist color palettes.
+
+## DEPTH & LAYERS
+Create layered compositions with foreground and background depth.
+Use floating shapes, soft glows, reflections, gradient lighting.
+Add large geometric background elements and subtle decorative graphics.
+Achieve commercial visual depth — not flat minimalism.
+
+## QUALITY
+Photorealistic. Studio quality. Modern advertising style. Ultra realistic. 8K.
+The product is always the main subject.
+Do not change the product shape. Do not invent new product parts.
+
+## DO NOT COPY FROM REFERENCE PHOTO
+CRITICAL — The reference photo is for product shape/color fidelity ONLY.
+NEVER copy or reproduce from the reference photo:
+- Logos, brand names, store names, shop names
+- Price tags, price stickers, barcodes
+- Watermarks, photographer signatures
+- Packaging text, label text
+- Any text that appears on the original product or its background
+These elements MUST NOT appear in the generated image. Create a completely new scene with no branding from the original photo.
+
+## DIFFERENTIATION FROM OTHER CARDS IN CAMPAIGN
+This card has a specific role in the campaign. Its composition, product angle, and layout
+must be DISTINCT from the other 2 cards. Do NOT repeat the same format.
+
+## SELF-REVIEW
+Before finalizing: would a professional e-commerce designer approve this layout for a paid advertisement?
+Does this image share visual DNA with the other 2 campaign images?
+If the answer is no, redesign before generating.
+
+CRITICAL — Analyze the uploaded product before generating the image. Determine automatically: product category, materials, intended use, target customer, suitable environment, appropriate lighting, realistic accessories, correct hand position if applicable, realistic usage scenario.
+
+Do not reuse the same environment for every product.
+Beauty products → skincare environments. Electronics → modern technology environments.
+Kitchen products → premium kitchens. Automotive → automotive environments.
+Fitness → sports environments. Office → office environments. Pet → home environments.`
+
+// ─── SYSTEM PROMPT — Creative Director с Campaign Brief ──────────────────────
+
+const SYSTEM_PROMPT = `You are a Creative Director for TAPLA MARKETPLACE (Azerbaijan). You design 3-image advertising CAMPAIGNS — not isolated images, but a cohesive set that shares visual DNA.
+
+## YOUR GOAL
+Maximize click-through rate (CTR). Create a CAMPAIGN of 3 images that:
+- Share ONE visual identity (colors, lighting, mood, design language)
+- Each have a DISTINCT composition, product angle, and message
+- Together tell a complete product story
+
+## CAMPAIGN BRIEF — DO THIS FIRST
+Before designing individual cards, establish the CAMPAIGN-LEVEL shared identity:
+
+1. **Color Palette** — You are assigned a color palette. USE IT for all 3 cards.
+   Apply these colors to backgrounds, gradients, cards, text, accents, decorative elements.
+   The palette creates instant brand recognition across all 3 images.
+
+2. **Visual Theme** — You are assigned ONE lighting + ONE background style + ONE mood.
+   ALL 3 cards use this same visual theme. This is the campaign's atmosphere.
+
+3. **Design Language** — Define how cards, shadows, typography will look.
+   Same rounded corner style, same shadow type, same font feel across all 3 cards.
+
+## THEN DESIGN 3 DISTINCT CARDS
+Within the shared campaign identity, design 3 cards that are COMPOSITIONALLY DIFFERENT:
+
+- **Card 1**: The assigned role. Different product angle from cards 2 and 3.
+- **Card 2**: The assigned role. Different layout from cards 1 and 3.
+- **Card 3**: The assigned role. Different supporting elements from cards 1 and 2.
+
+### How to make cards DISTINCT (while sharing visual DNA):
+- Use DIFFERENT product positions (center vs 45° vs macro vs in-hand vs top-down)
+- Use DIFFERENT layouts (A through H, features_row)
+- Use DIFFERENT commercial block arrangements
+- Use DIFFERENT focal points
+- BUT always with the SAME color palette, SAME lighting, SAME mood
+
+## 3-LAYER SYSTEM
+
+### Layer 1 — Creative Style (WHAT is in the frame)
+You are ASSIGNED one creative style per card — execute it faithfully.
+
+### Layer 2 — Marketing Style (WHAT message we communicate)
+Pick ONE per card from the Marketing Style Library.
+The marketing style should fit the card's role.
+
+### Layer 3 — Visual Theme (HOW it looks)
+SHARED across all 3 cards — do NOT change per card.
+
+## COLOR PALETTE RULES
+- Studio/product-only cards: build entire composition from the assigned color palette.
+- Environmental/model cards: palette colors go on GRAPHIC ELEMENTS ONLY (cards, badges, buttons, text containers). Walls, furniture, skin, nature stay natural and realistic — not palette-tinted.
+
+## TEXT RULES
+- ALL visible text: AZERBAIJANI LATIN SCRIPT ONLY. NEVER English. NEVER Russian. NEVER Cyrillic.
+- Short: 3-5 words per headline. Examples: "LED TERAPİYA", "3 REJİM", "PULSUZ ÇATDIRILMA"
+- Text goes inside rounded commercial blocks/cards — never floating without container
+
+## OUTPUT FORMAT
+Return JSON with campaign-level settings + 3 cards:
+
+{
+  "campaign": {
+    "color_palette_name": "Electric Blue",
+    "design_language": "Dark premium with blue accents, glass-morphism cards, soft box shadows"
+  },
+  "cards": [
+    {
+      "index": 1,
+      "role": "...",
+      "creative_style": "...",
+      "marketing_style": "...",
+      "layout": "...",
+      "product_position": "...",
+      "background": "...",
+      "visual_effects": [...],
+      "creative_director_passed": true,
+      "prompt_en": "...",
+      "text_overlay_az": [...],
+      "commercial_blocks": [...],
+      "needs_model": false,
+      "distinct_from_other_cards": "How this card differs compositionally from cards 2 and 3"
+    },
+    ... (cards 2, 3)
+  ]
+}
+
+Each prompt_en must describe a commercial advertisement, not a catalog photo.
+Respond ONLY with the JSON.`
+
+// ─── USER PROMPT — CAMPAIGN-LEVEL ───────────────────────────────────────────
+
+function buildUserPrompt(
+  triad: RoleTriad,
+  cs: CreativeStyle[],
+  colorPalette: { name: string; colors: string[] },
+  sharedVt: VisualTheme,
+  analysis: VisionOutput,
+  providerDescription?: string,
+  characteristics?: Record<string, string>,
+): string {
+  const CREATIVE_STYLES = loadCreativeStyles()
+  const MARKETING_STYLES = loadMarketingStyles()
+  const VISUAL_THEMES = loadVisualThemes()
+
+  const DESIGN = {
+    layouts: loadDesignLibrary('layouts.json'),
+    positions: loadDesignLibrary('positions.json'),
+    backgrounds: loadDesignLibrary('backgrounds.json'),
+    visual_effects: loadDesignLibrary('visual-effects.json'),
+    composition_rules: loadDesignLibrary('composition-rules.json'),
+    marketplace_rules: loadDesignLibrary('marketplace-rules.json'),
+    creative_director: loadDesignLibrary('creative-director.json'),
+  }
+
+  return [
+    'Create a 3-image advertising CAMPAIGN for this product. All 3 cards must share ONE visual identity.',
+    '',
+    '## CAMPAIGN STRATEGY',
+    `Triad: "${triad.name}" — ${triad.logic}`,
+    '',
+    '## SHARED CAMPAIGN IDENTITY (applies to ALL 3 cards)',
+    '',
+    '### Color Palette (campaign-wide)',
+    `Name: ${colorPalette.name}`,
+    `Colors: ${JSON.stringify(colorPalette.colors)}`,
+    '',
+    '### Shared Visual Theme',
+    `Lighting: ${sharedVt.lighting}`,
+    `Background Style: ${sharedVt.background_style}`,
+    `Mood: ${sharedVt.mood}`,
+    'ALL 3 cards share this exact visual theme.',
+    '',
+    '## CARD ROLES (do NOT change)',
+    `Card 1 — Role: "${triad.roles[0]}" → ${ROLE_DESCRIPTIONS[triad.roles[0]]}`,
+    `Card 2 — Role: "${triad.roles[1]}" → ${ROLE_DESCRIPTIONS[triad.roles[1]]}`,
+    `Card 3 — Role: "${triad.roles[2]}" → ${ROLE_DESCRIPTIONS[triad.roles[2]]}`,
+    '',
+    '### CRITICAL: Make cards COMPOSITIONALLY DISTINCT',
+    'Card 1, 2, and 3 must have DIFFERENT: product positions, layouts, focal points, and commercial block arrangements.',
+    'They share colors/lighting/mood but NOT composition.',
+    '',
+    '## LAYER 1 — Creative Style Library (40 styles)',
+    JSON.stringify(CREATIVE_STYLES, null, 2),
+    '',
+    '## LAYER 2 — Marketing Style Library (30 styles)',
+    JSON.stringify(MARKETING_STYLES, null, 2),
+    '',
+    '## LAYER 3 — Visual Theme Library (for reference)',
+    JSON.stringify(VISUAL_THEMES, null, 2),
+    '',
+    '## SUPPORTING DESIGN LIBRARIES',
+    '',
+    '### Layouts (pick DIFFERENT ones per card)',
+    DESIGN.layouts,
+    '',
+    '### Product Positions (pick DIFFERENT ones per card)',
+    DESIGN.positions,
+    '',
+    '### Backgrounds',
+    DESIGN.backgrounds,
+    '',
+    '### Visual Effects',
+    DESIGN.visual_effects,
+    '',
+    '### Composition Rules (MUST follow)',
+    DESIGN.composition_rules,
+    '',
+    '### Marketplace Rules (MUST follow)',
+    DESIGN.marketplace_rules,
+    '',
+    '### Creative Director Self-Review (MUST pass all 6)',
+    DESIGN.creative_director,
+    '',
+    '## CREATIVE STYLES ASSIGNED (do NOT change)',
+    `Card 1: ${cs[0].id} — ${cs[0].name} — ${cs[0].prompt_fragment}`,
+    `Card 2: ${cs[1].id} — ${cs[1].name} — ${cs[1].prompt_fragment}`,
+    `Card 3: ${cs[2].id} — ${cs[2].name} — ${cs[2].prompt_fragment}`,
+    '',
+    '## Product Analysis',
+    JSON.stringify(analysis, null, 2),
+    '',
+    '## Provider Description',
+    providerDescription || 'Not provided',
+    '',
+    '## Characteristics',
+    (characteristics && Object.keys(characteristics).length > 0 ? JSON.stringify(characteristics) : 'None'),
+    '',
+    'Return JSON with campaign-level settings + 3 cards:',
+    '{',
+    '  "campaign": {',
+    `    "color_palette_name": "${colorPalette.name}",`,
+    '    "design_language": "Describe the shared design language for all 3 cards"',
+    '  },',
+    '  "cards": [',
+    `    {`,
+    `      "index": 1,`,
+    `      "role": "${triad.roles[0]}",`,
+    `      "creative_style": "${cs[0].id}",`,
+    `      "marketing_style": "ms04",`,
+    `      "layout": "...",`,
+    `      "product_position": "...",`,
+    `      "background": "...",`,
+    `      "visual_effects": [...],`,
+    `      "creative_director_passed": true,`,
+    `      "prompt_en": "<300 words. Full advertising scene. Use color palette ${colorPalette.name}. Different composition from cards 2 and 3.>",`,
+    `      "text_overlay_az": ["HEADLINE AZ"],`,
+    `      "commercial_blocks": ["price card", "delivery badge"],`,
+    `      "needs_model": ${String(cs[0].needs_model)},`,
+    `      "distinct_from_other_cards": "How this card differs from cards 2 and 3"`,
+    `    },`,
+    `    {`,
+    `      "index": 2,`,
+    `      "role": "${triad.roles[1]}",`,
+    `      "creative_style": "${cs[1].id}",`,
+    `      "marketing_style": "ms20",`,
+    `      "layout": "...",`,
+    `      "product_position": "...",`,
+    `      "background": "...",`,
+    `      "visual_effects": [...],`,
+    `      "creative_director_passed": true,`,
+    `      "prompt_en": "<300 words. Full advertising scene. Use color palette ${colorPalette.name}. Different composition from cards 1 and 3.>",`,
+    `      "text_overlay_az": [],`,
+    `      "commercial_blocks": [],`,
+    `      "needs_model": ${String(cs[1].needs_model)},`,
+    `      "distinct_from_other_cards": "How this card differs from cards 1 and 3"`,
+    `    },`,
+    `    {`,
+    `      "index": 3,`,
+    `      "role": "${triad.roles[2]}",`,
+    `      "creative_style": "${cs[2].id}",`,
+    `      "marketing_style": "ms03",`,
+    `      "layout": "...",`,
+    `      "product_position": "...",`,
+    `      "background": "...",`,
+    `      "visual_effects": [...],`,
+    `      "creative_director_passed": true,`,
+    `      "prompt_en": "<300 words. Full advertising scene. Use color palette ${colorPalette.name}. Different composition from cards 1 and 2.>",`,
+    `      "text_overlay_az": ["FEATURE AZ"],`,
+    `      "commercial_blocks": ["feature cards"],`,
+    `      "needs_model": ${String(cs[2].needs_model)},`,
+    `      "distinct_from_other_cards": "How this card differs from cards 1 and 2"`,
+    `    }`,
+    '  ]',
+    '}',
+    '',
+    'RULES:',
+    '- All 3 cards MUST share the same color palette, lighting, background_style, and mood.',
+    '- Cards must have DIFFERENT product positions, layouts, and focal points.',
+    '- text_overlay_az: AZERBAIJANI LATIN ONLY. Empty array [] if no text.',
+    '- Every card must have creative_director_passed = true.',
+    '- One image = one advertising message.',
+    '- The images must look like a cohesive paid Meta Ads / Trendyol campaign.',
+    '',
+    'Respond ONLY with the JSON.',
+  ].join('\n')
+}
+
+// ─── ВЫБОР ТРИАДЫ ───────────────────────────────────────────────────────────
+
+function selectTriad(vision: VisionOutput): RoleTriad {
+  // Фильтруем триады, требующие модель, если товар без неё
+  const availableTriads = ROLE_TRIADS.filter(triad => {
+    const hasUsageRole = triad.roles.some(r => r === 'usage')
+    if (!vision.needs_human_model && hasUsageRole) {
+      // usage-триады всё ещё доступны — просто будет использован другой creative style
     }
     return true
   })
 
-  // Фишер-Йейтс shuffle
-  const shuffled = [...availableRoles]
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
-  }
-
-  return shuffled.slice(0, count)
+  return availableTriads[Math.floor(Math.random() * availableTriads.length)]
 }
 
-// ─── PICK FUNCTIONS — код даёт дефолт, LLM может переопределить ─────────────
+// ─── ВЫБОР ЦВЕТОВОЙ ПАЛИТРЫ ─────────────────────────────────────────────────
+
+function selectColorPalette(premiumLevel: string): { name: string; colors: string[] } {
+  const palettes = COLOR_PALETTES[premiumLevel] || COLOR_PALETTES.mid
+  return palettes[Math.floor(Math.random() * palettes.length)]
+}
+
+// ─── PICK FUNCTIONS ─────────────────────────────────────────────────────────
 
 function pickCreativeStyleForRole(
   role: CardRole,
   vision: VisionOutput,
   styles: CreativeStyle[],
+  excludeId?: string, // чтобы не повторять стиль между карточками
 ): CreativeStyle {
   const preferredIds = ROLE_CREATIVE_STYLES[role] || ['cs01']
   const candidates = preferredIds
     .map(id => styles.find(s => s.id === id))
     .filter(Boolean) as CreativeStyle[]
 
-  // Фильтруем по model/environment
   const filtered = candidates.filter(s => {
+    if (excludeId && s.id === excludeId) return false
     if (!vision.needs_human_model && s.needs_model) return false
     if (!vision.needs_lifestyle_scene && s.needs_environment) return false
     return true
@@ -533,10 +660,14 @@ function pickMarketingStyleForRole(
   return styles[0]
 }
 
-function pickVisualThemeForRole(
-  role: CardRole,
-): { lighting: string; background_style: string; mood: string } {
-  return ROLE_VISUAL_THEMES[role] || { lighting: 'soft_studio', background_style: 'pure_white', mood: 'minimal_luxury' }
+function pickSharedVisualTheme(
+  triad: RoleTriad,
+  vision: VisionOutput,
+): VisualTheme {
+  // Берём Visual Theme от hero-роли (card 1) как якорь для всей кампании
+  // Если первая роль не hero, берём от самой «визуально тяжёлой» роли
+  const anchorRole = triad.roles[0]
+  return ROLE_VISUAL_THEMES[anchorRole] || { lighting: 'soft_studio', background_style: 'premium_gradient', mood: 'minimal_luxury' }
 }
 
 // ─── MAIN ────────────────────────────────────────────────────────────────────
@@ -551,20 +682,31 @@ export async function planCardPrompts(
   const marketingStyles = loadMarketingStyles()
   const visualThemes = loadVisualThemes()
 
-  // Случайный выбор 3 разных ролей
-  const roles = selectRoles(config.DEFAULT_CARD_COUNT, analysis)
+  // 1. Выбор триады (комплементарные роли)
+  const triad = selectTriad(analysis)
 
-  // Код выбирает creative styles, marketing, visual theme под каждую роль
-  const cs = roles.map(r => pickCreativeStyleForRole(r, analysis, creativeStyles))
-  const ms = roles.map(r => pickMarketingStyleForRole(r, analysis, marketingStyles))
-  const vt = roles.map(r => pickVisualThemeForRole(r))
+  // 2. Выбор ОБЩЕЙ цветовой палитры (одна на все карточки)
+  const colorPalette = selectColorPalette(analysis.premium_level)
 
-  console.log(`[Stage 2] Roles: ${roles.join(', ')}`)
-  console.log(`[Stage 2] Creative Styles: ${cs.map((s, i) => `${i + 1}=${s.id} (${s.name})`).join(', ')}`)
-  console.log(`[Stage 2] Marketing Styles: ${ms.map((s, i) => `${i + 1}=${s.id} (${s.name})`).join(', ')}`)
-  console.log(`[Stage 2] Visual Themes: ${vt.map((v, i) => `${i + 1}=${v.mood}`).join(', ')}`)
+  // 3. Выбор ОБЩЕГО Visual Theme (один на все карточки — Brand Identity Lock)
+  const sharedVt = pickSharedVisualTheme(triad, analysis)
 
-  const userPrompt = buildUserPrompt(roles, cs, analysis, providerDescription, characteristics)
+  // 4. Creative Styles под роли (разные, не повторяются)
+  const cs0 = pickCreativeStyleForRole(triad.roles[0], analysis, creativeStyles)
+  const cs1 = pickCreativeStyleForRole(triad.roles[1], analysis, creativeStyles, cs0.id)
+  const cs2 = pickCreativeStyleForRole(triad.roles[2], analysis, creativeStyles, cs0.id)
+  const cs = [cs0, cs1, cs2]
+
+  // 5. Marketing Styles под роли
+  const ms = triad.roles.map(r => pickMarketingStyleForRole(r, analysis, marketingStyles))
+
+  console.log(`[Stage 2] Campaign Triad: "${triad.name}" — ${triad.logic}`)
+  console.log(`[Stage 2] Color Palette: "${colorPalette.name}" ${JSON.stringify(colorPalette.colors)}`)
+  console.log(`[Stage 2] Shared Visual Theme: lighting=${sharedVt.lighting}, bg=${sharedVt.background_style}, mood=${sharedVt.mood}`)
+  console.log(`[Stage 2] Roles: ${triad.roles.join(', ')}`)
+  console.log(`[Stage 2] Creative Styles: ${cs.map((s, i) => `${i + 1}=${s.id}`).join(', ')}`)
+
+  const userPrompt = buildUserPrompt(triad, cs, colorPalette, sharedVt, analysis, providerDescription, characteristics)
 
   const body = {
     model: config.PLANNER_MODEL,
@@ -594,14 +736,15 @@ export async function planCardPrompts(
   const data = await response.json()
   const raw = data.choices?.[0]?.message?.content || ''
   const parsed = parseJSON<{
+    campaign?: { color_palette_name: string; design_language: string }
     cards: Array<{
       index: number; role: string
       creative_style?: string; marketing_style?: string
-      visual_theme?: { lighting: string; background_style: string; mood: string }
       layout?: string; product_position?: string; background?: string
       visual_effects?: string[]; commercial_blocks?: string[]
       creative_director_passed?: boolean
       prompt_en: string; text_overlay_az: string[]; needs_model: boolean
+      distinct_from_other_cards?: string
     }>
   }>(raw)
 
@@ -609,7 +752,9 @@ export async function planCardPrompts(
     throw new Error(`Stage 2: Expected 3 cards, got ${parsed.cards?.length || 0}`)
   }
 
-  // Сборка финального промпта: [BASE] + [Creative Style] + [Marketing Style] + [Visual Theme] + [LLM content]
+  const campaign = parsed.campaign
+
+  // Сборка финального промпта: [BASE] + [CAMPAIGN IDENTITY] + [Card-specific] + [LLM content]
   for (const card of parsed.cards) {
     const cardCs = card.creative_style
       ? creativeStyles.find(s => s.id === card.creative_style) || cs[card.index - 1]
@@ -617,24 +762,45 @@ export async function planCardPrompts(
     const cardMs = card.marketing_style
       ? marketingStyles.find(m => m.id === card.marketing_style) || ms[card.index - 1]
       : ms[card.index - 1]
-    const cardVt = card.visual_theme || vt[card.index - 1]
 
-    const lightingItem = visualThemes.lighting.find(l => l.id === cardVt.lighting)
-    const bgItem = visualThemes.background_style.find(b => b.id === cardVt.background_style)
-    const moodItem = visualThemes.mood.find(m => m.id === cardVt.mood)
+    const lightingItem = visualThemes.lighting.find(l => l.id === sharedVt.lighting)
+    const bgItem = visualThemes.background_style.find(b => b.id === sharedVt.background_style)
+    const moodItem = visualThemes.mood.find(m => m.id === sharedVt.mood)
+
+    // Для карточек с окружением или моделью — палитра мягче (естественные цвета среды важнее)
+    const isEnvironmentalCard = cardCs.needs_environment || card.needs_model
+    const colorInstruction = isEnvironmentalCard
+      ? [
+          `CAMPAIGN COLOR PALETTE: "${colorPalette.name}" — ${colorPalette.colors.join(', ')}.`,
+          `Use these colors for cards, badges, text overlays, and accent elements.`,
+          `Keep the environment/background colors natural and realistic — do NOT force palette colors onto walls, furniture, skin tones, or natural surroundings.`,
+          `The environment should look like a real professional photo, with palette colors appearing only in designed graphic elements (cards, badges, CTA buttons, text containers).`,
+          campaign?.design_language ? `Design Language: ${campaign.design_language}.` : '',
+        ].filter(Boolean).join(' ')
+      : [
+          `CAMPAIGN COLOR PALETTE: "${colorPalette.name}" — ${colorPalette.colors.join(', ')}.`,
+          `Use these colors for backgrounds, gradients, cards, text, accents. Build the entire composition from this palette.`,
+          campaign?.design_language ? `Design Language: ${campaign.design_language}.` : '',
+        ].filter(Boolean).join(' ')
 
     const commercialBlocks = Array.isArray(card.commercial_blocks) && card.commercial_blocks.length > 0
-      ? `Commercial blocks to include: ${card.commercial_blocks.join(', ')}. Use premium rounded cards with soft shadows for each block.`
+      ? `Commercial blocks: ${card.commercial_blocks.join(', ')}. Use premium rounded cards with soft shadows in the campaign color palette.`
+      : ''
+
+    const distinctNote = card.distinct_from_other_cards
+      ? `This card differs from others in the campaign: ${card.distinct_from_other_cards}.`
       : ''
 
     const designDecisions = [
+      colorInstruction,
+      `CAMPAIGN SHARED IDENTITY — Lighting: ${lightingItem?.prompt_fragment || sharedVt.lighting}.`,
+      `CAMPAIGN SHARED IDENTITY — Background: ${bgItem?.prompt_fragment || sharedVt.background_style}.`,
+      `CAMPAIGN SHARED IDENTITY — Mood: ${moodItem?.prompt_fragment || sharedVt.mood}.`,
       `ADVERTISING ROLE: ${card.role}. ${ROLE_DESCRIPTIONS[card.role as CardRole] || card.role}.`,
       `Creative Style: ${cardCs.name}. ${cardCs.prompt_fragment}`,
       `Marketing Style: ${cardMs.name}. ${cardMs.prompt_fragment}`,
-      `Visual Theme — Lighting: ${lightingItem?.prompt_fragment || cardVt.lighting}.`,
-      `Visual Theme — Background: ${bgItem?.prompt_fragment || cardVt.background_style}.`,
-      `Visual Theme — Mood: ${moodItem?.prompt_fragment || cardVt.mood}.`,
       commercialBlocks,
+      distinctNote,
       card.layout ? `Layout: ${card.layout}.` : '',
       card.product_position ? `Product position: ${card.product_position}.` : '',
       card.background ? `Environment: ${card.background}.` : '',
@@ -643,7 +809,7 @@ export async function planCardPrompts(
     ].filter(Boolean).join(' ')
 
     const textInstruction = card.text_overlay_az.length > 0
-      ? `Render this text on the image inside rounded commercial blocks: ${card.text_overlay_az.join(' — ')}.`
+      ? `Render this text on the image inside rounded commercial blocks (use palette colors): ${card.text_overlay_az.join(' — ')}.`
       : ''
 
     card.prompt_en = [
@@ -654,10 +820,10 @@ export async function planCardPrompts(
     ].filter(Boolean).join(' ')
   }
 
-  // Clean cards — только нужное для генерации
+  // Clean cards
   const cleanCards = parsed.cards.map(c => ({
     index: c.index,
-    role: (c.role || roles[c.index - 1]) as CardRole,
+    role: (c.role || triad.roles[c.index - 1]) as CardRole,
     prompt_en: c.prompt_en,
     text_overlay_az: c.text_overlay_az,
     needs_model: c.needs_model,
@@ -665,14 +831,16 @@ export async function planCardPrompts(
     reference_weight: c.role === 'hero' ? 0.7 : c.needs_model ? 0.5 : 0.7,
     creative_style: c.creative_style || cs[c.index - 1].id,
     marketing_style: c.marketing_style || ms[c.index - 1].id,
-    visual_theme: c.visual_theme || vt[c.index - 1],
+    visual_theme: sharedVt,                            // ОБЩИЙ на все
+    color_palette: colorPalette.colors,                  // ОБЩАЯ на все
   }))
 
   return {
     style_name: cs.map(s => s.id).join('+'),
-    roles: roles,
+    roles: triad.roles,
     marketing_styles: ms.map(s => s.id),
-    visual_themes: vt,
+    visual_theme: sharedVt,                              // один объект
+    color_palette: colorPalette.colors,                   // один массив
     cards: cleanCards,
   }
 }

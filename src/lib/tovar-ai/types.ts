@@ -63,6 +63,13 @@ export type CardRole =
   | 'dimensions' | 'power' | 'premium' | 'review' | 'gift'
   | 'new_arrival' | 'best_seller'
 
+/** Общий визуальный стиль кампании (один на все карточки) */
+export interface VisualTheme {
+  lighting: string // soft_studio, dramatic_spotlight, natural_daylight, ...
+  background_style: string // pure_white, premium_gradient, marble_surface, ...
+  mood: string // minimal_luxury, editorial_vogue, tech_innovation, ...
+}
+
 export interface CardPrompt {
   index: number // 1, 2, 3
   role: CardRole // рекламная роль карточки
@@ -74,18 +81,16 @@ export interface CardPrompt {
   // 3-слойная система стилей
   creative_style: string // cs01..cs40 — ЧТО в кадре
   marketing_style: string // ms01..ms30 — КАКОЕ сообщение
-  visual_theme: {
-    lighting: string // soft_studio, dramatic_spotlight, natural_daylight, ...
-    background_style: string // pure_white, premium_gradient, marble_surface, ...
-    mood: string // minimal_luxury, editorial_vogue, tech_innovation, ...
-  }
+  visual_theme: VisualTheme // ОБЩИЙ на всю кампанию (одинаковый для всех карточек)
+  color_palette: string[] // ["#1A1A2E", "#E94560", ...] общая палитра кампании
 }
 
 export interface PromptsOutput {
   style_name: string // строка с выбранными стилями: "cs01+cs07+cs10"
   roles: CardRole[] // выбранные роли для каждой карточки
   marketing_styles: string[] // ms01, ms07, ms03
-  visual_themes: Array<{ lighting: string; background_style: string; mood: string }>
+  visual_theme: VisualTheme // ОДИН на всю кампанию (Brand Identity Lock)
+  color_palette: string[] // общая цветовая палитра кампании
   cards: CardPrompt[]
 }
 
