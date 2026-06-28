@@ -1,8 +1,9 @@
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { CATEGORIES } from '@/constants/data'
-import { deleteCategory, saveCategory } from '@/lib/actions'
+import { saveCategory } from '@/lib/actions'
 import { revalidatePath } from 'next/cache'
 import Link from 'next/link'
+import DeleteCategoryButton from './delete-button'
 
 export const dynamic = 'force-dynamic'
 
@@ -118,16 +119,7 @@ export default async function AdminCategoriesPage() {
                       <CategoryForm cats={cats} existing={cat} />
                     </div>
                   </details>
-                  <form action={deleteCategory} className="inline ml-2">
-                    <input type="hidden" name="id" value={cat.id} />
-                    <button
-                      type="submit"
-                      className="text-xs text-red-500 hover:text-red-700 px-2 py-1"
-                      onClick={e => { if (!confirm('Silinsin?')) e.preventDefault() }}
-                    >
-                      Sil
-                    </button>
-                  </form>
+                  <DeleteCategoryButton id={cat.id} />
                 </td>
               </tr>
             ))}
