@@ -8,18 +8,35 @@ import type { CardResult } from '@/lib/tovar-ai/types'
 
 // ─── Конфигурация ─────────────────────────────────────────────────────────────
 
-function getR2Config() {
+interface R2Config {
+  accountId: string
+  accessKey: string
+  secretKey: string
+  bucket: string
+  publicUrl: string
+}
+
+function getR2Config(): R2Config {
   const accountId = process.env.CLOUDFLARE_ACCOUNT_ID || ''
   const accessKey = process.env.CLOUDFLARE_R2_ACCESS_KEY || ''
   const secretKey = process.env.CLOUDFLARE_R2_SECRET_KEY || ''
   const bucket = process.env.CLOUDFLARE_R2_BUCKET || 'tapla-origin'
   const publicUrl = process.env.NEXT_PUBLIC_R2_PUBLIC_URL || ''
 
-  if (!accountId || !accessKey || !secretKey) {
+  const missing: string[] = []
+  if (!accountId) missing.push('CLOUDFLARE_ACCOUNT_ID')
+  if (!accessKey) missing.push('CLOUDFLARE_R2_ACCESS_KEY')
+  if (!secretKey) missing.push('CLOUDFLARE_R2_SECRET_KEY')
+
+  if (missing.length > 0) {
     throw new Error(
-      'R2 config missing. Set CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_R2_ACCESS_KEY, CLOUDFLARE_R2_SECRET_KEY in .env.local',
+      `[R2] Config error — missing env vars: ${missing.join(', ')}. Check .env.local`,
     )
   }
+
+  console.log(
+    `[R2] Config OK — account: ${accountId.slice(0, 8)}..., bucket: ${bucket}, publicUrl: ${publicUrl || '(dev mode)'}`,
+  )
 
   return { accountId, accessKey, secretKey, bucket, publicUrl }
 }
@@ -29,14 +46,20 @@ let _client: S3Client | null = null
 function getClient(): S3Client {
   if (_client) return _client
   const { accountId, accessKey, secretKey } = getR2Config()
+  const endpoint = `https://${accountId}.r2.cloudflarestorage.com`
+  console.log(`[R2] S3Client → endpoint: ${endpoint}`)
   _client = new S3Client({
     region: 'auto',
-    endpoint: `https://${accountId}.r2.cloudflarestorage.com`,
+    endpoint,
     credentials: {
       accessKeyId: accessKey,
       secretAccessKey: secretKey,
     },
-  })
+    // Добавляем таймаут чтобы не висеть вечно
+    requestHandler: {
+      requestTimeout: 30_000,
+    },
+  } as any)
   return _client
 }
 
@@ -47,16 +70,16 @@ function getClient(): S3Client {
  * Если задан NEXT_PUBLIC_R2_PUBLIC_URL — используется он (напр. cdn.tapla.az).
  * Иначе формируется стандартный R2 dev URL.
  */
-export function getPublicUrl(key: string): string {
-  const { publicUrl, accountId, bucket } = (() => {
+function buildPublicUrl(key: string): string {
+  const { publicUrl, accountId } = (() => {
     try { return getR2Config() }
-    catch { return { publicUrl: '', accountId: '', bucket: 'tapla-origin' } as ReturnType<typeof getR2Config> }
+    catch { return { publicUrl: '', accountId: '' } as R2Config }
   })()
 
   if (publicUrl) {
     return `${publicUrl.replace(/\/$/, '')}/${key}`
   }
-  // Fallback: R2 dev URL (если publicUrl не задан)
+  // R2 dev URL (нужен dev-paid домен или custom domain)
   return `https://pub-${accountId}.r2.dev/${key}`
 }
 
@@ -65,8 +88,8 @@ export function getPublicUrl(key: string): string {
 /**
  * Загружает один файл (base64) в R2.
  *
- * @param base64  — содержимое файла в base64 (без data: префикса)
- * @param key     — путь в бакете (напр. "products/slug/card_1.png")
+ * @param base64      — содержимое файла в base64 (без data: префикса)
+ * @param key         — путь в бакете (напр. "products/slug/card_1.png")
  * @param contentType — MIME-тип (по умолч. image/png)
  * @returns публичный URL загруженного файла
  */
@@ -75,11 +98,19 @@ export async function uploadImage(
   key: string,
   contentType: string = 'image/png',
 ): Promise<string> {
+  const startTime = Date.now()
   const client = getClient()
   const { bucket } = getR2Config()
 
-  // Декодируем base64 → Buffer
+  // Валидация base64
+  if (!base64 || base64.length < 100) {
+    throw new Error(`[R2] Invalid base64 data for key "${key}": length=${base64?.length || 0}`)
+  }
+
+  console.log(`[R2] Uploading "${key}" — ${(base64.length / 1024).toFixed(0)} KB base64`)
+
   const buffer = Buffer.from(base64, 'base64')
+  console.log(`[R2] Decoded buffer: ${(buffer.length / 1024).toFixed(0)} KB`)
 
   const upload = new Upload({
     client,
@@ -92,32 +123,56 @@ export async function uploadImage(
     },
   })
 
-  await upload.done()
-  return getPublicUrl(key)
+  // Логируем прогресс
+  upload.on('httpUploadProgress', (progress) => {
+    if (progress.loaded && progress.total) {
+      console.log(`[R2] Progress "${key}": ${Math.round((progress.loaded / progress.total) * 100)}%`)
+    }
+  })
+
+  try {
+    const result = await upload.done()
+    const elapsed = Date.now() - startTime
+    const url = buildPublicUrl(key)
+    console.log(`[R2] ✅ Uploaded "${key}" in ${elapsed}ms → ${url}`)
+    console.log(`[R2]    Result: ${JSON.stringify({ bucket: result.Bucket, key: result.Key, location: result.Location })}`)
+    return url
+  } catch (err) {
+    const elapsed = Date.now() - startTime
+    const msg = err instanceof Error ? err.message : String(err)
+    console.error(`[R2] ❌ Upload FAILED "${key}" after ${elapsed}ms: ${msg}`)
+    throw new Error(`R2 upload failed for "${key}": ${msg}`)
+  }
 }
 
 /**
  * Загружает все сгенерированные карточки в R2.
  *
- * @param cards       — массив CardResult (с imageBase64)
- * @param productSlug — slug товара для пути (напр. "professionalnyy-fen-2000w")
- * @returns массив публичных URL (в порядке карточек)
+ * @returns массив публичных URL (в порядке индексов карточек 1..N)
  */
 export async function uploadCardImages(
   cards: CardResult[],
   productSlug: string,
 ): Promise<string[]> {
-  const urls: string[] = []
+  console.log(`[R2] Starting batch upload: ${cards.length} cards → products/${productSlug}/`)
 
-  // Загружаем параллельно — каждая карточка в своём файле
-  const uploads = cards.map(async (card, i) => {
+  const results: { index: number; url: string }[] = []
+
+  // Загружаем параллельно
+  const uploads = cards.map(async (card) => {
     const key = `products/${productSlug}/card_${card.index}_${card.role}.png`
+    console.log(`[R2]   Card ${card.index} (${card.role}) → ${key}`)
     const url = await uploadImage(card.imageBase64, key, 'image/png')
-    urls[i] = url
+    results.push({ index: card.index, url })
+    return url
   })
 
   await Promise.all(uploads)
-  return urls
+
+  // Сортируем по index и возвращаем URLs
+  const sorted = results.sort((a, b) => a.index - b.index).map(r => r.url)
+  console.log(`[R2] Batch upload complete: ${sorted.length} URLs → ${JSON.stringify(sorted)}`)
+  return sorted
 }
 
 /**
@@ -127,10 +182,12 @@ export async function deleteFromR2(key: string): Promise<void> {
   const client = getClient()
   const { bucket } = getR2Config()
 
+  console.log(`[R2] Deleting "${key}" from bucket "${bucket}"`)
   await client.send(
     new DeleteObjectCommand({
       Bucket: bucket,
       Key: key,
     }),
   )
+  console.log(`[R2] ✅ Deleted "${key}"`)
 }

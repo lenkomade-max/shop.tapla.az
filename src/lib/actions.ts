@@ -89,6 +89,7 @@ export async function saveProduct(formData: FormData): Promise<void> {
     rating: Number(formData.get('rating')) || 0,
     reviews_count: Number(formData.get('reviewsCount')) || 0,
     category: formData.get('category') || '',
+    category_id: formData.get('categoryId') || null,
     status: formData.get('status') || 'active',
     how_to_use: formData.get('howToUse') || '',
     ingredients: formData.get('ingredients') || null,
@@ -128,6 +129,8 @@ export async function createProductFromAI(
     subtitle: string
     description: string
     category: string
+    category_id?: string | null
+    category_slug?: string | null
     price: number
     benefits: string[]
     how_to_use: string
@@ -170,6 +173,7 @@ export async function createProductFromAI(
       subtitle: productData.subtitle,
       description: productData.description,
       category: productData.category,
+      category_id: productData.category_id || null,
       price: productData.price,
       status,
       benefits: productData.benefits,
@@ -192,6 +196,26 @@ export async function createProductFromAI(
   revalidatePath('/', 'layout')
 
   return (product as unknown as { id: string }).id
+}
+
+/**
+ * Возвращает список активных категорий (для селектора в формах).
+ * Доступно без авторизации (только чтение).
+ */
+export async function fetchActiveCategories(): Promise<
+  Array<{ id: string; slug: string; title: string; parent_id: string | null }>
+> {
+  const { data, error } = await supabaseAdmin
+    .from('categories')
+    .select('id, slug, title, parent_id')
+    .eq('status', 'active')
+    .order('sort_order', { ascending: true })
+
+  if (error) {
+    console.error('fetchActiveCategories error:', error)
+    return []
+  }
+  return (data as any[]) || []
 }
 
 /**

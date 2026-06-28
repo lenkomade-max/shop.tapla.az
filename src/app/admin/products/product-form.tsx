@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { saveProduct } from '@/lib/actions';
+import React, { useState, useEffect } from 'react';
+import { saveProduct, fetchActiveCategories } from '@/lib/actions';
 
 interface Props {
   product?: Record<string, unknown>;
@@ -23,6 +23,12 @@ export function ProductForm({ product, error }: Props) {
   const [subtitle, setSubtitle] = useState((product?.subtitle as string) || '');
   const [description, setDescription] = useState((product?.description as string) || '');
   const [category, setCategory] = useState((product?.category as string) || '');
+  const [categoryId, setCategoryId] = useState((product?.category_id as string) || '');
+  const [categories, setCategories] = useState<Array<{ id: string; slug: string; title: string; parent_id: string | null }>>([]);
+
+  useEffect(() => {
+    fetchActiveCategories().then(setCategories).catch(() => {})
+  }, [])
   const [howToUse, setHowToUse] = useState((product?.how_to_use as string) || '');
   const [ingredients, setIngredients] = useState((product?.ingredients as string) || '');
   const [supplierUrl, setSupplierUrl] = useState((product?.supplier_url as string) || '');
@@ -70,8 +76,35 @@ export function ProductForm({ product, error }: Props) {
           </div>
           <div>
             <label className="mb-1 block text-xs font-medium text-zinc-600">Категория</label>
-            <input name="category" value={category} onChange={e => setCategory(e.target.value)}
-              className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black" />
+            {categories.length > 0 ? (
+              <select
+                name="category"
+                value={categoryId || category}
+                onChange={e => {
+                  const selected = categories.find(c => c.id === e.target.value)
+                  if (selected) {
+                    setCategoryId(selected.id)
+                    setCategory(selected.title)
+                  } else {
+                    setCategory(e.target.value)
+                  }
+                }}
+                className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black bg-white"
+              >
+                <option value="">— Seçin —</option>
+                {categories.filter(c => !c.parent_id).map(root => (
+                  <optgroup key={root.id} label={root.title}>
+                    <option value={root.id}>{root.title}</option>
+                    {categories.filter(c => c.parent_id === root.id).map(sub => (
+                      <option key={sub.id} value={sub.id}>&nbsp;&nbsp;└ {sub.title}</option>
+                    ))}
+                  </optgroup>
+                ))}
+              </select>
+            ) : (
+              <input name="category" value={category} onChange={e => setCategory(e.target.value)}
+                className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black" />
+            )}
           </div>
           <div className="col-span-2">
             <label className="mb-1 block text-xs font-medium text-zinc-600">Подзаголовок</label>
@@ -172,6 +205,7 @@ export function ProductForm({ product, error }: Props) {
       {tags.filter(Boolean).map((v, i) => <input key={`tag-${i}`} type="hidden" name="tags" value={v} />)}
       <input type="hidden" name="shades" value={JSON.stringify(shades.filter(s => s.name))} />
       <input type="hidden" name="supplierUrl" value={supplierUrl} />
+      <input type="hidden" name="categoryId" value={categoryId} />
     </form>
   );
 }

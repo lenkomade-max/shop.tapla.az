@@ -93,6 +93,22 @@ export async function runTovarAIPipeline(
       console.log(
         `[Pipeline] Product mode — data prepared: "${productData.name}", cat: ${productData.category}`,
       )
+
+      // Матчинг AI-категории → БД categories
+      try {
+        const { matchCategoryFromAI } = await import('@/lib/supabase/categories')
+        const matched = await matchCategoryFromAI(productAnalysis.category)
+        if (matched) {
+          productData.category_id = matched.id
+          productData.category = matched.title     // точное название из БД
+          productData.category_slug = matched.slug
+          console.log(`[Pipeline] Category matched: "${productAnalysis.category}" → ${matched.title} (${matched.id})`)
+        } else {
+          console.log(`[Pipeline] Category NOT matched for: "${productAnalysis.category}" — adмин выберет вручную`)
+        }
+      } catch (catErr) {
+        console.warn('[Pipeline] Category matching skipped (DB error?):', catErr instanceof Error ? catErr.message : String(catErr))
+      }
     }
 
     // ─── STAGE 2: Prompt Planning ────────────────────────────────────
@@ -125,19 +141,11 @@ export async function runTovarAIPipeline(
       throw new Error('All card generations failed')
     }
 
-    // В product mode: загружаем карточки в R2
+    // В product mode: загружаем карточки в R2 (обязательно)
     if (isProductMode && productData) {
-      try {
-        const { uploadCardImages } = await import('@/lib/r2/upload')
-        imageUrls = await uploadCardImages(cards, productData.slug)
-        console.log(`[Pipeline] R2 upload ✅ — ${imageUrls.length} cards uploaded`)
-      } catch (r2Err) {
-        console.warn(
-          '[Pipeline] ⚠️ R2 upload failed, continuing without R2 URLs:',
-          r2Err instanceof Error ? r2Err.message : String(r2Err),
-        )
-        // Не фейлим пайплайн — карточки доступны как base64
-      }
+      const { uploadCardImages } = await import('@/lib/r2/upload')
+      imageUrls = await uploadCardImages(cards, productData.slug)
+      console.log(`[Pipeline] R2 upload ✅ — ${imageUrls.length} cards uploaded`)
     }
 
     // ─── STAGE 4: Quality Check ──────────────────────────────────────

@@ -1,11 +1,11 @@
 'use client'
 
-import React, { useState, useCallback, useRef, DragEvent } from 'react'
+import React, { useState, useCallback, useRef, DragEvent, useEffect } from 'react'
 import {
   Loader2, CheckCircle2, XCircle, Upload, RefreshCw,
   Download, X, RotateCcw, Sparkles, ShoppingBag
 } from 'lucide-react'
-import { createProductFromAI, publishProduct } from '@/lib/actions'
+import { createProductFromAI, publishProduct, fetchActiveCategories } from '@/lib/actions'
 import type { ProductDraftData } from '@/lib/tovar-ai'
 
 type Stage = 'idle' | 'uploading' | 'analyzing' | 'planning' | 'generating' | 'done' | 'error'
@@ -121,6 +121,12 @@ export default function TovarAIPage() {
   const [imageUrls, setImageUrls] = useState<string[] | null>(null)
   const [savedProductId, setSavedProductId] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
+  const [categories, setCategories] = useState<Array<{ id: string; slug: string; title: string; parent_id: string | null }>>([])
+
+  // Загружаем категории при монтировании
+  useEffect(() => {
+    fetchActiveCategories().then(setCategories).catch(() => {})
+  }, [])
 
   // ─── Drag & Drop ──────────────────────────────────────────────────────
 
@@ -686,11 +692,51 @@ export default function TovarAIPage() {
                 {/* Категория */}
                 <div>
                   <label className="mb-1 block text-xs font-medium text-zinc-600">Kateqoriya</label>
-                  <input
-                    value={productData.category}
-                    onChange={e => updateProductField('category', e.target.value)}
-                    className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black"
-                  />
+                  {categories.length > 0 ? (
+                    <select
+                      value={productData.category_id || productData.category}
+                      onChange={e => {
+                        const selected = categories.find(c => c.id === e.target.value || c.slug === e.target.value)
+                        if (selected) {
+                          updateProductField('category_id', selected.id)
+                          updateProductField('category', selected.title)
+                          updateProductField('category_slug', selected.slug)
+                        } else {
+                          updateProductField('category', e.target.value)
+                        }
+                      }}
+                      className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black bg-white"
+                    >
+                      <option value="">— Kateqoriya seçin —</option>
+                      {categories.filter(c => !c.parent_id).map(root => (
+                        <optgroup key={root.id} label={root.title}>
+                          <option value={root.id}>{root.title} (ümumi)</option>
+                          {categories.filter(c => c.parent_id === root.id).map(sub => (
+                            <option key={sub.id} value={sub.id}>
+                              &nbsp;&nbsp;└ {sub.title}
+                            </option>
+                          ))}
+                        </optgroup>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      value={productData.category}
+                      onChange={e => updateProductField('category', e.target.value)}
+                      placeholder={productData.category}
+                      className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black"
+                    />
+                  )}
+                  {productData.category_id && categories.length > 0 && (
+                    <p className="mt-1 text-xs text-green-600">
+                      ✓ {categories.find(c => c.id === productData.category_id)?.title || 'Kateqoriya seçildi'}
+                    </p>
+                  )}
+                  {!productData.category_id && categories.length > 0 && (
+                    <p className="mt-1 text-xs text-amber-600">
+                      ⚠ AI kateqoriyanı tapa bilmədi, əl ilə seçin
+                    </p>
+                  )}
                 </div>
 
                 {/* Описание */}

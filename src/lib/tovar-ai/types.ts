@@ -175,6 +175,8 @@ export interface ProductDraftData {
   subtitle: string
   description: string
   category: string
+  category_id?: string | null     // UUID ссылка на categories.id
+  category_slug?: string | null   // slug категории (для URL)
   price: number
   benefits: string[]
   how_to_use: string
