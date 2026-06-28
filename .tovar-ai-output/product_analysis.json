@@ -1,62 +1,66 @@
 {
-  "product_type": "massajer",
-  "category": "Kosmetika",
-  "subcategory": "Üz massajeri",
-  "brand": null,
-  "model": null,
-  "logo_visible": false,
-  "inscriptions": [],
+  "product_type": "kamera",
+  "category": "Elektronika",
+  "subcategory": "İnstant kamera",
+  "brand": "Polaroid",
+  "model": "OneStep 2",
+  "logo_visible": true,
+  "inscriptions": [
+    "Polaroid",
+    "OneStep 2",
+    "I-TYPE CAMERA"
+  ],
   "primary_color": "white",
   "secondary_colors": [
-    "purple"
+    "black",
+    "red"
   ],
-  "finish": "parlaq",
-  "shape": "erqonomik, T-şəkilli",
+  "finish": "mat",
+  "shape": "rectangular with rounded edges",
   "material": "ABS-plastik",
   "texture": "hamar",
-  "dimensions_estimated": "təxminən 15×8×5 sm",
+  "dimensions_estimated": "təxminən 12×11×10 sm",
   "construction_features": [
-    "erqonomik tutacaq",
-    "LED işıq paneli"
+    "inteqrasiya olunmuş flaş",
+    "film çıxış yuvası",
+    "vizor"
   ],
   "controls": [
     "düymə"
   ],
   "buttons": [
-    "power"
+    "shutter button"
   ],
   "ports": [],
   "display": null,
-  "indicators": [
-    "bənövşəyi LED işığı"
-  ],
+  "indicators": [],
   "package_contents": [
-    "üz massajeri"
+    "kamera"
   ],
   "accessories": [],
   "possible_functions": [
-    "üz massajı",
-    "LED terapiyası",
-    "qırışların azaldılması",
-    "dəri gərilməsi"
+    "şəkil çəkmək",
+    "ani çap",
+    "flaş istifadəsi"
   ],
-  "intended_use": "üz dərisini massaj etmək və LED terapiyası ilə baxım etmək üçün",
+  "intended_use": "anı dondurmaq və dərhal fotoşəkil əldə etmək üçün",
   "needs_human_model": true,
   "needs_lifestyle_scene": true,
   "recommended_scenes": [
-    "vanna otağı",
-    "yataq otağı",
-    "kosmetologiya salonu"
+    "salon",
+    "səyahət",
+    "parti",
+    "park"
   ],
   "needs_macro_shots": true,
-  "needs_size_comparison": true,
+  "needs_size_comparison": false,
   "needs_exploded_view": false,
-  "target_audience": "qadınlar 18-60",
+  "target_audience": "gənclər, foto həvəskarlar, kreativ insanlar",
   "key_selling_points": [
-    "Bənövşəyi LED terapiyası",
-    "Erqonomik dizayn",
-    "Asan tək düyməli idarəetmə",
-    "Kompakt və portativ"
+    "Klassik Polaroid dizaynı",
+    "İnstant çap imkanı",
+    "İstifadəsi asan",
+    "İkonik retro görünüş"
   ],
   "premium_level": "mid"
 }

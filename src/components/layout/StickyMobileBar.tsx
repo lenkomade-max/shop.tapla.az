@@ -18,7 +18,7 @@ export function StickyMobileBar() {
   }, []);
 
   const handleSupportClick = () => {
-    alert('TAPLA MARKETPLACE Müştəri Xidmətləri: WhatsApp (+994 55 123-45-67) və ya Onlayn Çat vasitəsilə 24/7 xidmətinizdəyik!');
+    alert('TAPLA MARKETPLACE Müştəri Xidmətləri: WhatsApp (+994702453060) və ya Onlayn Çat vasitəsilə 24/7 xidmətinizdəyik!');
   };
 
   const handleDiscountClick = () => {

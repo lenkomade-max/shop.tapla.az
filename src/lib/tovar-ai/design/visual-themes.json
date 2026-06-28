@@ -1,6 +1,6 @@
 {
-  "description": "Visual Themes — HOW the image looks. Lighting, background style, and mood define the aesthetic treatment.",
-  "rule": "Pick ONE lighting, ONE background style, and ONE mood per card. They must work together harmoniously and support the chosen Creative Style and Marketing Style.",
+  "description": "Visual Themes — HOW the image looks. Lighting, background style, mood, materials, spatial depth, and motion define the complete artistic direction.",
+  "rule": "Pick ONE lighting, ONE background style, ONE mood, 1-2 materials, 1-2 spatial depth techniques, and 1 motion type per card. They must work together harmoniously and support the product category. Use category_matching for guidance.",
   "lighting": [
     {
       "id": "soft_studio",
@@ -174,5 +174,280 @@
       "description": "Contemporary modern design. Sleek surfaces. Urban sophistication.",
       "prompt_fragment": "Modern sleek mood. Contemporary design aesthetic with smooth surfaces and clean geometry. Urban sophistication. The mood communicates current design trends and metropolitan taste."
     }
-  ]
+  ],
+  "materials": [
+    {
+      "id": "matte_glass",
+      "name": "Matte Frosted Glass",
+      "description": "Frosted matte glass panels and surfaces. Soft diffused transparency. Modern premium look.",
+      "prompt_fragment": "Matte frosted glass elements in the background — semi-transparent glass panels with soft blurred edges. Glassmorphism design aesthetic. Sophisticated modern look.",
+      "best_for": ["electronics", "premium", "beauty", "modern"]
+    },
+    {
+      "id": "clear_acrylic",
+      "name": "Clear Acrylic",
+      "description": "Transparent acrylic plates and pedestals. Crystal-clear precision. High-end retail display quality.",
+      "prompt_fragment": "Clear transparent acrylic surfaces and pedestals. Crystal-clear like museum display quality. Light passes through creating subtle refractions. Premium retail display aesthetic.",
+      "best_for": ["electronics", "beauty", "luxury", "jewelry"]
+    },
+    {
+      "id": "brushed_chrome",
+      "name": "Brushed Chrome",
+      "description": "Brushed chrome and polished metal surfaces. Cool reflective tones. Technology and automotive feel.",
+      "prompt_fragment": "Brushed chrome and polished metal background elements. Cool silver-blue reflective surfaces. Technology and precision engineering feel. Light catches the metal grain creating subtle linear highlights.",
+      "best_for": ["electronics", "automotive", "tools", "technology"]
+    },
+    {
+      "id": "liquid_metal",
+      "name": "Liquid Metal",
+      "description": "Flowing liquid metal forms. Organic metallic curves. Futuristic premium.",
+      "prompt_fragment": "Liquid metal flowing forms — organic metallic curves that look like mercury frozen in motion. Futuristic premium aesthetic. The metal appears to flow and ripple creating mesmerizing reflections.",
+      "best_for": ["electronics", "premium", "technology", "sports"]
+    },
+    {
+      "id": "carbon_fiber",
+      "name": "Carbon Fiber",
+      "description": "Carbon fiber texture and weave pattern. Motorsport heritage. High-performance feel.",
+      "prompt_fragment": "Carbon fiber textured surfaces with visible weave pattern. Dark charcoal with subtle grid texture. Motorsport and high-performance engineering feel. Lightweight strength aesthetic.",
+      "best_for": ["electronics", "automotive", "sports", "technology"]
+    },
+    {
+      "id": "satin_fabric",
+      "name": "Satin Fabric",
+      "description": "Soft satin fabric draping. Silk-like smooth surface. Beauty and fashion products.",
+      "prompt_fragment": "Soft satin fabric draped elegantly in the background. Silk-like smooth surface catching soft highlights. Luxury fashion and beauty product feel. The fabric folds create natural gentle shadow gradients.",
+      "best_for": ["beauty", "fashion", "cosmetics", "luxury"]
+    },
+    {
+      "id": "polished_aluminum",
+      "name": "Polished Aluminum",
+      "description": "Polished aluminum surfaces. Clean industrial precision. Apple-like design language.",
+      "prompt_fragment": "Polished aluminum surfaces with clean precision-machined edges. Apple-design-language aesthetic. Silver-white metallic with subtle warm undertone. Modern industrial elegance.",
+      "best_for": ["electronics", "kitchen", "technology", "office"]
+    },
+    {
+      "id": "ceramic",
+      "name": "Premium Ceramic",
+      "description": "Smooth ceramic surfaces. Pure white or dark matte. Spa and bathroom luxury.",
+      "prompt_fragment": "Smooth premium ceramic surfaces — pure white or deep matte black. Spa-like luxury feel. The ceramic has a subtle organic warmth despite being perfectly smooth. High-end bathroom and wellness aesthetic.",
+      "best_for": ["beauty", "bathroom", "kitchen", "home"]
+    },
+    {
+      "id": "glossy_lacquer",
+      "name": "Glossy Lacquer",
+      "description": "High-gloss lacquered surfaces. Mirror-like reflections. Luxury retail and cosmetics.",
+      "prompt_fragment": "High-gloss lacquered surfaces with mirror-like reflections. Deep rich color with wet-look shine. Luxury cosmetics and premium retail display aesthetic. The gloss creates dramatic light reflections.",
+      "best_for": ["beauty", "cosmetics", "luxury", "fashion"]
+    },
+    {
+      "id": "natural_stone",
+      "name": "Natural Stone",
+      "description": "Raw or polished natural stone. Granite, slate, travertine. Earthy premium.",
+      "prompt_fragment": "Natural stone surfaces — granite, slate, or travertine. Raw or lightly polished. Earthy premium aesthetic with natural color variation and texture. The stone communicates permanence and natural quality.",
+      "best_for": ["kitchen", "home", "outdoor", "premium"]
+    },
+    {
+      "id": "walnut_wood",
+      "name": "Rich Walnut Wood",
+      "description": "Dark rich walnut wood. Visible grain. Warm premium. Craftsmanship and heritage.",
+      "prompt_fragment": "Rich dark walnut wood surface with visible organic grain. Warm brown tones. Heritage craftsmanship feel. The wood communicates quality, tradition, and natural authenticity. Workshop-to-showroom aesthetic.",
+      "best_for": ["kitchen", "home", "office", "premium"]
+    },
+    {
+      "id": "soft_rubber",
+      "name": "Soft-Touch Rubber",
+      "description": "Matte soft-touch rubber-like surfaces. Modern ergonomic feel. Sports and fitness.",
+      "prompt_fragment": "Matte soft-touch rubber-like background surfaces. Subtle slightly-textured matte finish. Modern ergonomic product feel. Sports, fitness, and active lifestyle aesthetic. The surface looks grippy and premium.",
+      "best_for": ["sports", "fitness", "outdoor", "electronics"]
+    }
+  ],
+  "spatial_depth": [
+    {
+      "id": "multi_layer_glass",
+      "name": "Multi-Layer Glass Panels",
+      "description": "Multiple semi-transparent glass panels at different depths. Glassmorphism depth effect.",
+      "prompt_fragment": "Multiple semi-transparent glass panels layered at different depths in the composition. Some closer, some further back. Each layer catches light differently. Glassmorphism depth effect — the image has clear foreground, midground, and background separation through transparent surfaces."
+    },
+    {
+      "id": "volumetric_light",
+      "name": "Volumetric Light Rays",
+      "description": "Visible light rays cutting through space. Volumetric god rays. Cinematic depth.",
+      "prompt_fragment": "Visible volumetric light rays cutting diagonally through the composition. Cinematic god rays creating depth layers. Light becomes a physical element in the scene. The rays separate foreground from background dramatically."
+    },
+    {
+      "id": "floating_geometric",
+      "name": "Floating Geometric Forms",
+      "description": "Large abstract geometric shapes floating at different depths. Premium advertising poster feel.",
+      "prompt_fragment": "Large abstract geometric shapes (rings, circles, soft cubes) floating at different depths in the composition. Some in sharp focus near the product, others softly blurred in the background. Premium advertising poster depth. The shapes create a rich spatial environment without distracting from the product."
+    },
+    {
+      "id": "liquid_abstract_forms",
+      "name": "Liquid Abstract Forms",
+      "description": "Flowing liquid-like abstract shapes. Organic waves and curves. Modern artistic depth.",
+      "prompt_fragment": "Flowing liquid-like abstract forms and organic waves curving through the composition at different depths. Soft gradient colors. Modern artistic depth — the forms create a sense of flowing space around the product. Beauty and premium aesthetic."
+    },
+    {
+      "id": "neon_glow_depth",
+      "name": "Neon Glow Lines",
+      "description": "Thin neon-like glowing lines at different depths. Technology and modern aesthetic.",
+      "prompt_fragment": "Thin neon-like glowing lines running through the composition at different depth planes. Some lines sharp, others softly glowing and blurred. Technology and modern electronic aesthetic. The glowing lines create a futuristic spatial grid that adds depth without clutter."
+    },
+    {
+      "id": "soft_mist_layers",
+      "name": "Soft Mist / Fog Layers",
+      "description": "Layers of soft atmospheric mist separating depth planes. Dreamy premium look.",
+      "prompt_fragment": "Layers of soft atmospheric mist or fog separating different depth planes in the composition. The mist creates natural depth separation — foreground sharp, midground softened by light haze, background dreamy and atmospheric. Premium cinematic depth."
+    },
+    {
+      "id": "acrylic_light_halos",
+      "name": "Acrylic Light Halos",
+      "description": "Soft luminous halos behind or around the product. Acrylic panel glow. Premium spotlight effect.",
+      "prompt_fragment": "Soft luminous light halos behind and around the product — like light passing through frosted acrylic panels. The halos create a natural spotlight effect that separates the product from the background with glowing depth. Premium commercial advertising look."
+    },
+    {
+      "id": "reflection_infinity",
+      "name": "Infinite Reflection Floor",
+      "description": "Highly reflective floor surface creating mirror reflections. Infinity pool effect. Luxury depth.",
+      "prompt_fragment": "Highly reflective floor surface beneath the product creating a mirror-like reflection extending downward. The reflection creates an infinity-pool depth effect — the product appears to float above its own reflection. Luxury commercial photography depth."
+    },
+    {
+      "id": "particle_atmosphere",
+      "name": "Particle Atmosphere",
+      "description": "Tiny floating particles suspended in space at various depths. Dust motes, sparkles, or light fragments.",
+      "prompt_fragment": "Tiny floating particles suspended throughout the composition at various depths — some sharp and near, others tiny and distant. Dust motes catching light, subtle sparkles, or light fragments. The particles reveal the depth of the space and add cinematic atmosphere."
+    }
+  ],
+  "motion": [
+    {
+      "id": "dynamic_diagonals",
+      "name": "Dynamic Diagonal Lines",
+      "description": "Strong diagonal composition lines creating forward energy. Sport and action feel.",
+      "prompt_fragment": "Strong diagonal composition lines running through the image — from bottom-left to top-right or vice versa. These diagonals create a sense of forward momentum and dynamic energy. Even though the product is static, the surrounding composition feels alive and moving."
+    },
+    {
+      "id": "floating_ascending",
+      "name": "Floating Ascending Elements",
+      "description": "Small decorative elements floating upward as if lifted by gentle wind. Magical premium feel.",
+      "prompt_fragment": "Small decorative elements (light fragments, subtle sparkles, tiny geometric shapes) floating gently upward around the product as if lifted by an invisible breeze. The ascending motion creates a magical premium feeling — the product appears light, desirable, elevated above the ordinary."
+    },
+    {
+      "id": "frozen_motion",
+      "name": "Frozen Motion Moment",
+      "description": "Elements caught mid-motion — water droplets, particles, fabric. High-speed photography feel.",
+      "prompt_fragment": "Elements caught frozen mid-motion — water droplets suspended in air, fabric mid-sway, particles stopped at peak action. High-speed photography aesthetic. The frozen moment creates tension and energy — the viewer senses the motion even though the image is still."
+    },
+    {
+      "id": "swirling_flow",
+      "name": "Swirling Flow",
+      "description": "Soft swirling energy lines wrapping around the product. Fluid dynamic movement.",
+      "prompt_fragment": "Soft swirling energy lines or light trails wrapping gently around and behind the product in a fluid spiral pattern. The swirls create a sense of flowing energy and dynamic movement. The product sits at the calm center of an energetic vortex. Beauty and premium aesthetic."
+    },
+    {
+      "id": "radial_burst",
+      "name": "Radial Burst",
+      "description": "Lines and elements radiating outward from the product center. Explosive energy.",
+      "prompt_fragment": "Subtle lines and light elements radiating outward from the product as the center point. A controlled radial burst of energy — not chaotic but directed. The product appears to emit power and presence. Technology and premium sports aesthetic."
+    },
+    {
+      "id": "gentle_drift",
+      "name": "Gentle Drift",
+      "description": "Very subtle slow drift feeling. Elements barely moving. Calm premium atmosphere.",
+      "prompt_fragment": "Very subtle gentle drift feeling — elements barely shifting as if in slow motion underwater. Calm, peaceful movement. The product sits in perfect stillness while the surrounding atmosphere drifts slowly. Luxury spa and wellness aesthetic."
+    },
+    {
+      "id": "wave_pulse",
+      "name": "Wave Pulse",
+      "description": "Concentric wave rings emanating from the product. Sound-wave or water-ripple effect.",
+      "prompt_fragment": "Concentric wave rings or pulses emanating outward from the product — like sound waves or water ripples frozen in time. The waves create a sense of the product's presence spreading through space. Technology and audio product aesthetic."
+    },
+    {
+      "id": "still_precision",
+      "name": "Absolute Stillness",
+      "description": "No motion at all. Perfect stillness. Museum quality. The product commands complete silence.",
+      "prompt_fragment": "Absolute perfect stillness. No motion whatsoever. Museum-display quality where the product commands complete visual silence. The stillness itself communicates confidence and premium quality. Nothing moves because nothing needs to — the product speaks for itself."
+    }
+  ],
+  "category_matching": {
+    "Электроника": {
+      "lighting": ["rim_light", "dramatic_spotlight", "softbox_diffused"],
+      "background_style": ["dark_studio", "abstract_tech", "metal_surface", "glass_surface"],
+      "mood": ["tech_innovation", "modern_sleek", "minimal_luxury"],
+      "materials": ["brushed_chrome", "carbon_fiber", "polished_aluminum", "matte_glass", "liquid_metal"],
+      "spatial_depth": ["neon_glow_depth", "floating_geometric", "volumetric_light", "acrylic_light_halos"],
+      "motion": ["radial_burst", "frozen_motion", "dynamic_diagonals", "still_precision"],
+      "atmosphere": "Cool sophisticated technology atmosphere. Glass, metal, precision engineering. The product feels advanced, capable, and cutting-edge."
+    },
+    "Косметика": {
+      "lighting": ["soft_studio", "golden_hour", "softbox_diffused"],
+      "background_style": ["premium_gradient", "marble_surface", "editorial_backdrop", "glass_surface"],
+      "mood": ["editorial_vogue", "minimal_luxury", "classic_luxury", "warm_cozy"],
+      "materials": ["satin_fabric", "glossy_lacquer", "clear_acrylic", "ceramic", "matte_glass"],
+      "spatial_depth": ["liquid_abstract_forms", "soft_mist_layers", "acrylic_light_halos", "multi_layer_glass"],
+      "motion": ["swirling_flow", "floating_ascending", "gentle_drift", "frozen_motion"],
+      "atmosphere": "Soft luxurious beauty atmosphere. Liquid forms, silk-like materials, gentle diffused lighting. The product feels desirable, elegant, and transformative."
+    },
+    "Бытовая техника": {
+      "lighting": ["soft_studio", "softbox_diffused", "natural_daylight"],
+      "background_style": ["pure_white", "environmental", "wood_surface", "marble_surface"],
+      "mood": ["clean_clinical", "warm_cozy", "scandinavian", "modern_sleek"],
+      "materials": ["polished_aluminum", "ceramic", "walnut_wood", "natural_stone"],
+      "spatial_depth": ["reflection_infinity", "soft_mist_layers", "multi_layer_glass", "acrylic_light_halos"],
+      "motion": ["still_precision", "gentle_drift", "frozen_motion"],
+      "atmosphere": "Clean functional atmosphere. Polished surfaces, natural materials, organized precision. The product feels reliable, essential, and perfectly designed for daily life."
+    },
+    "Кухонные товары": {
+      "lighting": ["natural_daylight", "soft_studio", "golden_hour"],
+      "background_style": ["wood_surface", "marble_surface", "environmental", "natural_stone"],
+      "mood": ["warm_cozy", "scandinavian", "industrial_premium", "classic_luxury"],
+      "materials": ["walnut_wood", "natural_stone", "ceramic", "polished_aluminum"],
+      "spatial_depth": ["soft_mist_layers", "particle_atmosphere", "floating_geometric"],
+      "motion": ["gentle_drift", "floating_ascending", "still_precision"],
+      "atmosphere": "Warm inviting kitchen atmosphere. Natural wood, stone, ceramic. The product feels essential to a beautiful cooking experience. Home and hearth warmth."
+    },
+    "Спортивные товары": {
+      "lighting": ["high_contrast", "dramatic_spotlight", "rim_light"],
+      "background_style": ["dark_studio", "abstract_tech", "metal_surface"],
+      "mood": ["dynamic_action", "industrial_premium", "tech_innovation", "modern_sleek"],
+      "materials": ["carbon_fiber", "liquid_metal", "soft_rubber", "brushed_chrome"],
+      "spatial_depth": ["volumetric_light", "floating_geometric", "particle_atmosphere", "neon_glow_depth"],
+      "motion": ["dynamic_diagonals", "frozen_motion", "radial_burst", "wave_pulse"],
+      "atmosphere": "Energetic dynamic atmosphere. Carbon, rubber, metal. The product feels powerful, explosive, ready for action. Frozen at peak performance."
+    },
+    "Детские товары": {
+      "lighting": ["soft_studio", "natural_daylight", "softbox_diffused"],
+      "background_style": ["premium_gradient", "environmental", "editorial_backdrop"],
+      "mood": ["warm_cozy", "scandinavian", "modern_sleek"],
+      "materials": ["soft_rubber", "satin_fabric", "clear_acrylic", "glossy_lacquer"],
+      "spatial_depth": ["floating_geometric", "particle_atmosphere", "acrylic_light_halos", "soft_mist_layers"],
+      "motion": ["floating_ascending", "gentle_drift", "swirling_flow"],
+      "atmosphere": "Bright friendly atmosphere. Soft rounded forms, gentle colors, floating playful elements. The product feels safe, fun, and joy-bringing."
+    },
+    "Офисные товары": {
+      "lighting": ["softbox_diffused", "soft_studio", "natural_daylight"],
+      "background_style": ["pure_white", "wood_surface", "metal_surface", "glass_surface"],
+      "mood": ["clean_clinical", "modern_sleek", "scandinavian", "minimal_luxury"],
+      "materials": ["polished_aluminum", "matte_glass", "walnut_wood", "clear_acrylic"],
+      "spatial_depth": ["multi_layer_glass", "reflection_infinity", "acrylic_light_halos"],
+      "motion": ["still_precision", "gentle_drift"],
+      "atmosphere": "Clean professional atmosphere. Aluminum, glass, wood. The product feels productive, organized, and essential for modern work."
+    },
+    "Аксессуары": {
+      "lighting": ["soft_studio", "golden_hour", "softbox_diffused"],
+      "background_style": ["premium_gradient", "editorial_backdrop", "marble_surface", "glass_surface"],
+      "mood": ["minimal_luxury", "editorial_vogue", "modern_sleek", "classic_luxury"],
+      "materials": ["clear_acrylic", "satin_fabric", "matte_glass", "glossy_lacquer", "brushed_chrome"],
+      "spatial_depth": ["acrylic_light_halos", "reflection_infinity", "floating_geometric", "multi_layer_glass"],
+      "motion": ["floating_ascending", "gentle_drift", "still_precision"],
+      "atmosphere": "Premium accessory atmosphere. The product complements and enhances. Elegant supporting role with its own beauty. Fashion and lifestyle aesthetic."
+    },
+    "Автотовары": {
+      "lighting": ["high_contrast", "dramatic_spotlight", "rim_light"],
+      "background_style": ["dark_studio", "metal_surface", "abstract_tech"],
+      "mood": ["dynamic_action", "industrial_premium", "tech_innovation", "modern_sleek"],
+      "materials": ["carbon_fiber", "brushed_chrome", "liquid_metal", "polished_aluminum"],
+      "spatial_depth": ["volumetric_light", "neon_glow_depth", "particle_atmosphere", "floating_geometric"],
+      "motion": ["dynamic_diagonals", "radial_burst", "frozen_motion", "wave_pulse"],
+      "atmosphere": "Powerful automotive atmosphere. Chrome, carbon, metal. The product feels engineered for performance. Garage-to-track energy."
+    }
+  }
 }

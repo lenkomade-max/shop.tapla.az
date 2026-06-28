@@ -60,7 +60,7 @@ export function Footer() {
                 <li><Link href="#faq" className="hover:text-white transition-colors">Tez-tez Verilən Suallar</Link></li>
                 <li><Link href="#faq" className="hover:text-white transition-colors">Çatdırılma və Ödəniş</Link></li>
                 <li><Link href="#faq" className="hover:text-white transition-colors">2 İllik Zəmanət</Link></li>
-                <li><Link href="#faq" className="hover:text-white transition-colors">Qaytarılma Siyasəti</Link></li>
+                <li><Link href="/qaytarma-siyaseti" className="hover:text-white transition-colors">Qaytarılma Siyasəti</Link></li>
                 <li><Link href="#about" className="hover:text-white transition-colors">Dəstək Mərkəzi</Link></li>
               </ul>
             </div>
@@ -68,7 +68,7 @@ export function Footer() {
             <div className="space-y-4">
               <h5 className="text-[11px] font-semibold tracking-widest uppercase text-white">ƏLAQƏ & SATIŞ</h5>
               <ul className="space-y-2.5 text-xs text-neutral-400">
-                <li className="font-semibold text-white">+994 (55) 123-45-67</li>
+                <li className="font-semibold text-white">+994702453060</li>
                 <li className="text-neutral-500 text-[10px]">Dəstək saatı: 09:00 - 21:00 (Hər gün)</li>
                 <li><a href="mailto:support@tapla.az" className="hover:text-white transition-colors">support@tapla.az</a></li>
                 <li><Link href="#faq" className="hover:text-white transition-colors">Texniki Dəstək</Link></li>
@@ -183,10 +183,10 @@ export function Footer() {
 
         <div className="pt-8 mt-8 border-t border-neutral-900 flex flex-col md:flex-row items-center justify-between gap-4 text-[10px] text-neutral-500">
           <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-6 gap-y-2">
-            <span>&copy; {new Date().getFullYear()} TAPLA MARKETPLACE MMC. BÜTÜN HÜQUQLAR QORUNUR.</span>
-            <Link href="#" className="hover:text-white transition-colors">MƏXFİLİK SİYASƏTİ</Link>
-            <Link href="#" className="hover:text-white transition-colors">İSTİFADƏ ŞƏRTLƏRİ</Link>
-            <Link href="#" className="hover:text-white transition-colors">KUKİ Siyasəti</Link>
+            <span>&copy; {new Date().getFullYear()} TAPLA TECHNOLOGIES M.M.C. BÜTÜN HÜQUQLAR QORUNUR.</span>
+            <Link href="/mexfilik-siyaseti" className="hover:text-white transition-colors">MƏXFİLİK SİYASƏTİ</Link>
+            <Link href="/istifade-sertleri" className="hover:text-white transition-colors">İSTİFADƏ ŞƏRTLƏRİ</Link>
+            <Link href="/kuki-siyaseti" className="hover:text-white transition-colors">KUKİ Siyasəti</Link>
           </div>
 
           <div className="flex items-center space-x-1.5 text-[9px] text-neutral-600">

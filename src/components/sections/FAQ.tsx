@@ -95,7 +95,7 @@ export function FAQ({ faqs }: FAQProps) {
               >
                 <MessageSquare className="h-5 w-5 text-emerald-500 group-hover:scale-110 transition-transform duration-300" />
                 <span className="text-[10px] tracking-widest uppercase font-semibold">WHATSAPP ÇAT</span>
-                <span className="text-[9px] text-neutral-500 font-sans">+994 (55) 123-45-67</span>
+                <span className="text-[9px] text-neutral-500 font-sans">+994702453060</span>
               </a>
 
               <a

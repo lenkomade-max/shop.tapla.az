@@ -25,11 +25,23 @@ interface VisualThemeItem {
   id: string; name: string; description: string; prompt_fragment: string
 }
 
+interface MaterialItem { id: string; name: string; description: string; prompt_fragment: string; best_for: string[] }
+interface SpatialDepthItem { id: string; name: string; description: string; prompt_fragment: string }
+interface MotionItem { id: string; name: string; description: string; prompt_fragment: string }
+interface CategoryMatch {
+  lighting: string[]; background_style: string[]; mood: string[]
+  materials: string[]; spatial_depth: string[]; motion: string[]; atmosphere: string
+}
+
 interface VisualThemeCatalog {
   description: string; rule: string
   lighting: VisualThemeItem[]
   background_style: VisualThemeItem[]
   mood: VisualThemeItem[]
+  materials: MaterialItem[]
+  spatial_depth: SpatialDepthItem[]
+  motion: MotionItem[]
+  category_matching: Record<string, CategoryMatch>
 }
 
 // ─── КОМПЛЕМЕНТАРНЫЕ ТРИАДЫ РОЛЕЙ ──────────────────────────────────────────
@@ -85,27 +97,27 @@ const ROLE_TRIADS: RoleTriad[] = [
 
 // ─── ЦВЕТОВЫЕ ПАЛИТРЫ (по premium_level) ────────────────────────────────────
 
-const COLOR_PALETTES: Record<string, Array<{ name: string; colors: string[] }>> = {
+const COLOR_PALETTES: Record<string, Array<{ name: string; colors: string[]; atmosphere: string; best_for: string[] }>> = {
   luxury: [
-    { name: 'Dark Gold', colors: ['#0D0D0D', '#D4AF37', '#1A1A2E', '#FFFFFF', '#C9A84C'] },
-    { name: 'Midnight Sapphire', colors: ['#0A0E27', '#3B82F6', '#1E1B4B', '#F8FAFC', '#6366F1'] },
-    { name: 'Emerald Prestige', colors: ['#022C22', '#10B981', '#064E3B', '#F0FDF4', '#34D399'] },
-    { name: 'Platinum', colors: ['#18181B', '#E4E4E7', '#27272A', '#FAFAFA', '#A1A1AA'] },
+    { name: 'Dark Gold', colors: ['#0D0D0D', '#D4AF37', '#1A1A2E', '#FFFFFF', '#C9A84C'], atmosphere: 'Rich black with warm gold accents. Timeless luxury. Heritage and exclusivity.', best_for: ['luxury', 'premium accessories', 'jewelry', 'watches'] },
+    { name: 'Midnight Sapphire', colors: ['#0A0E27', '#3B82F6', '#1E1B4B', '#F8FAFC', '#6366F1'], atmosphere: 'Deep midnight blue with electric sapphire glow. Modern royalty. Confident and sophisticated.', best_for: ['premium electronics', 'luxury beauty', 'high-end tech'] },
+    { name: 'Emerald Prestige', colors: ['#022C22', '#10B981', '#064E3B', '#F0FDF4', '#34D399'], atmosphere: 'Deep emerald green with fresh mint highlights. Natural luxury. Organic premium.', best_for: ['luxury beauty', 'premium kitchen', 'wellness'] },
+    { name: 'Platinum', colors: ['#18181B', '#E4E4E7', '#27272A', '#FAFAFA', '#A1A1AA'], atmosphere: 'Monochromatic platinum and zinc. Understated extreme luxury. Quiet confidence.', best_for: ['premium electronics', 'luxury accessories', 'modern design'] },
   ],
   premium: [
-    { name: 'Electric Blue', colors: ['#0F172A', '#3B82F6', '#1E293B', '#FFFFFF', '#60A5FA'] },
-    { name: 'Crimson Bold', colors: ['#1C0000', '#DC2626', '#450A0A', '#FEF2F2', '#F87171'] },
-    { name: 'Violet Impact', colors: ['#1E1B4B', '#8B5CF6', '#2E1065', '#F5F3FF', '#A78BFA'] },
-    { name: 'Teal Modern', colors: ['#042F2E', '#14B8A6', '#134E4A', '#F0FDFA', '#5EEAD4'] },
+    { name: 'Electric Blue', colors: ['#0F172A', '#3B82F6', '#1E293B', '#FFFFFF', '#60A5FA'], atmosphere: 'Dark slate with electric blue energy. Bold and modern. Technology-forward.', best_for: ['electronics', 'technology', 'gaming', 'sports'] },
+    { name: 'Crimson Bold', colors: ['#1C0000', '#DC2626', '#450A0A', '#FEF2F2', '#F87171'], atmosphere: 'Deep crimson with vivid red impact. Powerful and passionate. Demands attention.', best_for: ['sports', 'automotive', 'premium beauty', 'gaming'] },
+    { name: 'Violet Impact', colors: ['#1E1B4B', '#8B5CF6', '#2E1065', '#F5F3FF', '#A78BFA'], atmosphere: 'Royal purple with soft violet glow. Creative premium. Imaginative and distinctive.', best_for: ['beauty', 'cosmetics', 'creative tools', 'lifestyle'] },
+    { name: 'Teal Modern', colors: ['#042F2E', '#14B8A6', '#134E4A', '#F0FDFA', '#5EEAD4'], atmosphere: 'Deep teal with bright aqua freshness. Modern sophistication. Clean and refreshing.', best_for: ['kitchen', 'home', 'wellness', 'beauty'] },
   ],
   mid: [
-    { name: 'Orange Fresh', colors: ['#1C1917', '#F97316', '#431407', '#FFF7ED', '#FB923C'] },
-    { name: 'Sky Blue', colors: ['#0C1929', '#0EA5E9', '#1E3A5F', '#F0F9FF', '#38BDF8'] },
-    { name: 'Green Natural', colors: ['#052E16', '#22C55E', '#14532D', '#F0FDF4', '#4ADE80'] },
+    { name: 'Orange Fresh', colors: ['#1C1917', '#F97316', '#431407', '#FFF7ED', '#FB923C'], atmosphere: 'Warm dark base with vibrant orange energy. Friendly and accessible. Energetic value.', best_for: ['kitchen', 'home', 'sports', 'outdoor'] },
+    { name: 'Sky Blue', colors: ['#0C1929', '#0EA5E9', '#1E3A5F', '#F0F9FF', '#38BDF8'], atmosphere: 'Deep navy with bright sky blue. Trustworthy and clean. Open and inviting.', best_for: ['electronics', 'office', 'home', 'kids'] },
+    { name: 'Green Natural', colors: ['#052E16', '#22C55E', '#14532D', '#F0FDF4', '#4ADE80'], atmosphere: 'Forest green with fresh natural green. Organic and healthy. Earth-connected.', best_for: ['kitchen', 'home', 'sports', 'outdoor', 'wellness'] },
   ],
   budget: [
-    { name: 'Clean Blue', colors: ['#1E293B', '#2563EB', '#1E40AF', '#EFF6FF', '#60A5FA'] },
-    { name: 'Warm Red', colors: ['#292524', '#EA580C', '#9A3412', '#FFF7ED', '#FB923C'] },
+    { name: 'Clean Blue', colors: ['#1E293B', '#2563EB', '#1E40AF', '#EFF6FF', '#60A5FA'], atmosphere: 'Solid dark blue with clean bright blue. Dependable and straightforward. Great value.', best_for: ['electronics', 'office', 'home', 'general'] },
+    { name: 'Warm Red', colors: ['#292524', '#EA580C', '#9A3412', '#FFF7ED', '#FB923C'], atmosphere: 'Warm dark with energetic orange-red. Attention-grabbing value. Bold and direct.', best_for: ['kitchen', 'home', 'sports', 'general'] },
   ],
 }
 
@@ -169,7 +181,8 @@ const ROLE_MARKETING_STYLES: Record<CardRole, string[]> = {
 
 // ─── РОЛЬ → VISUAL THEME (дефолт, будет переопределён общим кампанией) ─────
 
-const ROLE_VISUAL_THEMES: Record<CardRole, VisualTheme> = {
+// Роли задают только lighting/background_style/mood. Материалы/глубина/движение — из категории.
+const ROLE_VISUAL_THEMES: Record<CardRole, Pick<VisualTheme, 'lighting' | 'background_style' | 'mood'>> = {
   hero:         { lighting: 'soft_studio', background_style: 'premium_gradient', mood: 'minimal_luxury' },
   price:        { lighting: 'high_contrast', background_style: 'pure_white', mood: 'dynamic_action' },
   problem:      { lighting: 'dark_moody', background_style: 'environmental', mood: 'industrial_premium' },
@@ -438,7 +451,7 @@ Respond ONLY with the JSON.`
 function buildUserPrompt(
   triad: RoleTriad,
   cs: CreativeStyle[],
-  colorPalette: { name: string; colors: string[] },
+  colorPalette: { name: string; colors: string[]; atmosphere?: string },
   sharedVt: VisualTheme,
   analysis: VisionOutput,
   providerDescription?: string,
@@ -447,6 +460,10 @@ function buildUserPrompt(
   const CREATIVE_STYLES = loadCreativeStyles()
   const MARKETING_STYLES = loadMarketingStyles()
   const VISUAL_THEMES = loadVisualThemes()
+
+  // Category atmosphere — из category_matching
+  const categoryMatch = VISUAL_THEMES.category_matching?.[analysis.category]
+  const categoryAtmosphere = categoryMatch?.atmosphere || ''
 
   const DESIGN = {
     layouts: loadDesignLibrary('layouts.json'),
@@ -464,17 +481,26 @@ function buildUserPrompt(
     '## CAMPAIGN STRATEGY',
     `Triad: "${triad.name}" — ${triad.logic}`,
     '',
+    '## CATEGORY ARTISTIC DIRECTION',
+    `Product category: ${analysis.category}`,
+    categoryAtmosphere ? `Atmosphere: ${categoryAtmosphere}` : '',
+    'Use this artistic direction to guide ALL visual decisions — materials, lighting mood, spatial depth, and motion must feel coherent with this category.',
+    '',
     '## SHARED CAMPAIGN IDENTITY (applies to ALL 3 cards)',
     '',
     '### Color Palette (campaign-wide)',
     `Name: ${colorPalette.name}`,
     `Colors: ${JSON.stringify(colorPalette.colors)}`,
+    colorPalette.atmosphere ? `Palette Atmosphere: ${colorPalette.atmosphere}` : '',
     '',
     '### Shared Visual Theme',
     `Lighting: ${sharedVt.lighting}`,
     `Background Style: ${sharedVt.background_style}`,
     `Mood: ${sharedVt.mood}`,
-    'ALL 3 cards share this exact visual theme.',
+    `Scene Materials (use for backdrop/surfaces): ${sharedVt.materials.join(', ')}`,
+    `Spatial Depth (create layers with): ${sharedVt.spatial_depth.join(', ')}`,
+    `Motion Energy: ${sharedVt.motion}`,
+    'ALL 3 cards share this exact visual theme — same lighting, mood, materials, depth, and motion energy.',
     '',
     '## CARD ROLES (do NOT change)',
     `Card 1 — Role: "${triad.roles[0]}" → ${ROLE_DESCRIPTIONS[triad.roles[0]]}`,
@@ -493,6 +519,15 @@ function buildUserPrompt(
     '',
     '## LAYER 3 — Visual Theme Library (for reference)',
     JSON.stringify(VISUAL_THEMES, null, 2),
+    '',
+    '## SCENE MATERIALS (use these for backdrop construction, pedestals, surfaces)',
+    JSON.stringify(VISUAL_THEMES.materials, null, 2),
+    '',
+    '## SPATIAL DEPTH TECHNIQUES (how to create multi-layer depth in the image)',
+    JSON.stringify(VISUAL_THEMES.spatial_depth, null, 2),
+    '',
+    '## MOTION & DYNAMIC ENERGY (how to add movement around the static product)',
+    JSON.stringify(VISUAL_THEMES.motion, null, 2),
     '',
     '## SUPPORTING DESIGN LIBRARIES',
     '',
@@ -618,8 +653,19 @@ function selectTriad(vision: VisionOutput): RoleTriad {
 
 // ─── ВЫБОР ЦВЕТОВОЙ ПАЛИТРЫ ─────────────────────────────────────────────────
 
-function selectColorPalette(premiumLevel: string): { name: string; colors: string[] } {
+function selectColorPalette(premiumLevel: string, category?: string): { name: string; colors: string[]; atmosphere: string } {
   const palettes = COLOR_PALETTES[premiumLevel] || COLOR_PALETTES.mid
+
+  // Пробуем подобрать палитру под категорию товара
+  if (category) {
+    const matching = palettes.filter(p =>
+      p.best_for.some(c => category.toLowerCase().includes(c.toLowerCase()))
+    )
+    if (matching.length > 0) {
+      return matching[Math.floor(Math.random() * matching.length)]
+    }
+  }
+
   return palettes[Math.floor(Math.random() * palettes.length)]
 }
 
@@ -663,11 +709,38 @@ function pickMarketingStyleForRole(
 function pickSharedVisualTheme(
   triad: RoleTriad,
   vision: VisionOutput,
+  visualThemes: VisualThemeCatalog,
 ): VisualTheme {
-  // Берём Visual Theme от hero-роли (card 1) как якорь для всей кампании
-  // Если первая роль не hero, берём от самой «визуально тяжёлой» роли
+  // Role-based defaults
   const anchorRole = triad.roles[0]
-  return ROLE_VISUAL_THEMES[anchorRole] || { lighting: 'soft_studio', background_style: 'premium_gradient', mood: 'minimal_luxury' }
+  const roleDefaults = ROLE_VISUAL_THEMES[anchorRole] || {
+    lighting: 'soft_studio',
+    background_style: 'premium_gradient',
+    mood: 'minimal_luxury',
+  }
+
+  // Category matching
+  const cm = visualThemes.category_matching?.[vision.category]
+
+  // Lighting / background / mood: role default если есть в category списке, иначе random из category
+  const lighting = cm && cm.lighting.includes(roleDefaults.lighting)
+    ? roleDefaults.lighting
+    : (cm ? cm.lighting[Math.floor(Math.random() * cm.lighting.length)] : roleDefaults.lighting)
+
+  const background_style = cm && cm.background_style.includes(roleDefaults.background_style)
+    ? roleDefaults.background_style
+    : (cm ? cm.background_style[Math.floor(Math.random() * cm.background_style.length)] : roleDefaults.background_style)
+
+  const mood = cm && cm.mood.includes(roleDefaults.mood)
+    ? roleDefaults.mood
+    : (cm ? cm.mood[Math.floor(Math.random() * cm.mood.length)] : roleDefaults.mood)
+
+  // Materials (1-2), spatial depth (1-2), motion — из category matching
+  const materials = cm?.materials?.slice(0, 2) || ['matte_glass', 'polished_aluminum']
+  const spatial_depth = cm?.spatial_depth?.slice(0, 2) || ['acrylic_light_halos', 'volumetric_light']
+  const motion = cm?.motion?.[Math.floor(Math.random() * (cm.motion.length || 1))] || 'still_precision'
+
+  return { lighting, background_style, mood, materials, spatial_depth, motion }
 }
 
 // ─── MAIN ────────────────────────────────────────────────────────────────────
@@ -685,11 +758,11 @@ export async function planCardPrompts(
   // 1. Выбор триады (комплементарные роли)
   const triad = selectTriad(analysis)
 
-  // 2. Выбор ОБЩЕЙ цветовой палитры (одна на все карточки)
-  const colorPalette = selectColorPalette(analysis.premium_level)
+  // 2. Выбор ОБЩЕЙ цветовой палитры (одна на все карточки) — с учётом категории
+  const colorPalette = selectColorPalette(analysis.premium_level, analysis.category)
 
-  // 3. Выбор ОБЩЕГО Visual Theme (один на все карточки — Brand Identity Lock)
-  const sharedVt = pickSharedVisualTheme(triad, analysis)
+  // 3. Выбор ОБЩЕГО Visual Theme (один на все карточки — Brand Identity Lock) — с учётом категории
+  const sharedVt = pickSharedVisualTheme(triad, analysis, visualThemes)
 
   // 4. Creative Styles под роли (разные, не повторяются)
   const cs0 = pickCreativeStyleForRole(triad.roles[0], analysis, creativeStyles)
@@ -701,8 +774,9 @@ export async function planCardPrompts(
   const ms = triad.roles.map(r => pickMarketingStyleForRole(r, analysis, marketingStyles))
 
   console.log(`[Stage 2] Campaign Triad: "${triad.name}" — ${triad.logic}`)
-  console.log(`[Stage 2] Color Palette: "${colorPalette.name}" ${JSON.stringify(colorPalette.colors)}`)
+  console.log(`[Stage 2] Color Palette: "${colorPalette.name}" ${JSON.stringify(colorPalette.colors)} (${colorPalette.atmosphere})`)
   console.log(`[Stage 2] Shared Visual Theme: lighting=${sharedVt.lighting}, bg=${sharedVt.background_style}, mood=${sharedVt.mood}`)
+  console.log(`[Stage 2] Scene: materials=${sharedVt.materials.join('+')}, depth=${sharedVt.spatial_depth.join('+')}, motion=${sharedVt.motion}`)
   console.log(`[Stage 2] Roles: ${triad.roles.join(', ')}`)
   console.log(`[Stage 2] Creative Styles: ${cs.map((s, i) => `${i + 1}=${s.id}`).join(', ')}`)
 

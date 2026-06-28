@@ -356,7 +356,7 @@ export default function CheckoutPage() {
                           name="phone"
                           value={form.phone}
                           onChange={handleInputChange}
-                          placeholder="+994 (55) 123-45-67"
+                          placeholder="+994702453060"
                           className={`w-full bg-neutral-50 border ${formErrors.phone ? 'border-red-500' : 'border-neutral-200'} text-xs pl-10 pr-4 py-3 focus:outline-hidden focus:border-neutral-950 rounded-xl`}
                         />
                       </div>
