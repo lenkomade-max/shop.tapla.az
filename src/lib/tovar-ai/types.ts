@@ -55,9 +55,17 @@ export interface VisionOutput {
 
 // ─── Stage 2: Prompt Planner ────────────────────────────────────────────────
 
+/** Рекламная роль карточки — что она продаёт в этом креативе */
+export type CardRole =
+  | 'hero' | 'price' | 'problem' | 'solution' | 'benefits' | 'usage'
+  | 'lifestyle' | 'offer' | 'bundle' | 'delivery' | 'comparison' | 'quality'
+  | 'materials' | 'warranty' | 'accessories' | 'close_up' | 'cta'
+  | 'dimensions' | 'power' | 'premium' | 'review' | 'gift'
+  | 'new_arrival' | 'best_seller'
+
 export interface CardPrompt {
   index: number // 1, 2, 3
-  purpose: 'main_cover' | 'usage_demo' | 'features_detail'
+  role: CardRole // рекламная роль карточки
   prompt_en: string // полный промпт на английском для Nano Banana
   text_overlay_az: string[] // тексты для карточки на азербайджанском
   composition: string // описание композиции (layout)
@@ -75,6 +83,7 @@ export interface CardPrompt {
 
 export interface PromptsOutput {
   style_name: string // строка с выбранными стилями: "cs01+cs07+cs10"
+  roles: CardRole[] // выбранные роли для каждой карточки
   marketing_styles: string[] // ms01, ms07, ms03
   visual_themes: Array<{ lighting: string; background_style: string; mood: string }>
   cards: CardPrompt[]
@@ -84,7 +93,7 @@ export interface PromptsOutput {
 
 export interface CardResult {
   index: number
-  purpose: CardPrompt['purpose']
+  role: CardRole
   promptUsed: string
   imageBase64: string // base64-encoded PNG
   attempt: number // сколько попыток потребовалось
@@ -96,7 +105,7 @@ export interface QACheck {
   product_fidelity: boolean // товар выглядит как оригинал
   text_readable: boolean // текст читается и правильный
   no_hallucinations: boolean // нет лишних деталей
-  composition_ok: boolean // композиция соответствует purpose
+  composition_ok: boolean // композиция соответствует рекламной роли
   style_consistent: boolean // стиль совпадает с другими
 }
 

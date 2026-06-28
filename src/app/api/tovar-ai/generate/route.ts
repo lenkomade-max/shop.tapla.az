@@ -25,7 +25,7 @@ export async function POST(request: Request) {
       success: result.status === 'done',
       cards: result.cards.map(c => ({
         index: c.index,
-        purpose: c.purpose,
+        role: c.role,
         imageBase64: c.imageBase64,
         attempt: c.attempt,
       })),

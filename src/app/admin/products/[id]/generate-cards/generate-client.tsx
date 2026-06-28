@@ -7,7 +7,7 @@ type Stage = 'idle' | 'analyzing' | 'planning' | 'generating' | 'done' | 'error'
 
 interface CardData {
   index: number
-  purpose: string
+  role: string
   imageBase64: string
   attempt: number
 }
@@ -18,10 +18,14 @@ interface Props {
   mainImage: string | null
 }
 
-const PURPOSE_LABELS: Record<string, string> = {
-  main_cover: 'Əsas örtük',
-  usage_demo: 'İstifadə nümayişi',
-  features_detail: 'Xüsusiyyətlər',
+const ROLE_LABELS: Record<string, string> = {
+  hero: 'Hero', price: 'Qiymət', problem: 'Problem', solution: 'Həll',
+  benefits: 'Üstünlüklər', usage: 'İstifadə', lifestyle: 'Lifestyle',
+  offer: 'Təklif', bundle: 'Komplekt', delivery: 'Çatdırılma',
+  comparison: 'Müqayisə', quality: 'Keyfiyyət', materials: 'Materiallar',
+  warranty: 'Zəmanət', accessories: 'Aksessuarlar', close_up: 'Makro',
+  cta: 'CTA', dimensions: 'Ölçülər', power: 'Güc', premium: 'Premium',
+  review: 'Rəylər', gift: 'Hədiyyə', new_arrival: 'Yeni', best_seller: 'Best Seller',
 }
 
 const STAGE_LABELS: Record<Stage, string> = {
@@ -196,14 +200,14 @@ export function GenerateCardsClient({ productId, productName, mainImage }: Props
                 />
                 <div className="p-3 border-t bg-white">
                   <p className="text-xs font-medium text-zinc-700">
-                    Kart {card.index}: {PURPOSE_LABELS[card.purpose] || card.purpose}
+                    Kart {card.index}: {ROLE_LABELS[card.role] || card.role}
                   </p>
                   <p className="text-xs text-zinc-400 mt-0.5">
                     Cəhd {card.attempt} • 1024×1024
                   </p>
                   <a
                     href={`data:image/png;base64,${card.imageBase64}`}
-                    download={`card_${card.index}_${card.purpose}.png`}
+                    download={`card_${card.index}_${card.role}.png`}
                     className="text-xs text-black underline mt-1 inline-block"
                   >
                     Yüklə

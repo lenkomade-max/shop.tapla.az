@@ -13,7 +13,7 @@ For each card, evaluate:
 1. product_fidelity — Does the product look like the ORIGINAL product? Same shape, color, features?
 2. text_readable — Is any text in the image readable and correctly spelled (Azerbaijani Latin)?
 3. no_hallucinations — Are there NO extra elements, fake logos, distorted parts, or made-up features?
-4. composition_ok — Does the composition match the card's purpose?
+4. composition_ok — Does the composition match the card's advertising role?
 5. style_consistent — Is the visual style consistent with a premium marketplace look?
 
 Be STRICT. If anything looks off, flag it.

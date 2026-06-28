@@ -111,7 +111,7 @@ export async function generateSingleCard(
 
   return {
     index: card.index,
-    purpose: card.purpose,
+    role: card.role,
     promptUsed: card.prompt_en,
     imageBase64,
     attempt,

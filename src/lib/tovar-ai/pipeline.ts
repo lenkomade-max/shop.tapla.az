@@ -87,7 +87,7 @@ export async function runTovarAIPipeline(
       input.characteristics,
     )
     console.log(
-      `[Pipeline] Stage 2 ✅ — ${prompts.cards.length} prompts, style: ${prompts.style_name}`,
+      `[Pipeline] Stage 2 ✅ — ${prompts.cards.length} prompts, roles: ${prompts.roles.join(', ')}`,
     )
 
     // ─── STAGE 3: Parallel Image Generation ──────────────────────────

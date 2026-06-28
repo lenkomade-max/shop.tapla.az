@@ -120,10 +120,10 @@ async function main() {
 
   // Сохраняем карточки
   for (const card of result.cards) {
-    const cardPath = path.join(outDir, `card_${card.index}_${card.purpose}.png`)
+    const cardPath = path.join(outDir, `card_${card.index}_${card.role}.png`)
     const buffer = Buffer.from(card.imageBase64, 'base64')
     fs.writeFileSync(cardPath, buffer)
-    console.log(`🖼️  Карточка ${card.index} (${card.purpose}): ${cardPath} (${(buffer.length / 1024).toFixed(1)} KB, попытка ${card.attempt})`)
+    console.log(`🖼️  Карточка ${card.index} (${card.role}): ${cardPath} (${(buffer.length / 1024).toFixed(1)} KB, попытка ${card.attempt})`)
   }
 
   // Сохраняем QA

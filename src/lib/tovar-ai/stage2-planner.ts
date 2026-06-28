@@ -1,14 +1,14 @@
 // ============================================================================
 // Stage 2: Creative Director + Prompt Planner
-// 3-слойная система: Creative Style (40) + Marketing Style (30) + Visual Theme
-// + 8 design-библиотек (layouts, positions, backgrounds, effects, rules, etc.)
+// Рекламная философия: Meta Ads креативы, а не «красивые карточки»
+// 3-слойная система + 24 рекламные роли + 8 design-библиотек
 // ============================================================================
 
 import * as fs from 'node:fs'
 import * as path from 'node:path'
-import { TOVAR_AI_CONFIG, type VisionOutput, type PromptsOutput } from './types'
+import { TOVAR_AI_CONFIG, type VisionOutput, type PromptsOutput, type CardRole } from './types'
 
-// ─── ТИПЫ ДЛЯ 3 СЛОЁВ ───────────────────────────────────────────────────────
+// ─── ТИПЫ ДЛЯ БИБЛИОТЕК ─────────────────────────────────────────────────────
 
 interface CreativeStyle {
   id: string; name: string; description: string
@@ -32,9 +32,105 @@ interface VisualThemeCatalog {
   mood: VisualThemeItem[]
 }
 
+// ─── ВСЕ РЕКЛАМНЫЕ РОЛИ ─────────────────────────────────────────────────────
+
+const ALL_ROLES: CardRole[] = [
+  'hero', 'price', 'problem', 'solution', 'benefits', 'usage',
+  'lifestyle', 'offer', 'bundle', 'delivery', 'comparison', 'quality',
+  'materials', 'warranty', 'accessories', 'close_up', 'cta',
+  'dimensions', 'power', 'premium', 'review', 'gift',
+  'new_arrival', 'best_seller',
+]
+
+// ─── РОЛЬ → CREATIVE STYLES ─────────────────────────────────────────────────
+
+const ROLE_CREATIVE_STYLES: Record<CardRole, string[]> = {
+  hero:         ['cs01', 'cs12', 'cs25', 'cs37', 'cs27'],
+  price:        ['cs02', 'cs15'],
+  problem:      ['cs09'],
+  solution:     ['cs09', 'cs01'],
+  benefits:     ['cs04', 'cs05', 'cs22'],
+  usage:        ['cs06', 'cs07'],
+  lifestyle:    ['cs08', 'cs11', 'cs29', 'cs34'],
+  offer:        ['cs02', 'cs15', 'cs23'],
+  bundle:       ['cs13', 'cs30'],
+  delivery:     ['cs03'],
+  comparison:   ['cs17'],
+  quality:      ['cs10', 'cs18', 'cs28'],
+  materials:    ['cs18', 'cs10'],
+  warranty:     ['cs04', 'cs22', 'cs01'],
+  accessories:  ['cs13', 'cs30'],
+  close_up:     ['cs10', 'cs16'],
+  cta:          ['cs23', 'cs01'],
+  dimensions:   ['cs06', 'cs34'],
+  power:        ['cs19', 'cs20', 'cs32'],
+  premium:      ['cs37', 'cs27', 'cs12', 'cs28'],
+  review:       ['cs40', 'cs11'],
+  gift:         ['cs31', 'cs24'],
+  new_arrival:  ['cs07', 'cs19', 'cs01'],
+  best_seller:  ['cs14', 'cs01', 'cs12'],
+}
+
+// ─── РОЛЬ → MARKETING STYLES ────────────────────────────────────────────────
+
+const ROLE_MARKETING_STYLES: Record<CardRole, string[]> = {
+  hero:         ['ms27', 'ms04', 'ms06'],
+  price:        ['ms01', 'ms02', 'ms28'],
+  problem:      ['ms21'],
+  solution:     ['ms21', 'ms22'],
+  benefits:     ['ms03', 'ms04', 'ms05'],
+  usage:        ['ms09', 'ms20', 'ms11'],
+  lifestyle:    ['ms20', 'ms11'],
+  offer:        ['ms02', 'ms29', 'ms30'],
+  bundle:       ['ms05', 'ms28'],
+  delivery:     ['ms08'],
+  comparison:   ['ms03', 'ms15'],
+  quality:      ['ms04', 'ms14'],
+  materials:    ['ms04', 'ms14'],
+  warranty:     ['ms18', 'ms26'],
+  accessories:  ['ms05'],
+  close_up:     ['ms03', 'ms04'],
+  cta:          ['ms30', 'ms29'],
+  dimensions:   ['ms12', 'ms09'],
+  power:        ['ms15', 'ms16', 'ms17'],
+  premium:      ['ms27', 'ms04'],
+  review:       ['ms06', 'ms26'],
+  gift:         ['ms23', 'ms24'],
+  new_arrival:  ['ms07', 'ms16'],
+  best_seller:  ['ms06', 'ms29'],
+}
+
+// ─── РОЛЬ → VISUAL THEME ────────────────────────────────────────────────────
+
+const ROLE_VISUAL_THEMES: Record<CardRole, { lighting: string; background_style: string; mood: string }> = {
+  hero:         { lighting: 'soft_studio', background_style: 'premium_gradient', mood: 'minimal_luxury' },
+  price:        { lighting: 'high_contrast', background_style: 'pure_white', mood: 'dynamic_action' },
+  problem:      { lighting: 'dark_moody', background_style: 'environmental', mood: 'industrial_premium' },
+  solution:     { lighting: 'golden_hour', background_style: 'environmental', mood: 'warm_cozy' },
+  benefits:     { lighting: 'softbox_diffused', background_style: 'dark_studio', mood: 'tech_innovation' },
+  usage:        { lighting: 'natural_daylight', background_style: 'environmental', mood: 'warm_cozy' },
+  lifestyle:    { lighting: 'golden_hour', background_style: 'environmental', mood: 'editorial_vogue' },
+  offer:        { lighting: 'high_contrast', background_style: 'premium_gradient', mood: 'dynamic_action' },
+  bundle:       { lighting: 'soft_studio', background_style: 'pure_white', mood: 'clean_clinical' },
+  delivery:     { lighting: 'soft_studio', background_style: 'pure_white', mood: 'clean_clinical' },
+  comparison:   { lighting: 'softbox_diffused', background_style: 'pure_white', mood: 'clean_clinical' },
+  quality:      { lighting: 'dramatic_spotlight', background_style: 'dark_studio', mood: 'classic_luxury' },
+  materials:    { lighting: 'dramatic_spotlight', background_style: 'marble_surface', mood: 'classic_luxury' },
+  warranty:     { lighting: 'soft_studio', background_style: 'pure_white', mood: 'clean_clinical' },
+  accessories:  { lighting: 'soft_studio', background_style: 'pure_white', mood: 'clean_clinical' },
+  close_up:     { lighting: 'rim_light', background_style: 'dark_studio', mood: 'modern_sleek' },
+  cta:          { lighting: 'high_contrast', background_style: 'premium_gradient', mood: 'dynamic_action' },
+  dimensions:   { lighting: 'soft_studio', background_style: 'pure_white', mood: 'clean_clinical' },
+  power:        { lighting: 'dramatic_spotlight', background_style: 'abstract_tech', mood: 'tech_innovation' },
+  premium:      { lighting: 'soft_studio', background_style: 'premium_gradient', mood: 'minimal_luxury' },
+  review:       { lighting: 'natural_daylight', background_style: 'editorial_backdrop', mood: 'editorial_vogue' },
+  gift:         { lighting: 'golden_hour', background_style: 'editorial_backdrop', mood: 'warm_cozy' },
+  new_arrival:  { lighting: 'rim_light', background_style: 'abstract_tech', mood: 'tech_innovation' },
+  best_seller:  { lighting: 'soft_studio', background_style: 'premium_gradient', mood: 'minimal_luxury' },
+}
+
 // ─── ЗАГРУЗКА БИБЛИОТЕК ─────────────────────────────────────────────────────
 
-// __dirname не работает в Next.js (компилируется в /ROOT/).
 const TOLER_AI_DIR = path.join(process.cwd(), 'src/lib/tovar-ai')
 const DESIGN_DIR = path.join(TOLER_AI_DIR, 'design')
 
@@ -57,100 +153,141 @@ function loadDesignLibrary(name: string): string {
   return fs.readFileSync(path.join(DESIGN_DIR, name), 'utf-8')
 }
 
-// ─── БАЗОВЫЙ ПРОМПТ (оригинал, без правок) ──────────────────────────────────
+// ─── BASE PROMPT — рекламный, не каталожный ─────────────────────────────────
 
-const BASE_PROMPT = `Create a premium marketplace product image.
+const BASE_PROMPT = `Create a high-converting e-commerce advertisement image.
 
-The image must look like a professional e-commerce product photograph suitable for Amazon, Trendyol, Temu, AliExpress Premium, Shopify or a modern online marketplace.
+The image must look like a paid Meta Ads creative, not a product catalog photo. It should resemble the best-performing ads on Facebook, Instagram, Trendyol, Shopify, and modern marketplaces.
 
 Generate ONE image only.
 Never create collages.
 Never create split layouts.
 Never create multiple panels.
 Never create infographic grids.
-One image = one marketing message.
+One image = one clear advertising message.
 
-The product must occupy approximately 60-80% of the frame.
-Use realistic premium photography.
-Luxury commercial lighting.
-Photorealistic.
-Natural materials.
-Studio quality.
-Modern advertising style.
-High-end product photography.
-Ultra realistic.
-8K.
+## PRODUCT DOMINANCE
+The product should dominate the composition — occupy approximately 60-70% of the frame.
+It must be the undisputed hero. Never make the product small or secondary.
 
+## ADVERTISING STYLE
+Do NOT generate luxury Apple-style posters.
+Do NOT create minimal premium editorials with lots of empty space.
+Prefer high-converting e-commerce advertisements over minimal catalog images.
+The design should maximize click-through rate.
+The advertisement should immediately feel promotional — like a paid Meta Ads creative.
+
+## LAYOUT & HIERARCHY
+Always build a strong visual hierarchy:
+Headline first → Product dominant → Benefits/info blocks → Offer/promotion → CTA.
+Do not leave large empty areas.
+The advertisement should contain enough commercial information.
+Prefer multiple short information cards over long paragraphs.
+
+## COMMERCIAL BLOCKS
+Use premium rounded commercial blocks for: Prices, Features, Delivery, Warranty, Discounts, Specifications, Buttons.
+Cards should have soft shadows and rounded corners.
+Cards should naturally surround the product.
+Do not leave floating text without visual containers.
+Generate floating rounded information blocks when appropriate.
+
+## COLORS
+Prefer vibrant commercial backgrounds.
+Use bold gradients.
+Use high contrast between background and product.
+Avoid pale minimalist color palettes.
+
+## DEPTH & LAYERS
+Create layered compositions with foreground and background depth.
+Use floating shapes, soft glows, reflections, gradient lighting.
+Add large geometric background elements and subtle decorative graphics.
+Achieve commercial visual depth — not flat minimalism.
+
+## QUALITY
+Photorealistic. Studio quality. Modern advertising style. Ultra realistic. 8K.
 The product is always the main subject.
-Do not change the product shape.
-Do not invent new product parts.
+Do not change the product shape. Do not invent new product parts.
 Remove all watermarks, stickers, logos and packaging unless requested.
-Leave enough negative space for optional text placement.
-Generate images suitable for Meta Ads and marketplace galleries.
 
-CRITICAL — Analyze the uploaded product before generating the image. Determine automatically: product category, materials, intended use, target customer, suitable environment, appropriate lighting, realistic accessories, correct hand position if applicable, realistic usage scenario, luxury commercial style.
+## SELF-REVIEW
+Before finalizing: would a professional e-commerce designer approve this layout for a paid advertisement?
+If the answer is no, redesign the composition before generating.
+
+CRITICAL — Analyze the uploaded product before generating the image. Determine automatically: product category, materials, intended use, target customer, suitable environment, appropriate lighting, realistic accessories, correct hand position if applicable, realistic usage scenario.
 
 Do not reuse the same environment for every product.
-Beauty products should receive skincare environments.
-Electronics should receive modern technology environments.
-Kitchen products should receive premium kitchens.
-Automotive products should receive automotive environments.
-Fitness products should receive sports environments.
-Office products should receive office environments.
-Pet products should receive home environments.`
+Beauty products → skincare environments.
+Electronics → modern technology environments.
+Kitchen products → premium kitchens.
+Automotive → automotive environments.
+Fitness → sports environments.
+Office → office environments.
+Pet → home environments.`
 
-// ─── SYSTEM PROMPT — Creative Director (3 слоя) ─────────────────────────────
+// ─── SYSTEM PROMPT — Creative Director как рекламщик ─────────────────────────
 
-const SYSTEM_PROMPT = `You are a Creative Director for TAPLA MARKETPLACE (Azerbaijan). You design advertising creatives for e-commerce using a 3-layer style system.
+const SYSTEM_PROMPT = `You are a Creative Director for TAPLA MARKETPLACE (Azerbaijan). You design high-converting advertising creatives for e-commerce — not just product photos, but paid social media advertisements.
+
+## YOUR GOAL
+Maximize click-through rate (CTR). Every image should make someone STOP scrolling and CLICK.
+The image must feel like a professional Meta Ads / Trendyol / Shopify promotional creative.
 
 ## 3-LAYER SYSTEM
 
 ### Layer 1 — Creative Style (WHAT is in the frame)
-Composition layout. You are ASSIGNED one creative style per card — do not change it. Your job is to execute it perfectly.
+You are ASSIGNED one creative style per card — execute it faithfully.
 
 ### Layer 2 — Marketing Style (WHAT message we communicate)
-Pick ONE per card. The marketing style defines what we are selling:
-- main_cover → Premium Brand, Premium Quality, Bestseller, New Arrival, Feature First
-- usage_demo → Lifestyle, Easy To Use, Problem→Solution, Home Use, Comfort
-- features_detail → Feature First, Premium Quality, Performance, Technology, Durability
+Pick ONE per card. The marketing style defines the primary selling message.
 
 ### Layer 3 — Visual Theme (HOW it looks)
-Pick ONE lighting + ONE background style + ONE mood per card. They must work together:
-- Lighting sets the mood: soft studio, dramatic spotlight, natural daylight, dark moody, high contrast, golden hour
-- Background style sets the stage: pure white, premium gradient, marble surface, dark studio, environmental, abstract tech, editorial backdrop
-- Mood sets the feeling: minimal luxury, editorial/vogue, technology/innovation, warm & cozy, dynamic/action, clean & clinical
+Pick ONE lighting + ONE background style + ONE mood per card.
 
-## 3 CARDS
-
-Card 1 (main_cover): Hero shot. STOP the scroll. Magazine quality. Large AZ headline.
-Card 2 (usage_demo): Product in use. Lifestyle context. Create desire.
-Card 3 (features_detail): Details, quality, features. Infographic style.
+## CARD ROLES
+Each card has an ASSIGNED advertising role (e.g., "hero", "price", "lifestyle", "offer", "benefits", etc.).
+The role determines what the card is selling. Your job is to bring that role to life:
+- hero → stunning first impression, scroll-stopper
+- price → price is the hero, product supports it
+- offer → discount/promotion, urgency
+- benefits → feature cards around product
+- usage → real person using the product
+- lifestyle → aspirational beautiful context
+- quality → materials and craftsmanship
+- comparison → product vs alternative
+- close_up → extreme detail shot
+- cta → direct action, buy now
+- And others... Each role = one clear advertising task.
 
 ## TEXT RULES
 - ALL visible text: AZERBAIJANI LATIN SCRIPT ONLY. NEVER English. NEVER Russian. NEVER Cyrillic.
-- Short: 3-5 words per headline. Examples: "LED TERAPİYA", "3 REJİM", "ERQONOMİK DİZAYN"
+- Short: 3-5 words per headline. Examples: "LED TERAPİYA", "3 REJİM", "PULSUZ ÇATDIRILMA"
+- Text goes inside rounded commercial blocks/cards — never floating without container
 
 ## PROCESS
-1. You receive an assigned Creative Style per card — execute it
-2. Pick ONE Marketing Style per card (from marketing_styles library)
-3. Select lighting + background style + mood per card (from visual_themes library)
-4. Pick layout, position, background, visual effects from design libraries
-5. Run Creative Director self-review (all 6 questions MUST be YES)
-6. If any question = NO, redesign and try again
-7. Write the final image description
+1. Understand the assigned role for each card
+2. Execute the assigned Creative Style
+3. Pick ONE Marketing Style per card
+4. Select lighting + background style + mood per card
+5. Pick layout, position, background, visual effects
+6. Design commercial information blocks (price cards, feature cards, delivery badges, etc.)
+7. Run Creative Director self-review (all 6 questions MUST be YES)
+8. If any question = NO, redesign and try again
+9. Write the final image description
 
 ## PROMPT RULES
 - Each prompt_en under 300 words
 - Full English sentences for Nano Banana 2
 - Reference original photo for product shape/color fidelity
 - CREATE A NEW IMAGE — do not edit the reference photo
+- The prompt must describe a commercial advertisement, not a product catalog photo
 
 Output ONLY valid JSON. No markdown.`
 
-// ─── USER PROMPT (собирается динамически) ───────────────────────────────────
+// ─── USER PROMPT ────────────────────────────────────────────────────────────
 
 function buildUserPrompt(
-  cs1: CreativeStyle, cs2: CreativeStyle, cs3: CreativeStyle,
+  roles: CardRole[],
+  cs: CreativeStyle[],
   analysis: VisionOutput,
   providerDescription?: string,
   characteristics?: Record<string, string>,
@@ -169,9 +306,16 @@ function buildUserPrompt(
     creative_director: loadDesignLibrary('creative-director.json'),
   }
 
-  // Собираем через конкатенацию (JSON контент ломает template literals)
+  // Собираем роли в читаемый формат
+  const roleDescriptions = roles.map((r, i) =>
+    `CARD ${i + 1} ROLE: "${r}" — ${ROLE_DESCRIPTIONS[r]}`
+  ).join('\n')
+
   return [
-    'Create 3 image prompts for this product. Act as Creative Director using the 3-layer system.',
+    'Create 3 advertising image prompts for this product. Act as Creative Director using the 3-layer system with assigned advertising roles.',
+    '',
+    '## ASSIGNED ADVERTISING ROLES (do NOT change)',
+    roleDescriptions,
     '',
     '## LAYER 1 — Creative Style Library (40 styles — WHAT is in frame)',
     JSON.stringify(CREATIVE_STYLES, null, 2),
@@ -206,10 +350,7 @@ function buildUserPrompt(
     DESIGN.creative_director,
     '',
     '## CREATIVE STYLES ASSIGNED (do NOT change)',
-    '',
-    'CARD 1 CREATIVE STYLE: ' + cs1.id + ' — ' + cs1.name + ' — ' + cs1.prompt_fragment,
-    'CARD 2 CREATIVE STYLE: ' + cs2.id + ' — ' + cs2.name + ' — ' + cs2.prompt_fragment,
-    'CARD 3 CREATIVE STYLE: ' + cs3.id + ' — ' + cs3.name + ' — ' + cs3.prompt_fragment,
+    ...cs.map((s, i) => `CARD ${i + 1} CREATIVE STYLE: ${s.id} — ${s.name} — ${s.prompt_fragment}`),
     '',
     '## Product Analysis',
     JSON.stringify(analysis, null, 2),
@@ -223,89 +364,152 @@ function buildUserPrompt(
     'Return JSON:',
     '{',
     '  "cards": [',
-    '    {',
-    '      "index": 1,',
-    '      "purpose": "main_cover",',
-    '      "creative_style": "' + cs1.id + '",',
-    '      "marketing_style": "ms04",',
-    '      "visual_theme": {',
-    '        "lighting": "soft_studio",',
-    '        "background_style": "pure_white",',
-    '        "mood": "minimal_luxury"',
-    '      },',
-    '      "layout": "C",',
-    '      "product_position": "Center front",',
-    '      "background": "Soft white studio",',
-    '      "visual_effects": ["soft_glow"],',
-    '      "creative_director_passed": true,',
-    '      "prompt_en": "Full product scene description in English. Under 300 words.",',
-    '      "text_overlay_az": ["HEADLINE AZ"],',
-    '      "needs_model": ' + String(cs1.needs_model),
-    '    },',
-    '    {',
-    '      "index": 2,',
-    '      "purpose": "usage_demo",',
-    '      "creative_style": "' + cs2.id + '",',
-    '      "marketing_style": "ms20",',
-    '      "visual_theme": {',
-    '        "lighting": "natural_daylight",',
-    '        "background_style": "environmental",',
-    '        "mood": "warm_cozy"',
-    '      },',
-    '      "layout": "G",',
-    '      "product_position": "In hand",',
-    '      "background": "Modern bathroom",',
-    '      "visual_effects": [],',
-    '      "creative_director_passed": true,',
-    '      "prompt_en": "...",',
-    '      "text_overlay_az": [],',
-    '      "needs_model": ' + String(cs2.needs_model),
-    '    },',
-    '    {',
-    '      "index": 3,',
-    '      "purpose": "features_detail",',
-    '      "creative_style": "' + cs3.id + '",',
-    '      "marketing_style": "ms03",',
-    '      "visual_theme": {',
-    '        "lighting": "soft_studio",',
-    '        "background_style": "pure_white",',
-    '        "mood": "clean_clinical"',
-    '      },',
-    '      "layout": "features_row",',
-    '      "product_position": "Macro close-up (partial)",',
-    '      "background": "Soft white studio",',
-    '      "visual_effects": ["luxury_highlights"],',
-    '      "creative_director_passed": true,',
-    '      "prompt_en": "...",',
-    '      "text_overlay_az": ["FEATURE 1 AZ", "FEATURE 2 AZ"],',
-    '      "needs_model": ' + String(cs3.needs_model),
-    '    }',
+    `    {`,
+    `      "index": 1,`,
+    `      "role": "${roles[0]}",`,
+    `      "creative_style": "${cs[0].id}",`,
+    `      "marketing_style": "ms04",`,
+    `      "visual_theme": {`,
+    `        "lighting": "soft_studio",`,
+    `        "background_style": "premium_gradient",`,
+    `        "mood": "minimal_luxury"`,
+    `      },`,
+    `      "layout": "C",`,
+    `      "product_position": "Center front",`,
+    `      "background": "Soft white studio",`,
+    `      "visual_effects": ["soft_glow"],`,
+    `      "creative_director_passed": true,`,
+    `      "prompt_en": "Full advertising scene description in English. Under 300 words. Describe a commercial ad, not a catalog photo.",`,
+    `      "text_overlay_az": ["HEADLINE AZ"],`,
+    `      "commercial_blocks": ["price card", "delivery badge"],`,
+    `      "needs_model": ${String(cs[0].needs_model)}`,
+    `    },`,
+    `    {`,
+    `      "index": 2,`,
+    `      "role": "${roles[1]}",`,
+    `      "creative_style": "${cs[1].id}",`,
+    `      "marketing_style": "ms20",`,
+    `      "visual_theme": {`,
+    `        "lighting": "natural_daylight",`,
+    `        "background_style": "environmental",`,
+    `        "mood": "warm_cozy"`,
+    `      },`,
+    `      "layout": "G",`,
+    `      "product_position": "In hand",`,
+    `      "background": "Modern bathroom",`,
+    `      "visual_effects": [],`,
+    `      "creative_director_passed": true,`,
+    `      "prompt_en": "...",`,
+    `      "text_overlay_az": [],`,
+    `      "commercial_blocks": [],`,
+    `      "needs_model": ${String(cs[1].needs_model)}`,
+    `    },`,
+    `    {`,
+    `      "index": 3,`,
+    `      "role": "${roles[2]}",`,
+    `      "creative_style": "${cs[2].id}",`,
+    `      "marketing_style": "ms03",`,
+    `      "visual_theme": {`,
+    `        "lighting": "softbox_diffused",`,
+    `        "background_style": "dark_studio",`,
+    `        "mood": "tech_innovation"`,
+    `      },`,
+    `      "layout": "features_row",`,
+    `      "product_position": "Macro close-up (partial)",`,
+    `      "background": "Dark premium studio",`,
+    `      "visual_effects": ["luxury_highlights"],`,
+    `      "creative_director_passed": true,`,
+    `      "prompt_en": "...",`,
+    `      "text_overlay_az": ["FEATURE 1 AZ", "FEATURE 2 AZ"],`,
+    `      "commercial_blocks": ["feature cards", "spec badges"],`,
+    `      "needs_model": ${String(cs[2].needs_model)}`,
+    `    }`,
     '  ]',
     '}',
     '',
     'RULES:',
+    '- role: use the ASSIGNED role — do not change it.',
     '- creative_style: use the ASSIGNED id — do not change it.',
     '- marketing_style: pick from the Marketing Style Library (ms01-ms30).',
     '- visual_theme: pick lighting, background_style, mood from Visual Theme Library.',
     '- text_overlay_az: AZERBAIJANI LATIN ONLY. Empty array [] if no text.',
+    '- commercial_blocks: list which commercial blocks to include (price cards, delivery badges, feature cards, warranty badge, CTA button, etc.).',
     '- Every card must have creative_director_passed = true.',
-    '- One image = one marketing message.',
-    '- prompt_en writes product scene only — style prefix, design libraries, and rules are added automatically.',
+    '- One image = one advertising message.',
+    '- prompt_en writes the full advertising scene — style prefix, design libraries, and rules are added automatically.',
+    '- The image must look like a paid Meta Ads / Trendyol creative, NOT a catalog photo.',
     '',
     'Respond ONLY with the JSON.',
   ].join('\n')
 }
 
-// ─── ВЫБОР CREATIVE STYLE (код, не LLM) ─────────────────────────────────────
+// ─── ОПИСАНИЯ РОЛЕЙ ─────────────────────────────────────────────────────────
 
-function pickCreativeStyle(
-  useFor: string,
+const ROLE_DESCRIPTIONS: Record<CardRole, string> = {
+  hero: 'Stunning first impression. Scroll-stopper. Magazine quality. Product dominant with headline.',
+  price: 'Price is the hero. Large price card. Product supports the attractive price. Promotional.',
+  problem: 'Show a common problem visually. The product is the answer. Creates recognition.',
+  solution: 'The product as the immediate solution. Visible transformation or benefit.',
+  benefits: 'Product centered with feature/benefit cards arranged around it. Icons and thin connection lines.',
+  usage: 'Real person naturally using the product. Authentic interaction. Shows real-world application.',
+  lifestyle: 'Beautiful aspirational environment. No people or subtle human presence. Magazine quality.',
+  offer: 'Promotion card prominent. Discount emphasis. Urgency. Limited-time feeling.',
+  bundle: 'Show everything included. All accessories visible. Complete package presentation.',
+  delivery: 'Fast delivery message prominent. Product remains focus. Shipping iconography.',
+  comparison: 'Product compared against standard alternative. Clean visual comparison showing superiority.',
+  quality: 'Focus on materials and craftsmanship. Premium macro details. Luxury texture visible.',
+  materials: 'Extreme focus on materials: metal, glass, leather, wood. Craftsmanship celebration.',
+  warranty: 'Trust and reliability message. Warranty badge prominent. Professional confidence.',
+  accessories: 'All included accessories displayed. Perfect alignment. Complete set presentation.',
+  close_up: 'Extreme macro detail of key feature. Texture, materials, premium reflections. Very shallow depth of field.',
+  cta: 'Large clear Call To Action. Minimal supporting text. Hero product. Designed for conversion.',
+  dimensions: 'Show actual size and scale. Product in hand or with size reference. Portability emphasis.',
+  power: 'Performance focus. Energy, speed, efficiency. Technology-inspired. Dynamic lighting.',
+  premium: 'Luxury positioning. Minimal but vibrant. High-end brand aesthetic. Very expensive feeling.',
+  review: 'Testimonial feeling. Trust and social proof. Magazine editorial quality with review stars.',
+  gift: 'Gift-ready presentation. Premium packaging visible. Holiday or special occasion feeling.',
+  new_arrival: 'Fresh and cutting-edge. Latest technology. Modern and innovative. Just launched feeling.',
+  best_seller: 'Popular choice. Bestseller badge. Social proof through popularity. Most purchased.',
+}
+
+// ─── ВЫБОР РОЛЕЙ (случайно, с учётом VisionOutput) ───────────────────────────
+
+function selectRoles(count: number, vision: VisionOutput): CardRole[] {
+  // Роли, требующие модель — исключаем если товар без неё
+  const availableRoles = ALL_ROLES.filter(role => {
+    if (!vision.needs_human_model && ['usage', 'lifestyle'].includes(role)) {
+      // lifestyle без модели — ок (cs11, cs29), usage — нет
+      if (role === 'usage') return false
+    }
+    if (!vision.needs_macro_shots && ['close_up', 'materials', 'quality'].includes(role)) {
+      // всё ещё доступны, просто меньше стилей подходит
+    }
+    return true
+  })
+
+  // Фишер-Йейтс shuffle
+  const shuffled = [...availableRoles]
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+  }
+
+  return shuffled.slice(0, count)
+}
+
+// ─── PICK FUNCTIONS — код даёт дефолт, LLM может переопределить ─────────────
+
+function pickCreativeStyleForRole(
+  role: CardRole,
   vision: VisionOutput,
   styles: CreativeStyle[],
 ): CreativeStyle {
-  const candidates = styles.filter(s => s.use_for.includes(useFor))
+  const preferredIds = ROLE_CREATIVE_STYLES[role] || ['cs01']
+  const candidates = preferredIds
+    .map(id => styles.find(s => s.id === id))
+    .filter(Boolean) as CreativeStyle[]
 
-  // Фильтруем по model/environment требованиям
+  // Фильтруем по model/environment
   const filtered = candidates.filter(s => {
     if (!vision.needs_human_model && s.needs_model) return false
     if (!vision.needs_lifestyle_scene && s.needs_environment) return false
@@ -313,134 +517,26 @@ function pickCreativeStyle(
   })
 
   const pool = filtered.length > 0 ? filtered : candidates
-
-  // main_cover: приоритеты по premium_level
-  if (useFor === 'main_cover') {
-    // luxury → cs37 Minimal Luxury, cs27 Premium Gradient, cs12 Premium Showcase
-    if (vision.premium_level === 'luxury') {
-      const luxuryPick = pool.find(s => s.id === 'cs37')
-        || pool.find(s => s.id === 'cs27')
-        || pool.find(s => s.id === 'cs12')
-      if (luxuryPick) return luxuryPick
-    }
-    // premium → cs01 Hero Product, cs25 Premium Banner
-    if (vision.premium_level === 'premium') {
-      const premiumPick = pool.find(s => s.id === 'cs01')
-        || pool.find(s => s.id === 'cs25')
-        || pool.find(s => s.id === 'cs04')
-      if (premiumPick) return premiumPick
-    }
-    // budget/mid → cs02 Product + Price, cs26 Clean Marketplace
-    if (vision.premium_level === 'budget' || vision.premium_level === 'mid') {
-      const valuePick = pool.find(s => s.id === 'cs26')
-        || pool.find(s => s.id === 'cs02')
-        || pool.find(s => s.id === 'cs01')
-      if (valuePick) return valuePick
-    }
-    // дефолт: cs01 Hero Product
-    const hero = pool.find(s => s.id === 'cs01')
-    if (hero) return hero
-  }
-
-  // usage_demo с моделью → cs07 Product In Use, cs06 In Hand
-  if (useFor === 'usage_demo' && vision.needs_human_model) {
-    const inUse = pool.find(s => s.id === 'cs07')
-      || pool.find(s => s.id === 'cs06')
-    if (inUse) return inUse
-  }
-
-  // usage_demo без модели → cs11 Lifestyle Hero, cs08 Premium Interior, cs29 Environmental Scene
-  if (useFor === 'usage_demo' && !vision.needs_human_model) {
-    const life = pool.find(s => s.id === 'cs11')
-      || pool.find(s => s.id === 'cs08')
-      || pool.find(s => s.id === 'cs29')
-    if (life) return life
-  }
-
-  // features_detail с макро → cs10 Macro Detail
-  if (useFor === 'features_detail' && vision.needs_macro_shots) {
-    const macro = pool.find(s => s.id === 'cs10')
-    if (macro) return macro
-  }
-
-  // features_detail с exploded → cs21 Exploded View
-  if (useFor === 'features_detail' && vision.needs_exploded_view) {
-    const exp = pool.find(s => s.id === 'cs21')
-    if (exp) return exp
-  }
-
-  // features_detail дефолт → cs04 Premium Feature, cs22 Benefits Around
-  if (useFor === 'features_detail') {
-    const feat = pool.find(s => s.id === 'cs04')
-      || pool.find(s => s.id === 'cs22')
-      || pool.find(s => s.id === 'cs16')
-    if (feat) return feat
-  }
-
-  // Дефолт: первая подходящая
-  return pool[0] || candidates[0] || styles[0]
+  return pool[0] || styles[0]
 }
 
-// ─── ВЫБОР MARKETING STYLE (код даёт дефолт, LLM может переопределить) ──────
-
-function pickMarketingStyle(
-  useFor: string,
+function pickMarketingStyleForRole(
+  role: CardRole,
   _vision: VisionOutput,
   styles: MarketingStyle[],
 ): MarketingStyle {
-  const candidates = styles.filter(s => s.best_for.includes(useFor))
-
-  if (useFor === 'main_cover') {
-    // Приоритет: Premium Brand > Premium Quality > Feature First
-    const pick = candidates.find(s => s.id === 'ms27')  // Premium Brand
-      || candidates.find(s => s.id === 'ms04')           // Premium Quality
-      || candidates.find(s => s.id === 'ms06')           // Bestseller
-    if (pick) return pick
+  const preferredIds = ROLE_MARKETING_STYLES[role] || ['ms04']
+  for (const id of preferredIds) {
+    const found = styles.find(s => s.id === id)
+    if (found) return found
   }
-
-  if (useFor === 'usage_demo') {
-    const pick = candidates.find(s => s.id === 'ms20')   // Lifestyle
-      || candidates.find(s => s.id === 'ms09')           // Easy To Use
-      || candidates.find(s => s.id === 'ms11')           // Home Use
-    if (pick) return pick
-  }
-
-  if (useFor === 'features_detail') {
-    const pick = candidates.find(s => s.id === 'ms03')   // Feature First
-      || candidates.find(s => s.id === 'ms04')           // Premium Quality
-      || candidates.find(s => s.id === 'ms15')           // Performance
-    if (pick) return pick
-  }
-
-  return candidates[0] || styles[0]
+  return styles[0]
 }
 
-// ─── ВЫБОР VISUAL THEME (код даёт дефолт, LLM может переопределить) ─────────
-
-function pickVisualTheme(
-  useFor: string,
-  vision: VisionOutput,
-  themes: VisualThemeCatalog,
+function pickVisualThemeForRole(
+  role: CardRole,
 ): { lighting: string; background_style: string; mood: string } {
-  if (useFor === 'main_cover') {
-    if (vision.premium_level === 'luxury' || vision.premium_level === 'premium') {
-      return { lighting: 'soft_studio', background_style: 'premium_gradient', mood: 'minimal_luxury' }
-    }
-    return { lighting: 'soft_studio', background_style: 'pure_white', mood: 'clean_clinical' }
-  }
-
-  if (useFor === 'usage_demo') {
-    return { lighting: 'natural_daylight', background_style: 'environmental', mood: 'warm_cozy' }
-  }
-
-  if (useFor === 'features_detail') {
-    if (vision.premium_level === 'luxury' || vision.premium_level === 'premium') {
-      return { lighting: 'softbox_diffused', background_style: 'dark_studio', mood: 'tech_innovation' }
-    }
-    return { lighting: 'soft_studio', background_style: 'pure_white', mood: 'clean_clinical' }
-  }
-
-  return { lighting: 'soft_studio', background_style: 'pure_white', mood: 'minimal_luxury' }
+  return ROLE_VISUAL_THEMES[role] || { lighting: 'soft_studio', background_style: 'pure_white', mood: 'minimal_luxury' }
 }
 
 // ─── MAIN ────────────────────────────────────────────────────────────────────
@@ -455,29 +551,20 @@ export async function planCardPrompts(
   const marketingStyles = loadMarketingStyles()
   const visualThemes = loadVisualThemes()
 
-  // Код выбирает creative styles (структурное решение)
-  const cs1 = pickCreativeStyle('main_cover', analysis, creativeStyles)
-  const cs2 = pickCreativeStyle('usage_demo', analysis, creativeStyles)
-  const cs3 = pickCreativeStyle('features_detail', analysis, creativeStyles)
+  // Случайный выбор 3 разных ролей
+  const roles = selectRoles(config.DEFAULT_CARD_COUNT, analysis)
 
-  // Код даёт дефолты для marketing и visual theme (LLM может переопределить)
-  const ms1 = pickMarketingStyle('main_cover', analysis, marketingStyles)
-  const ms2 = pickMarketingStyle('usage_demo', analysis, marketingStyles)
-  const ms3 = pickMarketingStyle('features_detail', analysis, marketingStyles)
+  // Код выбирает creative styles, marketing, visual theme под каждую роль
+  const cs = roles.map(r => pickCreativeStyleForRole(r, analysis, creativeStyles))
+  const ms = roles.map(r => pickMarketingStyleForRole(r, analysis, marketingStyles))
+  const vt = roles.map(r => pickVisualThemeForRole(r))
 
-  const vt1 = pickVisualTheme('main_cover', analysis, visualThemes)
-  const vt2 = pickVisualTheme('usage_demo', analysis, visualThemes)
-  const vt3 = pickVisualTheme('features_detail', analysis, visualThemes)
+  console.log(`[Stage 2] Roles: ${roles.join(', ')}`)
+  console.log(`[Stage 2] Creative Styles: ${cs.map((s, i) => `${i + 1}=${s.id} (${s.name})`).join(', ')}`)
+  console.log(`[Stage 2] Marketing Styles: ${ms.map((s, i) => `${i + 1}=${s.id} (${s.name})`).join(', ')}`)
+  console.log(`[Stage 2] Visual Themes: ${vt.map((v, i) => `${i + 1}=${v.mood}`).join(', ')}`)
 
-  const styleMap = [cs1, cs2, cs3]
-  const msMap = [ms1, ms2, ms3]
-  const vtMap = [vt1, vt2, vt3]
-
-  console.log(`[Stage 2] Creative Styles: card1=${cs1.id} (${cs1.name}), card2=${cs2.id} (${cs2.name}), card3=${cs3.id} (${cs3.name})`)
-  console.log(`[Stage 2] Marketing Styles: card1=${ms1.id} (${ms1.name}), card2=${ms2.id} (${ms2.name}), card3=${ms3.id} (${ms3.name})`)
-  console.log(`[Stage 2] Visual Themes: card1=${vt1.mood}, card2=${vt2.mood}, card3=${vt3.mood}`)
-
-  const userPrompt = buildUserPrompt(cs1, cs2, cs3, analysis, providerDescription, characteristics)
+  const userPrompt = buildUserPrompt(roles, cs, analysis, providerDescription, characteristics)
 
   const body = {
     model: config.PLANNER_MODEL,
@@ -508,11 +595,12 @@ export async function planCardPrompts(
   const raw = data.choices?.[0]?.message?.content || ''
   const parsed = parseJSON<{
     cards: Array<{
-      index: number; purpose: string
+      index: number; role: string
       creative_style?: string; marketing_style?: string
       visual_theme?: { lighting: string; background_style: string; mood: string }
       layout?: string; product_position?: string; background?: string
-      visual_effects?: string[]; creative_director_passed?: boolean
+      visual_effects?: string[]; commercial_blocks?: string[]
+      creative_director_passed?: boolean
       prompt_en: string; text_overlay_az: string[]; needs_model: boolean
     }>
   }>(raw)
@@ -523,23 +611,30 @@ export async function planCardPrompts(
 
   // Сборка финального промпта: [BASE] + [Creative Style] + [Marketing Style] + [Visual Theme] + [LLM content]
   for (const card of parsed.cards) {
-    const cs = styleMap[card.index - 1]
-    const ms = card.marketing_style
-      ? marketingStyles.find(m => m.id === card.marketing_style) || msMap[card.index - 1]
-      : msMap[card.index - 1]
-    const vt = card.visual_theme || vtMap[card.index - 1]
+    const cardCs = card.creative_style
+      ? creativeStyles.find(s => s.id === card.creative_style) || cs[card.index - 1]
+      : cs[card.index - 1]
+    const cardMs = card.marketing_style
+      ? marketingStyles.find(m => m.id === card.marketing_style) || ms[card.index - 1]
+      : ms[card.index - 1]
+    const cardVt = card.visual_theme || vt[card.index - 1]
 
-    // Находим lighting, background_style, mood описания из каталога
-    const lightingItem = visualThemes.lighting.find(l => l.id === vt.lighting)
-    const bgItem = visualThemes.background_style.find(b => b.id === vt.background_style)
-    const moodItem = visualThemes.mood.find(m => m.id === vt.mood)
+    const lightingItem = visualThemes.lighting.find(l => l.id === cardVt.lighting)
+    const bgItem = visualThemes.background_style.find(b => b.id === cardVt.background_style)
+    const moodItem = visualThemes.mood.find(m => m.id === cardVt.mood)
+
+    const commercialBlocks = Array.isArray(card.commercial_blocks) && card.commercial_blocks.length > 0
+      ? `Commercial blocks to include: ${card.commercial_blocks.join(', ')}. Use premium rounded cards with soft shadows for each block.`
+      : ''
 
     const designDecisions = [
-      `Creative Style: ${cs.name}. ${cs.prompt_fragment}`,
-      `Marketing Style: ${ms.name}. ${ms.prompt_fragment}`,
-      `Visual Theme — Lighting: ${lightingItem?.prompt_fragment || vt.lighting}.`,
-      `Visual Theme — Background: ${bgItem?.prompt_fragment || vt.background_style}.`,
-      `Visual Theme — Mood: ${moodItem?.prompt_fragment || vt.mood}.`,
+      `ADVERTISING ROLE: ${card.role}. ${ROLE_DESCRIPTIONS[card.role as CardRole] || card.role}.`,
+      `Creative Style: ${cardCs.name}. ${cardCs.prompt_fragment}`,
+      `Marketing Style: ${cardMs.name}. ${cardMs.prompt_fragment}`,
+      `Visual Theme — Lighting: ${lightingItem?.prompt_fragment || cardVt.lighting}.`,
+      `Visual Theme — Background: ${bgItem?.prompt_fragment || cardVt.background_style}.`,
+      `Visual Theme — Mood: ${moodItem?.prompt_fragment || cardVt.mood}.`,
+      commercialBlocks,
       card.layout ? `Layout: ${card.layout}.` : '',
       card.product_position ? `Product position: ${card.product_position}.` : '',
       card.background ? `Environment: ${card.background}.` : '',
@@ -548,7 +643,7 @@ export async function planCardPrompts(
     ].filter(Boolean).join(' ')
 
     const textInstruction = card.text_overlay_az.length > 0
-      ? `Render this text on the image: ${card.text_overlay_az.join(' — ')}.`
+      ? `Render this text on the image inside rounded commercial blocks: ${card.text_overlay_az.join(' — ')}.`
       : ''
 
     card.prompt_en = [
@@ -559,24 +654,25 @@ export async function planCardPrompts(
     ].filter(Boolean).join(' ')
   }
 
-  // Убираем design-поля из cards, оставляем нужное для генерации
+  // Clean cards — только нужное для генерации
   const cleanCards = parsed.cards.map(c => ({
     index: c.index,
-    purpose: c.purpose as 'main_cover' | 'usage_demo' | 'features_detail',
+    role: (c.role || roles[c.index - 1]) as CardRole,
     prompt_en: c.prompt_en,
     text_overlay_az: c.text_overlay_az,
     needs_model: c.needs_model,
     composition: c.layout || 'center',
-    reference_weight: c.purpose === 'main_cover' ? 0.8 : c.needs_model ? 0.5 : 0.8,
-    creative_style: c.creative_style || styleMap[c.index - 1].id,
-    marketing_style: c.marketing_style || msMap[c.index - 1].id,
-    visual_theme: c.visual_theme || vtMap[c.index - 1],
+    reference_weight: c.role === 'hero' ? 0.7 : c.needs_model ? 0.5 : 0.7,
+    creative_style: c.creative_style || cs[c.index - 1].id,
+    marketing_style: c.marketing_style || ms[c.index - 1].id,
+    visual_theme: c.visual_theme || vt[c.index - 1],
   }))
 
   return {
-    style_name: `${cs1.id}+${cs2.id}+${cs3.id}`,
-    marketing_styles: [ms1.id, ms2.id, ms3.id],
-    visual_themes: [vt1, vt2, vt3],
+    style_name: cs.map(s => s.id).join('+'),
+    roles: roles,
+    marketing_styles: ms.map(s => s.id),
+    visual_themes: vt,
     cards: cleanCards,
   }
 }

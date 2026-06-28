@@ -7,21 +7,63 @@ type Stage = 'idle' | 'uploading' | 'analyzing' | 'planning' | 'generating' | 'd
 
 interface CardData {
   index: number
-  purpose: string
+  role: string
   imageBase64: string
   attempt: number
 }
 
-const PURPOSE_LABELS: Record<string, string> = {
-  main_cover: 'Əsas örtük',
-  usage_demo: 'İstifadə nümayişi',
-  features_detail: 'Xüsusiyyətlər',
+const ROLE_LABELS: Record<string, string> = {
+  hero: 'Hero — Əsas örtük',
+  price: 'Qiymət',
+  problem: 'Problem',
+  solution: 'Həll',
+  benefits: 'Üstünlüklər',
+  usage: 'İstifadə',
+  lifestyle: 'Lifestyle',
+  offer: 'Təklif',
+  bundle: 'Komplekt',
+  delivery: 'Çatdırılma',
+  comparison: 'Müqayisə',
+  quality: 'Keyfiyyət',
+  materials: 'Materiallar',
+  warranty: 'Zəmanət',
+  accessories: 'Aksessuarlar',
+  close_up: 'Makro detal',
+  cta: 'CTA — Alış',
+  dimensions: 'Ölçülər',
+  power: 'Güc',
+  premium: 'Premium',
+  review: 'Rəylər',
+  gift: 'Hədiyyə',
+  new_arrival: 'Yeni gəlib',
+  best_seller: 'Best Seller',
 }
 
-const PURPOSE_DESC: Record<string, string> = {
-  main_cover: 'Məhsul iri planda, premium dizayn, başlıq',
-  usage_demo: 'İstifadə səhnəsi, lifestyle',
-  features_detail: 'Detallar, makro, infoqrafika',
+const ROLE_DESC: Record<string, string> = {
+  hero: 'Məhsul iri planda, scroll-stopper, başlıq',
+  price: 'Qiymət əsasdır, aksiya, endirim',
+  problem: 'Problemi göstərir, məhsul cavabdır',
+  solution: 'Məhsul həll kimi, transformasiya',
+  benefits: 'Üstünlük kartları məhsul ətrafında',
+  usage: 'Real istifadə səhnəsi, insanla',
+  lifestyle: 'Gözəl mühit, jurnal keyfiyyəti',
+  offer: 'Promo kart, təcililik, endirim',
+  bundle: 'Bütün aksessuarlar, tam komplekt',
+  delivery: 'Sürətli çatdırılma mesajı',
+  comparison: 'Məhsul alternativlə müqayisədə',
+  quality: 'Material və işlənmə keyfiyyəti',
+  materials: 'Materiallar: metal, şüşə, dəri, ağac',
+  warranty: 'Zəmanət və etibarlılıq',
+  accessories: 'Aksessuarlar düzülmüş',
+  close_up: 'Ekstrem makro, detal, tekstura',
+  cta: 'Böyük CTA, alışa yönləndirən',
+  dimensions: 'Ölçü və miqyas, portativlik',
+  power: 'Güc, sürət, performans',
+  premium: 'Lüks mövqe, bahalı hiss',
+  review: 'Rəy və sosial sübut',
+  gift: 'Hədiyyə təqdimatı, qablaşdırma',
+  new_arrival: 'Yeni gəlib, təzə, müasir',
+  best_seller: 'Populyar seçim, bestseller',
 }
 
 export default function TovarAIPage() {
@@ -120,7 +162,7 @@ export default function TovarAIPage() {
     cards.forEach(card => {
       const a = document.createElement('a')
       a.href = `data:image/png;base64,${card.imageBase64}`
-      a.download = `tapla_card_${card.index}_${card.purpose}.png`
+      a.download = `tapla_card_${card.index}_${card.role}.png`
       a.click()
     })
   }
@@ -304,17 +346,17 @@ export default function TovarAIPage() {
                     />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-zinc-800">
-                        Kart {card.index}: {PURPOSE_LABELS[card.purpose]}
+                        Kart {card.index}: {ROLE_LABELS[card.role] || card.role}
                       </p>
                       <p className="text-xs text-zinc-500 mt-0.5">
-                        {PURPOSE_DESC[card.purpose]}
+                        {ROLE_DESC[card.role] || ''}
                       </p>
                       <p className="text-xs text-zinc-400 mt-1">
                         Cəhd {card.attempt} • 1K (1024×1024)
                       </p>
                       <a
                         href={`data:image/png;base64,${card.imageBase64}`}
-                        download={`tapla_card_${card.index}_${card.purpose}.png`}
+                        download={`tapla_card_${card.index}_${card.role}.png`}
                         className="text-xs text-black underline mt-1 inline-block"
                       >
                         Yüklə
