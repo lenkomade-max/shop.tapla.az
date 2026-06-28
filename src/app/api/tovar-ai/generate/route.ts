@@ -3,7 +3,7 @@
 // ============================================================================
 
 import { NextResponse } from 'next/server'
-import { runTovarAIPipeline } from '@/lib/tovar-ai/pipeline'
+import { runTovarAIPipeline, TOVAR_AI_CONFIG } from '@/lib/tovar-ai'
 
 export async function POST(request: Request) {
   try {
@@ -22,6 +22,24 @@ export async function POST(request: Request) {
       priceAz,
     })
 
+    // Возвращаем также cardPrompts — данные промптов для каждой карточки,
+    // чтобы фронтенд мог перегенерировать конкретную карточку
+    const cardPrompts = result.prompts?.cards
+      ?.slice(0, TOVAR_AI_CONFIG.DEFAULT_CARD_COUNT)
+      ?.map(p => ({
+        index: p.index,
+        role: p.role,
+        prompt_en: p.prompt_en,
+        text_overlay_az: p.text_overlay_az,
+        composition: p.composition,
+        needs_model: p.needs_model,
+        reference_weight: p.reference_weight,
+        creative_style: p.creative_style,
+        marketing_style: p.marketing_style,
+        visual_theme: p.visual_theme,
+        color_palette: p.color_palette,
+      })) ?? []
+
     return NextResponse.json({
       success: result.status === 'done',
       cards: result.cards.map(c => ({
@@ -30,6 +48,7 @@ export async function POST(request: Request) {
         imageBase64: c.imageBase64,
         attempt: c.attempt,
       })),
+      cardPrompts, // данные для регенерации отдельных карточек
       product_analysis: result.product_analysis,
       qa_results: result.qa_results,
       cost: result.cost,

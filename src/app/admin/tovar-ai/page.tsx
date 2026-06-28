@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useCallback, useRef, DragEvent } from 'react'
-import { Loader2, CheckCircle2, XCircle, Upload, RefreshCw, Download, X } from 'lucide-react'
+import { Loader2, CheckCircle2, XCircle, Upload, RefreshCw, Download, X, RotateCcw } from 'lucide-react'
 
 type Stage = 'idle' | 'uploading' | 'analyzing' | 'planning' | 'generating' | 'done' | 'error'
 
@@ -10,6 +10,28 @@ interface CardData {
   role: string
   imageBase64: string
   attempt: number
+}
+
+/** Данные промпта для регенерации одной карточки (возвращается из API) */
+interface CardPromptData {
+  index: number
+  role: string
+  prompt_en: string
+  text_overlay_az: string[]
+  composition: string
+  needs_model: boolean
+  reference_weight: number
+  creative_style: string
+  marketing_style: string
+  visual_theme: {
+    lighting: string
+    background_style: string
+    mood: string
+    materials: string[]
+    spatial_depth: string[]
+    motion: string
+  }
+  color_palette: string[]
 }
 
 const ROLE_LABELS: Record<string, string> = {
@@ -67,9 +89,11 @@ const ROLE_DESC: Record<string, string> = {
 export default function TovarAIPage() {
   const [stage, setStage] = useState<Stage>('idle')
   const [cards, setCards] = useState<CardData[]>([])
+  const [cardPrompts, setCardPrompts] = useState<CardPromptData[]>([])
   const [error, setError] = useState('')
   const [cost, setCost] = useState(0)
   const [elapsed, setElapsed] = useState(0)
+  const [regeneratingIndex, setRegeneratingIndex] = useState<number | null>(null)
 
   // Фото
   const [photo, setPhoto] = useState<{ base64: string; name: string; size: number } | null>(null)
@@ -126,6 +150,7 @@ export default function TovarAIPage() {
     setStage('analyzing')
     setError('')
     setCards([])
+    setCardPrompts([])
     const start = Date.now()
 
     try {
@@ -146,6 +171,7 @@ export default function TovarAIPage() {
 
       const data = await resp.json()
       setCards(data.cards || [])
+      setCardPrompts(data.cardPrompts || [])
       setCost(data.cost || 0)
       setElapsed(((Date.now() - start) / 1000))
       setStage(data.success ? 'done' : 'error')
@@ -155,6 +181,50 @@ export default function TovarAIPage() {
       setElapsed(((Date.now() - start) / 1000))
     }
   }, [photo, description, price])
+
+  // ─── Регенерация одной карточки ─────────────────────────────────────────
+
+  const regenerateCard = useCallback(async (index: number) => {
+    if (!photo || regeneratingIndex !== null) return
+
+    const promptData = cardPrompts.find(p => p.index === index)
+    if (!promptData) {
+      setError(`Промпт для карточки ${index} не найден`)
+      return
+    }
+
+    setRegeneratingIndex(index)
+    setError('')
+
+    try {
+      const resp = await fetch('/api/tovar-ai/regenerate-card', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          photoBase64: photo.base64,
+          cardPrompt: promptData,
+        }),
+      })
+
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({ error: 'API error' }))
+        throw new Error(err.error || `API ${resp.status}`)
+      }
+
+      const data = await resp.json()
+      if (data.success && data.card) {
+        setCards(prev =>
+          prev.map(c => c.index === index ? { ...data.card } : c),
+        )
+      } else {
+        throw new Error('No card in response')
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Naməlum xəta')
+    } finally {
+      setRegeneratingIndex(null)
+    }
+  }, [photo, cardPrompts, regeneratingIndex])
 
   // ─── Скачать всё ────────────────────────────────────────────────────────
 
@@ -355,33 +425,59 @@ export default function TovarAIPage() {
               </div>
 
               <div className="space-y-4">
-                {cards.map(card => (
-                  <div key={card.index} className="flex gap-4 rounded-lg border bg-zinc-50 overflow-hidden p-3">
-                    <img
-                      src={`data:image/png;base64,${card.imageBase64}`}
-                      alt={`Kart ${card.index}`}
-                      className="w-28 h-28 rounded-md object-cover border shrink-0"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-zinc-800">
-                        Kart {card.index}: {ROLE_LABELS[card.role] || card.role}
-                      </p>
-                      <p className="text-xs text-zinc-500 mt-0.5">
-                        {ROLE_DESC[card.role] || ''}
-                      </p>
-                      <p className="text-xs text-zinc-400 mt-1">
-                        Cəhd {card.attempt} • 1K (1024×1024)
-                      </p>
+                {cards.map(card => {
+                  const isRegenerating = regeneratingIndex === card.index
+                  return (
+                    <div key={card.index} className="relative flex gap-4 rounded-lg border bg-zinc-50 overflow-hidden p-3">
+                      {/* Картинка */}
+                      <div className="relative w-28 h-28 shrink-0">
+                        <img
+                          src={`data:image/png;base64,${card.imageBase64}`}
+                          alt={`Kart ${card.index}`}
+                          className="w-full h-full rounded-md object-cover border"
+                        />
+                        {/* Оверлей при регенерации */}
+                        {isRegenerating && (
+                          <div className="absolute inset-0 rounded-md bg-white/70 flex items-center justify-center">
+                            <Loader2 className="h-6 w-6 animate-spin text-black" />
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Информация */}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-zinc-800">
+                          Kart {card.index}: {ROLE_LABELS[card.role] || card.role}
+                        </p>
+                        <p className="text-xs text-zinc-500 mt-0.5">
+                          {ROLE_DESC[card.role] || ''}
+                        </p>
+                        <p className="text-xs text-zinc-400 mt-1">
+                          Cəhd {card.attempt} • 1K (1024×1024)
+                        </p>
+
+                        {/* Кнопка регенерации */}
+                        <button
+                          onClick={() => regenerateCard(card.index)}
+                          disabled={isRegenerating || isBusy}
+                          className="inline-flex items-center gap-1 mt-2 text-xs font-medium text-zinc-600 hover:text-black disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                        >
+                          <RotateCcw className={`h-3 w-3 ${isRegenerating ? 'animate-spin' : ''}`} />
+                          {isRegenerating ? 'Yenilənir...' : 'Təkrar yarat'}
+                        </button>
+                      </div>
+
+                      {/* Кнопка скачать */}
                       <a
                         href={`data:image/png;base64,${card.imageBase64}`}
                         download={`tapla_card_${card.index}_${card.role}.png`}
-                        className="text-xs text-black underline mt-1 inline-block"
+                        className="absolute bottom-3 right-3 text-xs text-black underline"
                       >
                         Yüklə
                       </a>
                     </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
 
               {stage === 'done' && (

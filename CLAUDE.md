@@ -1,12 +1,10 @@
 @AGENTS.md
 
-# shop.tapla.az — TAPLA MARKETPLACE (Электроника)
+# shop.tapla.az — TAPLA MARKETPLACE (E-commerce)
 
 **Стек:** Next.js 16 + React 19 + TypeScript + Tailwind CSS 4 + shadcn/ui + Framer Motion + Supabase
 
-**Домен:** shop.tapla.az (Азербайджан, маркетплейс электроники)
-
-**Бренд:** TAPLA MARKETPLACE — ноутбуки, смартфоны, планшеты, аксессуары
+**Домен:** shop.tapla.az (Азербайджан, маркетплейс)
 
 ---
 
@@ -15,6 +13,7 @@
 | Файл | О чём |
 |------|-------|
 | `docs/ARCHITECTURE.md` | Полная архитектура: структура, роуты, темы, секции, Supabase |
+| `docs/TOVAR-AI.md` | Tovar.AI — система AI-генерации карточек товаров (4 стадии) |
 
 ---
 
@@ -28,161 +27,139 @@ npm run lint      # ESLint
 
 ---
 
-## Структура проекта
+## Архитектура проекта
 
 ```
 src/
   app/
-    layout.tsx                    — Root layout (Inter, AppProviders, Header, Footer, StickyMobileBar)
-    page.tsx                      — Homepage (Hero → ProductGrid → ValueProps → ... → FAQ)
-    not-found.tsx                 — 404
+    layout.tsx                  — Root layout (Inter, AppProviders, Header, Footer, StickyMobileBar)
+    page.tsx                    — Homepage (Hero → ProductGrid → Reviews → FAQ)
+    not-found.tsx               — 404
     products/
-      page.tsx                    — Каталог
-      [slug]/page.tsx             — Детальная с generateStaticParams + generateMetadata
-      [slug]/ProductClient.tsx    — Клиентский компонент продукта
-    checkout/page.tsx             — Чекаут с корзиной и оплатой
-    collections/                  — Коллекции (v1)
-    api/orders/route.ts           — API заказов (v1)
+      page.tsx                  — Каталог
+      [slug]/page.tsx           — Детальная с generateStaticParams + generateMetadata
+      [slug]/ProductClient.tsx  — Клиентский компонент продукта
+    checkout/page.tsx           — Чекаут с корзиной и оплатой (3 способа: наличные, карта курьеру, online)
+    collections/                — Коллекции
+    admin/                      — Админ-панель (JWT auth)
+      tovar-ai/page.tsx         — UI генерации карточек (Drag&Drop фото, прогресс, результат)
+    api/
+      tovar-ai/generate/route.ts        — POST запуск пайплайна
+      tovar-ai/regenerate-card/route.ts — POST перегенерация одной карточки
   components/
-    ui/                           — Button, Container, Badge, Heading, Section, Input, Modal, Drawer, Accordion
-    layout/                       — Header, Footer, AnnouncementBar, StickyMobileBar
-    cards/                        — ProductCard, ReviewCard
-    sections/                     — Hero, ProductGrid, ValueProps, FeaturesStep, PromoBanners, Benefits, ReviewsSection, FAQ
-    landings/                     — (удалено, не используется)
+    ui/                         — Button, Container, Badge, Heading, Section, Input, Modal, Drawer, Accordion
+    layout/                     — Header, Footer, AnnouncementBar, StickyMobileBar
+    cards/                      — ProductCard, ReviewCard
+    auth/                       — AuthModal, AuthButton, AuthContext, PhonePrompt
+    checkout/                   — SecurePaymentAnimation, SecurePaymentTransition, PashaBankCard
+    landings/                   — landing-renderer, 9 секций (hero, benefits, ingredients, etc.)
   store/
-    CartContext.tsx               — Корзина с localStorage (key: tapla_cart)
+    CartContext.tsx              — Корзина с localStorage (key: tapla_cart)
   providers/
-    AppProviders.tsx              — CartProvider wrapper
+    AppProviders.tsx             — CartProvider + AuthProvider wrapper
   services/
-    db.ts                         — Data service: Supabase → static fallback
+    db.ts                        — Data service: Supabase → static fallback
   constants/
-    data.ts                       — 4 electronics products, reviews, FAQs, steps, benefits
+    data.ts                      — Статические продукты, отзывы, FAQ
   lib/
-    supabase/                     — client, admin, types, queries, schema.sql (единый DDL)
-    api/                          — profile.ts, profile-server.ts (бизнес-логика, не в SQL!)
-    utils.ts                      — cn()
-    animations.ts                 — Framer Motion variants
+    tovar-ai/                    — **AI subsystem (4-stage pipeline)**
+      types.ts                   — Все типы (VisionOutput, CardPrompt, PromptsOutput, CardResult, QAResult)
+      stage1-vision.ts           — Stage 1: Vision анализ фото (Gemma 4 31B / GPT-4o-mini)
+      stage2-planner.ts          — Stage 2: Creative Director — 7 триад ролей, 12 композиций, дизайн-библиотеки
+      stage3-generate.ts         — Stage 3: Параллельная генерация (Nano Banana 2, Promise.all)
+      stage4-qa.ts               — Stage 4: Quality Check (Vision-модель, 5 проверок)
+      pipeline.ts                — Оркестратор 4 стадий с callbacks
+      index.ts                   — barrel export
+      design/                    — Дизайн-библиотеки (11 JSON-файлов)
+    supabase/                    — client, admin, server, middleware, types, queries, schema.sql
+    api/                         — profile.ts, profile-server.ts
+    auth.ts                      — JWT авторизация админки (jose, httpOnly cookie, 24ч)
+    actions.ts                   — Server Actions (login, logout, CRUD товаров, submitOrder, updateOrderStatus)
+    utils.ts                     — cn()
+    animations.ts                — Framer Motion variants
   types/
-    index.ts                      — Product types + marketplace types
+    index.ts                     — Product, Review, FAQ, Benefit, LandingConfig, ThemeConfig
 ```
+
+---
 
 ## Роуты (полные)
 
 | Путь | Тип | Описание |
 |------|-----|----------|
-| `/` | Static | Homepage TAPLA MARKETPLACE (8 секций) |
+| `/` | Static | Homepage TAPLA MARKETPLACE |
 | `/products` | Static | Каталог |
 | `/products/{slug}` | SSG | Детальная товара |
-| `/checkout` | Dynamic | Чекаут с корзиной и онлайн-оплатой |
+| `/checkout` | Dynamic | Чекаут с корзиной (3 способа оплаты) |
 | `/collections` | Static | Коллекции |
-| `/collections/{slug}` | SSG | Детальная коллекции |
-| `/api/orders` | API | POST create order |
+| `/admin` | Server | Админ-панель (логин + дашборд) |
+| `/admin/products` | Server | CRUD товаров |
+| `/admin/orders` | Server | Заказы со сменой статуса |
+| `/admin/tovar-ai` | Client | Tovar.AI: генерация карточек |
+| `/api/tovar-ai/generate` | API | POST — полный пайплайн |
+| `/api/tovar-ai/regenerate-card` | API | POST — регенерация одной карточки |
+| `/api/orders` | API | POST — создание заказа |
+| Legal pages | Static | `/qaytarma-siyaseti`, `/satici-muqavilesi`, `/mexfilik-siyaseti`, `/istifade-sertleri`, `/huquqi-melumat` |
 
-## Секции главной
-
-| Секция | Файл | Особенности |
-|--------|------|-------------|
-| Hero | `Hero.tsx` | 3 слайда, авто-ротация 6с, framer-motion |
-| ProductGrid | `ProductGrid.tsx` | Фильтр по категориям, QuickView модалка |
-| ValueProps | `ValueProps.tsx` | Тест подбора товара, сравнение, AI чат, поддержка |
-| FeaturesStep | `FeaturesStep.tsx` | 4 шага покупки, интерактивный deck |
-| PromoBanners | `PromoBanners.tsx` | Dual banners + spotlight + category grid |
-| Benefits | `Benefits.tsx` | 4 колонки с иконками |
-| ReviewsSection | `ReviewsSection.tsx` | Snapshot 5.0, фильтры, форма отзыва |
-| FAQ | `FAQ.tsx` | Поиск, accordion, контакты WhatsApp/Phone/Email |
-
-## Ключевые решения интеграции
-
-- **framer-motion** вместо `motion/react` (та же API)
-- **lucide-react** v1.21.0 — соц-иконки: Globe, ExternalLink, CirclePlay
-- Импорты: `@/components/ui/...` вместо `../ui/...`
-- `[id]` → `[slug]` (чтобы избежать conflict в Next.js)
-- Supabase: lazy init отменён, `supabase` всегда non-null, fallback через try/catch
-
-## Supabase
-
-Подключена: `nzkqorbyexisnbyjhvdf.supabase.co`
-
-Таблицы:
-- **v1:** products, landings, media, orders, leads, collections, collection_products
-- **v2:** products, reviews, faqs (TAPLA MARKETPLACE data)
-
-Данные: `services/db.ts` → пробует Supabase → падает на `constants/data.ts`
-
-### Схема БД
-
-**Единый файл:** `src/lib/supabase/schema.sql` — полный актуальный DDL (таблицы, индексы, RLS).
-
-При добавлении новой таблицы или изменении структуры:
-1. Добавить `CREATE TABLE IF NOT EXISTS` в `schema.sql`
-
-
-### Архитектура: API-first (как в vakansiya)
-
-**Правило:** бизнес-логика в TypeScript (`lib/api/`), а НЕ в SQL триггерах.
-
-```
-lib/api/
-  profile.ts        — клиентские операции с профилем (браузер, anon key + RLS)
-  profile-server.ts — серверные операции (service_role, для Route Handlers)
-```
-
-**Паттерн для новой фичи:**
-1. Создать `lib/api/<feature>.ts` — все операции с БД через Server Actions или async-функции
-2. Если нужен серверный доступ (service_role) — создать `<feature>-server.ts`
-3. Клиентские компоненты импортируют из `lib/api/<feature>.ts`
-4. Route Handlers / Server Actions импортируют из `lib/api/<feature>-server.ts`
-5. SQL содержит **только структуру** (CREATE TABLE, индексы, RLS, updated_at триггер)
-6. **Никакой бизнес-логики в SQL** — форматирование, валидация, create/update логика только в коде
-
-**Пример:** форматирование телефона (`+994`) — в `lib/api/profile.ts` (TypeScript), не в SQL триггере.
+---
 
 ## Платёжная система (Pasha Bank)
 
-Оплата через шлюз **tapla.az** (отдельный Next.js проект на Vercel).
+Оплата через **tapla.az** (отдельный Next.js проект на Vercel, платёжный шлюз).
 
-### Как работает
+1. Чекаут → `submitOrder()` → если `online_card` → `POST tapla.az/api/payments/pasha/create`
+2. Шлюз создаёт транзакцию (mTLS), возвращает `redirectUrl`
+3. Браузер редиректится в Pasha Bank — пользователь вводит карту
+4. Callback → `orders.status = 'paid'`
+5. Возврат на `shop.tapla.az/checkout/success`
 
-1. Чекаут → `submitOrder()` в `lib/actions.ts`
-2. Если `paymentMethod === 'online_card'` → вызывает `POST tapla.az/api/payments/pasha/create`
-3. Шлюз создаёт транзакцию в Pasha Bank (mTLS), возвращает `redirectUrl`
-4. Браузер редиректится на страницу Pasha Bank — пользователь вводит карту
-5. Банк шлёт callback на `tapla.az/api/payments/pasha/callback` → шлюз обновляет `orders.status = 'paid'`
-6. Браузер возвращается на `tapla.az/api/payments/pasha/return` → редирект на `shop.tapla.az/checkout/success`
-
-### Ключевые файлы
-
-| Файл | Роль |
-|------|------|
-| `src/lib/actions.ts` | `submitOrder()` — создаёт заказ + вызывает шлюз для online_card |
-| `src/app/checkout/page.tsx` | Чекаут — убраны поля карты (ввод на стороне Pasha), редирект по `redirectUrl` |
-| `src/app/checkout/success/page.tsx` | Страница успешной оплаты |
-| `src/lib/supabase/migrations/001_payment_transactions.sql` | Таблица платежей (общая с tapla.az) |
-| `src/lib/supabase/migrations/002_extend_orders_status.sql` | Статусы `paid`, `payment_failed` |
-| `src/lib/supabase/migrations/003_fix_product_id_nullable.sql` | Фикс NOT NULL на product_id |
-
-### Vercel env vars (shop.tapla.az)
+### Vercel env vars
 
 ```
 GATEWAY_API_KEY=<общий секрет с tapla.az>
 GATEWAY_BASE_URL=https://tapla.az
 ```
 
+---
+
 ## Админ-панель
 
-| Роут | Описание |
-|------|---------|
-| `/admin` | Логин (пароль из `ADMIN_PASSWORD`) + дашборд |
-| `/admin/products` | Список товаров |
-| `/admin/products/new` | Создание товара |
-| `/admin/products/[id]/edit` | Редактирование |
-| `/admin/orders` | Заказы со сменой статуса |
+Авторизация: `ADMIN_PASSWORD` из `.env.local` → JWT (jose), httpOnly cookie, 24ч.
 
-Авторизация: JWT (jose), httpOnly cookie, 24ч.
+Файлы: `src/lib/auth.ts`, `src/app/admin/layout.tsx` (проверка auth), `src/app/admin/page.tsx` (дашборд).
 
-## Сборка
+CRUD товаров: `src/app/admin/products/*` (Server Actions в `lib/actions.ts`).
+
+Заказы: `/admin/orders` — список + select смена статуса.
+
+---
+
+## Supabase
+
+Подключена: `nzkqorbyexisnbyjhvdf.supabase.co`
+
+Таблицы: products, landings, media, profiles, orders, order_items, reviews, faqs, collections, collection_products, leads
+
+**Единый DDL:** `src/lib/supabase/schema.sql` (293 строки, все CREATE TABLE + индексы + RLS)
+
+**Паттерн:** бизнес-логика в TypeScript (`lib/api/`), SQL только для структуры.
+
+---
+
+## Сборка и деплой
 
 ```bash
-npm run build     # SSG — генерирует все страницы
-npm run dev       # dev-сервер
+npm run build     # SSG — генерирует все статические страницы
+npm run dev       # dev-сервер :3000
+```
+
+---
+
+## PM2 (если запущено локально)
+
+```bash
+# В корне Mac-Server
+pm2 list | grep shop
+# Перезапуск после изменений
+pm2 restart shop.tapla.az
 ```
