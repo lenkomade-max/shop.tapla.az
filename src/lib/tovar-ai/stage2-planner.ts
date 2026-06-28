@@ -1,38 +1,63 @@
 // ============================================================================
 // Stage 2: Creative Director + Prompt Planner
-// 12 стилей + 8 design-библиотек + авто-адаптация → в промпты
-// LLM = Creative Director: выбирает угол, лэйаут, позицию, фон, эффекты
+// 3-слойная система: Creative Style (40) + Marketing Style (30) + Visual Theme
+// + 8 design-библиотек (layouts, positions, backgrounds, effects, rules, etc.)
 // ============================================================================
 
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 import { TOVAR_AI_CONFIG, type VisionOutput, type PromptsOutput } from './types'
 
-// ─── ФОТО-СТИЛИ (12 шт, из JSON) ───────────────────────────────────────────
+// ─── ТИПЫ ДЛЯ 3 СЛОЁВ ───────────────────────────────────────────────────────
 
-interface PhotoStyle {
-  id: string; name: string; prompt_prefix: string; forbidden: string[]
-  composition: string; lighting: string; use_for: string[]
+interface CreativeStyle {
+  id: string; name: string; description: string
+  prompt_fragment: string; use_for: string[]
   needs_model: boolean; needs_environment: boolean
 }
 
+interface MarketingStyle {
+  id: string; name: string; description: string
+  tone: string; best_for: string[]; prompt_fragment: string
+}
+
+interface VisualThemeItem {
+  id: string; name: string; description: string; prompt_fragment: string
+}
+
+interface VisualThemeCatalog {
+  description: string; rule: string
+  lighting: VisualThemeItem[]
+  background_style: VisualThemeItem[]
+  mood: VisualThemeItem[]
+}
+
+// ─── ЗАГРУЗКА БИБЛИОТЕК ─────────────────────────────────────────────────────
+
 // __dirname не работает в Next.js (компилируется в /ROOT/).
-// Используем process.cwd() + известный путь от корня проекта.
 const TOLER_AI_DIR = path.join(process.cwd(), 'src/lib/tovar-ai')
-const STYLES_DIR = path.join(TOLER_AI_DIR, 'styles')
 const DESIGN_DIR = path.join(TOLER_AI_DIR, 'design')
 
-function loadAllPhotoStyles(): PhotoStyle[] {
-  return fs.readdirSync(STYLES_DIR)
-    .filter(f => f.startsWith('s') && f.endsWith('.json'))
-    .map(f => JSON.parse(fs.readFileSync(path.join(STYLES_DIR, f), 'utf-8')) as PhotoStyle)
+function loadCreativeStyles(): CreativeStyle[] {
+  const raw = fs.readFileSync(path.join(DESIGN_DIR, 'creative-styles.json'), 'utf-8')
+  return (JSON.parse(raw) as { styles: CreativeStyle[] }).styles
+}
+
+function loadMarketingStyles(): MarketingStyle[] {
+  const raw = fs.readFileSync(path.join(DESIGN_DIR, 'marketing-styles.json'), 'utf-8')
+  return (JSON.parse(raw) as { styles: MarketingStyle[] }).styles
+}
+
+function loadVisualThemes(): VisualThemeCatalog {
+  const raw = fs.readFileSync(path.join(DESIGN_DIR, 'visual-themes.json'), 'utf-8')
+  return JSON.parse(raw) as VisualThemeCatalog
 }
 
 function loadDesignLibrary(name: string): string {
   return fs.readFileSync(path.join(DESIGN_DIR, name), 'utf-8')
 }
 
-// ─── БАЗОВЫЙ ПРОМПТ (оригинал, без правок) ────────────────────────────────
+// ─── БАЗОВЫЙ ПРОМПТ (оригинал, без правок) ──────────────────────────────────
 
 const BASE_PROMPT = `Create a premium marketplace product image.
 
@@ -74,16 +99,30 @@ Fitness products should receive sports environments.
 Office products should receive office environments.
 Pet products should receive home environments.`
 
-// ─── SYSTEM PROMPT — Creative Director ─────────────────────────────────────
+// ─── SYSTEM PROMPT — Creative Director (3 слоя) ─────────────────────────────
 
-const SYSTEM_PROMPT = `You are a Creative Director for TAPLA MARKETPLACE (Azerbaijan). You design advertising creatives for e-commerce, not just images.
+const SYSTEM_PROMPT = `You are a Creative Director for TAPLA MARKETPLACE (Azerbaijan). You design advertising creatives for e-commerce using a 3-layer style system.
 
-Given: product analysis + photo style per card + design libraries.
-Your job: select marketing strategy, layout, positioning, background, effects for each of 3 cards.
+## 3-LAYER SYSTEM
+
+### Layer 1 — Creative Style (WHAT is in the frame)
+Composition layout. You are ASSIGNED one creative style per card — do not change it. Your job is to execute it perfectly.
+
+### Layer 2 — Marketing Style (WHAT message we communicate)
+Pick ONE per card. The marketing style defines what we are selling:
+- main_cover → Premium Brand, Premium Quality, Bestseller, New Arrival, Feature First
+- usage_demo → Lifestyle, Easy To Use, Problem→Solution, Home Use, Comfort
+- features_detail → Feature First, Premium Quality, Performance, Technology, Durability
+
+### Layer 3 — Visual Theme (HOW it looks)
+Pick ONE lighting + ONE background style + ONE mood per card. They must work together:
+- Lighting sets the mood: soft studio, dramatic spotlight, natural daylight, dark moody, high contrast, golden hour
+- Background style sets the stage: pure white, premium gradient, marble surface, dark studio, environmental, abstract tech, editorial backdrop
+- Mood sets the feeling: minimal luxury, editorial/vogue, technology/innovation, warm & cozy, dynamic/action, clean & clinical
 
 ## 3 CARDS
 
-Card 1 (main_cover): Hero shot. Product dominant. STOP the scroll. Magazine quality. Large AZ headline.
+Card 1 (main_cover): Hero shot. STOP the scroll. Magazine quality. Large AZ headline.
 Card 2 (usage_demo): Product in use. Lifestyle context. Create desire.
 Card 3 (features_detail): Details, quality, features. Infographic style.
 
@@ -92,14 +131,15 @@ Card 3 (features_detail): Details, quality, features. Infographic style.
 - Short: 3-5 words per headline. Examples: "LED TERAPİYA", "3 REJİM", "ERQONOMİK DİZAYN"
 
 ## PROCESS
-1. Pick ONE marketing angle per card (from marketing_angles library)
-2. Pick ONE layout per card (from layouts library)
-3. Select position, background, visual effects for each card
-4. Run Creative Director self-review (all 6 questions MUST be YES)
-5. If any question = NO, redesign and try again
-6. Write the final image description
+1. You receive an assigned Creative Style per card — execute it
+2. Pick ONE Marketing Style per card (from marketing_styles library)
+3. Select lighting + background style + mood per card (from visual_themes library)
+4. Pick layout, position, background, visual effects from design libraries
+5. Run Creative Director self-review (all 6 questions MUST be YES)
+6. If any question = NO, redesign and try again
+7. Write the final image description
 
-## PROMT RULES
+## PROMPT RULES
 - Each prompt_en under 300 words
 - Full English sentences for Nano Banana 2
 - Reference original photo for product shape/color fidelity
@@ -107,16 +147,19 @@ Card 3 (features_detail): Details, quality, features. Infographic style.
 
 Output ONLY valid JSON. No markdown.`
 
-// ─── USER PROMPT (собирается динамически с design-библиотеками) ────────────
+// ─── USER PROMPT (собирается динамически) ───────────────────────────────────
 
 function buildUserPrompt(
-  s1: PhotoStyle, s2: PhotoStyle, s3: PhotoStyle,
+  cs1: CreativeStyle, cs2: CreativeStyle, cs3: CreativeStyle,
   analysis: VisionOutput,
   providerDescription?: string,
   characteristics?: Record<string, string>,
 ): string {
+  const CREATIVE_STYLES = loadCreativeStyles()
+  const MARKETING_STYLES = loadMarketingStyles()
+  const VISUAL_THEMES = loadVisualThemes()
+
   const DESIGN = {
-    marketing_angles: loadDesignLibrary('marketing-angles.json'),
     layouts: loadDesignLibrary('layouts.json'),
     positions: loadDesignLibrary('positions.json'),
     backgrounds: loadDesignLibrary('backgrounds.json'),
@@ -126,14 +169,20 @@ function buildUserPrompt(
     creative_director: loadDesignLibrary('creative-director.json'),
   }
 
-  // Собираем через конкатенацию (JSON контент может ломать template literals)
+  // Собираем через конкатенацию (JSON контент ломает template literals)
   return [
-    'Create 3 image prompts for this product. Act as Creative Director.',
+    'Create 3 image prompts for this product. Act as Creative Director using the 3-layer system.',
     '',
-    '## DESIGN LIBRARIES — use these to build each card',
+    '## LAYER 1 — Creative Style Library (40 styles — WHAT is in frame)',
+    JSON.stringify(CREATIVE_STYLES, null, 2),
     '',
-    '### Marketing Angles (pick ONE per card)',
-    DESIGN.marketing_angles,
+    '## LAYER 2 — Marketing Style Library (30 styles — WHAT message we sell)',
+    JSON.stringify(MARKETING_STYLES, null, 2),
+    '',
+    '## LAYER 3 — Visual Theme Library (HOW it looks)',
+    JSON.stringify(VISUAL_THEMES, null, 2),
+    '',
+    '## SUPPORTING DESIGN LIBRARIES',
     '',
     '### Layouts (pick ONE per card)',
     DESIGN.layouts,
@@ -156,11 +205,11 @@ function buildUserPrompt(
     '### Creative Director Self-Review (MUST pass all 6)',
     DESIGN.creative_director,
     '',
-    '## PHOTO STYLES ASSIGNED',
+    '## CREATIVE STYLES ASSIGNED (do NOT change)',
     '',
-    'CARD 1 STYLE: ' + s1.name + ' — ' + s1.prompt_prefix,
-    'CARD 2 STYLE: ' + s2.name + ' — ' + s2.prompt_prefix,
-    'CARD 3 STYLE: ' + s3.name + ' — ' + s3.prompt_prefix,
+    'CARD 1 CREATIVE STYLE: ' + cs1.id + ' — ' + cs1.name + ' — ' + cs1.prompt_fragment,
+    'CARD 2 CREATIVE STYLE: ' + cs2.id + ' — ' + cs2.name + ' — ' + cs2.prompt_fragment,
+    'CARD 3 CREATIVE STYLE: ' + cs3.id + ' — ' + cs3.name + ' — ' + cs3.prompt_fragment,
     '',
     '## Product Analysis',
     JSON.stringify(analysis, null, 2),
@@ -177,49 +226,69 @@ function buildUserPrompt(
     '    {',
     '      "index": 1,',
     '      "purpose": "main_cover",',
-    '      "marketing_angle": "premium",',
+    '      "creative_style": "' + cs1.id + '",',
+    '      "marketing_style": "ms04",',
+    '      "visual_theme": {',
+    '        "lighting": "soft_studio",',
+    '        "background_style": "pure_white",',
+    '        "mood": "minimal_luxury"',
+    '      },',
     '      "layout": "C",',
-    '      "product_position": "45° rotated",',
+    '      "product_position": "Center front",',
     '      "background": "Soft white studio",',
     '      "visual_effects": ["soft_glow"],',
     '      "creative_director_passed": true,',
     '      "prompt_en": "Full product scene description in English. Under 300 words.",',
     '      "text_overlay_az": ["HEADLINE AZ"],',
-    '      "needs_model": false',
+    '      "needs_model": ' + String(cs1.needs_model),
     '    },',
     '    {',
     '      "index": 2,',
     '      "purpose": "usage_demo",',
-    '      "marketing_angle": "lifestyle",',
+    '      "creative_style": "' + cs2.id + '",',
+    '      "marketing_style": "ms20",',
+    '      "visual_theme": {',
+    '        "lighting": "natural_daylight",',
+    '        "background_style": "environmental",',
+    '        "mood": "warm_cozy"',
+    '      },',
     '      "layout": "G",',
-    '      "product_position": "in hand",',
+    '      "product_position": "In hand",',
     '      "background": "Modern bathroom",',
     '      "visual_effects": [],',
     '      "creative_director_passed": true,',
     '      "prompt_en": "...",',
     '      "text_overlay_az": [],',
-    '      "needs_model": true',
+    '      "needs_model": ' + String(cs2.needs_model),
     '    },',
     '    {',
     '      "index": 3,',
     '      "purpose": "features_detail",',
-    '      "marketing_angle": "features",',
+    '      "creative_style": "' + cs3.id + '",',
+    '      "marketing_style": "ms03",',
+    '      "visual_theme": {',
+    '        "lighting": "soft_studio",',
+    '        "background_style": "pure_white",',
+    '        "mood": "clean_clinical"',
+    '      },',
     '      "layout": "features_row",',
-    '      "product_position": "macro close-up",',
+    '      "product_position": "Macro close-up (partial)",',
     '      "background": "Soft white studio",',
     '      "visual_effects": ["luxury_highlights"],',
     '      "creative_director_passed": true,',
     '      "prompt_en": "...",',
     '      "text_overlay_az": ["FEATURE 1 AZ", "FEATURE 2 AZ"],',
-    '      "needs_model": false',
+    '      "needs_model": ' + String(cs3.needs_model),
     '    }',
     '  ]',
     '}',
     '',
     'RULES:',
+    '- creative_style: use the ASSIGNED id — do not change it.',
+    '- marketing_style: pick from the Marketing Style Library (ms01-ms30).',
+    '- visual_theme: pick lighting, background_style, mood from Visual Theme Library.',
     '- text_overlay_az: AZERBAIJANI LATIN ONLY. Empty array [] if no text.',
     '- Every card must have creative_director_passed = true.',
-    '- Do NOT invent new styles — use the assigned photo style.',
     '- One image = one marketing message.',
     '- prompt_en writes product scene only — style prefix, design libraries, and rules are added automatically.',
     '',
@@ -227,9 +296,13 @@ function buildUserPrompt(
   ].join('\n')
 }
 
-// ─── ВЫБОР СТИЛЯ ДЛЯ КАЖДОЙ КАРТОЧКИ (код, не LLM) ────────────────────────
+// ─── ВЫБОР CREATIVE STYLE (код, не LLM) ─────────────────────────────────────
 
-function pickStyle(useFor: string, vision: VisionOutput, styles: PhotoStyle[]): PhotoStyle {
+function pickCreativeStyle(
+  useFor: string,
+  vision: VisionOutput,
+  styles: CreativeStyle[],
+): CreativeStyle {
   const candidates = styles.filter(s => s.use_for.includes(useFor))
 
   // Фильтруем по model/environment требованиям
@@ -241,41 +314,136 @@ function pickStyle(useFor: string, vision: VisionOutput, styles: PhotoStyle[]): 
 
   const pool = filtered.length > 0 ? filtered : candidates
 
-  // s01 (white studio) — дефолт для main_cover
+  // main_cover: приоритеты по premium_level
   if (useFor === 'main_cover') {
-    const white = pool.find(s => s.id === 's01-white-studio')
-    if (white) return white
+    // luxury → cs37 Minimal Luxury, cs27 Premium Gradient, cs12 Premium Showcase
+    if (vision.premium_level === 'luxury') {
+      const luxuryPick = pool.find(s => s.id === 'cs37')
+        || pool.find(s => s.id === 'cs27')
+        || pool.find(s => s.id === 'cs12')
+      if (luxuryPick) return luxuryPick
+    }
+    // premium → cs01 Hero Product, cs25 Premium Banner
+    if (vision.premium_level === 'premium') {
+      const premiumPick = pool.find(s => s.id === 'cs01')
+        || pool.find(s => s.id === 'cs25')
+        || pool.find(s => s.id === 'cs04')
+      if (premiumPick) return premiumPick
+    }
+    // budget/mid → cs02 Product + Price, cs26 Clean Marketplace
+    if (vision.premium_level === 'budget' || vision.premium_level === 'mid') {
+      const valuePick = pool.find(s => s.id === 'cs26')
+        || pool.find(s => s.id === 'cs02')
+        || pool.find(s => s.id === 'cs01')
+      if (valuePick) return valuePick
+    }
+    // дефолт: cs01 Hero Product
+    const hero = pool.find(s => s.id === 'cs01')
+    if (hero) return hero
   }
 
-  // Для usage_demo с моделью — s03 (in-use) приоритет
+  // usage_demo с моделью → cs07 Product In Use, cs06 In Hand
   if (useFor === 'usage_demo' && vision.needs_human_model) {
-    const inUse = pool.find(s => s.id === 's03-product-in-use')
+    const inUse = pool.find(s => s.id === 'cs07')
+      || pool.find(s => s.id === 'cs06')
     if (inUse) return inUse
   }
 
-  // Для usage_demo без модели — s02 (lifestyle)
+  // usage_demo без модели → cs11 Lifestyle Hero, cs08 Premium Interior, cs29 Environmental Scene
   if (useFor === 'usage_demo' && !vision.needs_human_model) {
-    const life = pool.find(s => s.id === 's02-luxury-lifestyle')
+    const life = pool.find(s => s.id === 'cs11')
+      || pool.find(s => s.id === 'cs08')
+      || pool.find(s => s.id === 'cs29')
     if (life) return life
   }
 
-  // Для features_detail с макро — s06
+  // features_detail с макро → cs10 Macro Detail
   if (useFor === 'features_detail' && vision.needs_macro_shots) {
-    const macro = pool.find(s => s.id === 's06-macro-detail')
+    const macro = pool.find(s => s.id === 'cs10')
     if (macro) return macro
   }
 
-  // Для features_detail с exploded — s07
+  // features_detail с exploded → cs21 Exploded View
   if (useFor === 'features_detail' && vision.needs_exploded_view) {
-    const exp = pool.find(s => s.id === 's07-exploded-view')
+    const exp = pool.find(s => s.id === 'cs21')
     if (exp) return exp
+  }
+
+  // features_detail дефолт → cs04 Premium Feature, cs22 Benefits Around
+  if (useFor === 'features_detail') {
+    const feat = pool.find(s => s.id === 'cs04')
+      || pool.find(s => s.id === 'cs22')
+      || pool.find(s => s.id === 'cs16')
+    if (feat) return feat
   }
 
   // Дефолт: первая подходящая
   return pool[0] || candidates[0] || styles[0]
 }
 
-// ─── MAIN ──────────────────────────────────────────────────────────────────
+// ─── ВЫБОР MARKETING STYLE (код даёт дефолт, LLM может переопределить) ──────
+
+function pickMarketingStyle(
+  useFor: string,
+  _vision: VisionOutput,
+  styles: MarketingStyle[],
+): MarketingStyle {
+  const candidates = styles.filter(s => s.best_for.includes(useFor))
+
+  if (useFor === 'main_cover') {
+    // Приоритет: Premium Brand > Premium Quality > Feature First
+    const pick = candidates.find(s => s.id === 'ms27')  // Premium Brand
+      || candidates.find(s => s.id === 'ms04')           // Premium Quality
+      || candidates.find(s => s.id === 'ms06')           // Bestseller
+    if (pick) return pick
+  }
+
+  if (useFor === 'usage_demo') {
+    const pick = candidates.find(s => s.id === 'ms20')   // Lifestyle
+      || candidates.find(s => s.id === 'ms09')           // Easy To Use
+      || candidates.find(s => s.id === 'ms11')           // Home Use
+    if (pick) return pick
+  }
+
+  if (useFor === 'features_detail') {
+    const pick = candidates.find(s => s.id === 'ms03')   // Feature First
+      || candidates.find(s => s.id === 'ms04')           // Premium Quality
+      || candidates.find(s => s.id === 'ms15')           // Performance
+    if (pick) return pick
+  }
+
+  return candidates[0] || styles[0]
+}
+
+// ─── ВЫБОР VISUAL THEME (код даёт дефолт, LLM может переопределить) ─────────
+
+function pickVisualTheme(
+  useFor: string,
+  vision: VisionOutput,
+  themes: VisualThemeCatalog,
+): { lighting: string; background_style: string; mood: string } {
+  if (useFor === 'main_cover') {
+    if (vision.premium_level === 'luxury' || vision.premium_level === 'premium') {
+      return { lighting: 'soft_studio', background_style: 'premium_gradient', mood: 'minimal_luxury' }
+    }
+    return { lighting: 'soft_studio', background_style: 'pure_white', mood: 'clean_clinical' }
+  }
+
+  if (useFor === 'usage_demo') {
+    return { lighting: 'natural_daylight', background_style: 'environmental', mood: 'warm_cozy' }
+  }
+
+  if (useFor === 'features_detail') {
+    if (vision.premium_level === 'luxury' || vision.premium_level === 'premium') {
+      return { lighting: 'softbox_diffused', background_style: 'dark_studio', mood: 'tech_innovation' }
+    }
+    return { lighting: 'soft_studio', background_style: 'pure_white', mood: 'clean_clinical' }
+  }
+
+  return { lighting: 'soft_studio', background_style: 'pure_white', mood: 'minimal_luxury' }
+}
+
+// ─── MAIN ────────────────────────────────────────────────────────────────────
 
 export async function planCardPrompts(
   analysis: VisionOutput,
@@ -283,15 +451,33 @@ export async function planCardPrompts(
   characteristics?: Record<string, string>,
 ): Promise<PromptsOutput> {
   const config = TOVAR_AI_CONFIG
-  const styles = loadAllPhotoStyles()
+  const creativeStyles = loadCreativeStyles()
+  const marketingStyles = loadMarketingStyles()
+  const visualThemes = loadVisualThemes()
 
-  const s1 = pickStyle('main_cover', analysis, styles)
-  const s2 = pickStyle('usage_demo', analysis, styles)
-  const s3 = pickStyle('features_detail', analysis, styles)
+  // Код выбирает creative styles (структурное решение)
+  const cs1 = pickCreativeStyle('main_cover', analysis, creativeStyles)
+  const cs2 = pickCreativeStyle('usage_demo', analysis, creativeStyles)
+  const cs3 = pickCreativeStyle('features_detail', analysis, creativeStyles)
 
-  console.log(`[Stage 2] Styles: card1=${s1.id}, card2=${s2.id}, card3=${s3.id}`)
+  // Код даёт дефолты для marketing и visual theme (LLM может переопределить)
+  const ms1 = pickMarketingStyle('main_cover', analysis, marketingStyles)
+  const ms2 = pickMarketingStyle('usage_demo', analysis, marketingStyles)
+  const ms3 = pickMarketingStyle('features_detail', analysis, marketingStyles)
 
-  const userPrompt = buildUserPrompt(s1, s2, s3, analysis, providerDescription, characteristics)
+  const vt1 = pickVisualTheme('main_cover', analysis, visualThemes)
+  const vt2 = pickVisualTheme('usage_demo', analysis, visualThemes)
+  const vt3 = pickVisualTheme('features_detail', analysis, visualThemes)
+
+  const styleMap = [cs1, cs2, cs3]
+  const msMap = [ms1, ms2, ms3]
+  const vtMap = [vt1, vt2, vt3]
+
+  console.log(`[Stage 2] Creative Styles: card1=${cs1.id} (${cs1.name}), card2=${cs2.id} (${cs2.name}), card3=${cs3.id} (${cs3.name})`)
+  console.log(`[Stage 2] Marketing Styles: card1=${ms1.id} (${ms1.name}), card2=${ms2.id} (${ms2.name}), card3=${ms3.id} (${ms3.name})`)
+  console.log(`[Stage 2] Visual Themes: card1=${vt1.mood}, card2=${vt2.mood}, card3=${vt3.mood}`)
+
+  const userPrompt = buildUserPrompt(cs1, cs2, cs3, analysis, providerDescription, characteristics)
 
   const body = {
     model: config.PLANNER_MODEL,
@@ -321,10 +507,13 @@ export async function planCardPrompts(
   const data = await response.json()
   const raw = data.choices?.[0]?.message?.content || ''
   const parsed = parseJSON<{
-    cards: Array<PromptsOutput['cards'][number] & {
-      marketing_angle?: string; layout?: string
-      product_position?: string; background?: string
+    cards: Array<{
+      index: number; purpose: string
+      creative_style?: string; marketing_style?: string
+      visual_theme?: { lighting: string; background_style: string; mood: string }
+      layout?: string; product_position?: string; background?: string
       visual_effects?: string[]; creative_director_passed?: boolean
+      prompt_en: string; text_overlay_az: string[]; needs_model: boolean
     }>
   }>(raw)
 
@@ -332,17 +521,28 @@ export async function planCardPrompts(
     throw new Error(`Stage 2: Expected 3 cards, got ${parsed.cards?.length || 0}`)
   }
 
-  // Сборка финального промпта: [BASE] + [дизайн-решения] + [стиль] + [контент]
-  const styleMap = [s1, s2, s3]
-
+  // Сборка финального промпта: [BASE] + [Creative Style] + [Marketing Style] + [Visual Theme] + [LLM content]
   for (const card of parsed.cards) {
-    const style = styleMap[card.index - 1]
+    const cs = styleMap[card.index - 1]
+    const ms = card.marketing_style
+      ? marketingStyles.find(m => m.id === card.marketing_style) || msMap[card.index - 1]
+      : msMap[card.index - 1]
+    const vt = card.visual_theme || vtMap[card.index - 1]
+
+    // Находим lighting, background_style, mood описания из каталога
+    const lightingItem = visualThemes.lighting.find(l => l.id === vt.lighting)
+    const bgItem = visualThemes.background_style.find(b => b.id === vt.background_style)
+    const moodItem = visualThemes.mood.find(m => m.id === vt.mood)
 
     const designDecisions = [
-      card.marketing_angle ? `Marketing angle: ${card.marketing_angle}.` : '',
+      `Creative Style: ${cs.name}. ${cs.prompt_fragment}`,
+      `Marketing Style: ${ms.name}. ${ms.prompt_fragment}`,
+      `Visual Theme — Lighting: ${lightingItem?.prompt_fragment || vt.lighting}.`,
+      `Visual Theme — Background: ${bgItem?.prompt_fragment || vt.background_style}.`,
+      `Visual Theme — Mood: ${moodItem?.prompt_fragment || vt.mood}.`,
       card.layout ? `Layout: ${card.layout}.` : '',
       card.product_position ? `Product position: ${card.product_position}.` : '',
-      card.background ? `Background: ${card.background}.` : '',
+      card.background ? `Environment: ${card.background}.` : '',
       Array.isArray(card.visual_effects) && card.visual_effects.length > 0
         ? `Visual effects: ${card.visual_effects.join(', ')}.` : '',
     ].filter(Boolean).join(' ')
@@ -354,28 +554,34 @@ export async function planCardPrompts(
     card.prompt_en = [
       BASE_PROMPT,
       designDecisions,
-      `STYLE: ${style.name}. ${style.prompt_prefix}`,
-      `Composition: ${style.composition}. Lighting: ${style.lighting}.`,
       textInstruction,
       card.prompt_en,
     ].filter(Boolean).join(' ')
   }
 
-  // Убираем design-поля из cards (не нужны дальше)
+  // Убираем design-поля из cards, оставляем нужное для генерации
   const cleanCards = parsed.cards.map(c => ({
     index: c.index,
-    purpose: c.purpose,
+    purpose: c.purpose as 'main_cover' | 'usage_demo' | 'features_detail',
     prompt_en: c.prompt_en,
     text_overlay_az: c.text_overlay_az,
     needs_model: c.needs_model,
     composition: c.layout || 'center',
     reference_weight: c.purpose === 'main_cover' ? 0.8 : c.needs_model ? 0.5 : 0.8,
+    creative_style: c.creative_style || styleMap[c.index - 1].id,
+    marketing_style: c.marketing_style || msMap[c.index - 1].id,
+    visual_theme: c.visual_theme || vtMap[c.index - 1],
   }))
 
-  return { style_name: `${s1.id}+${s2.id}+${s3.id}`, cards: cleanCards }
+  return {
+    style_name: `${cs1.id}+${cs2.id}+${cs3.id}`,
+    marketing_styles: [ms1.id, ms2.id, ms3.id],
+    visual_themes: [vt1, vt2, vt3],
+    cards: cleanCards,
+  }
 }
 
-// ─── Helpers ────────────────────────────────────────────────────────────────
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function parseJSON<T>(raw: string): T {
   let cleaned = raw.trim()

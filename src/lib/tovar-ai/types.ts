@@ -58,15 +58,25 @@ export interface VisionOutput {
 export interface CardPrompt {
   index: number // 1, 2, 3
   purpose: 'main_cover' | 'usage_demo' | 'features_detail'
-  prompt_en: string // полный промпт на английском для Nano Banana (style уже вшит)
+  prompt_en: string // полный промпт на английском для Nano Banana
   text_overlay_az: string[] // тексты для карточки на азербайджанском
-  composition: string // описание композиции
+  composition: string // описание композиции (layout)
   needs_model: boolean
   reference_weight: number // 0.0–1.0
+  // 3-слойная система стилей
+  creative_style: string // cs01..cs40 — ЧТО в кадре
+  marketing_style: string // ms01..ms30 — КАКОЕ сообщение
+  visual_theme: {
+    lighting: string // soft_studio, dramatic_spotlight, natural_daylight, ...
+    background_style: string // pure_white, premium_gradient, marble_surface, ...
+    mood: string // minimal_luxury, editorial_vogue, tech_innovation, ...
+  }
 }
 
 export interface PromptsOutput {
-  style_name: string // имя выбранного стиля (из папки styles/)
+  style_name: string // строка с выбранными стилями: "cs01+cs07+cs10"
+  marketing_styles: string[] // ms01, ms07, ms03
+  visual_themes: Array<{ lighting: string; background_style: string; mood: string }>
   cards: CardPrompt[]
 }
 

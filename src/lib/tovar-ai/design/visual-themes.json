@@ -1,0 +1,178 @@
+{
+  "description": "Visual Themes — HOW the image looks. Lighting, background style, and mood define the aesthetic treatment.",
+  "rule": "Pick ONE lighting, ONE background style, and ONE mood per card. They must work together harmoniously and support the chosen Creative Style and Marketing Style.",
+  "lighting": [
+    {
+      "id": "soft_studio",
+      "name": "Soft Studio",
+      "description": "Soft diffused studio lighting. Even illumination. Clean commercial look.",
+      "prompt_fragment": "Soft diffused studio lighting with even illumination. No harsh shadows. Clean commercial product photography lighting."
+    },
+    {
+      "id": "dramatic_spotlight",
+      "name": "Dramatic Spotlight",
+      "description": "Focused spotlight creating drama. Deep shadows. High-end advertising look.",
+      "prompt_fragment": "Dramatic focused spotlight on the product. Deep luxury shadows in the background. High-end commercial advertising lighting with strong light direction."
+    },
+    {
+      "id": "natural_daylight",
+      "name": "Natural Daylight",
+      "description": "Soft natural daylight through large windows. Warm and inviting. Lifestyle photography.",
+      "prompt_fragment": "Soft natural daylight streaming through large windows. Warm natural color temperature. Lifestyle photography lighting that feels authentic and inviting."
+    },
+    {
+      "id": "dark_moody",
+      "name": "Dark Moody",
+      "description": "Dark background with selective light on product. Moody atmosphere. Luxury feel.",
+      "prompt_fragment": "Dark moody lighting with selective illumination on the product only. Moody sophisticated atmosphere. The darkness around the product creates mystery and luxury."
+    },
+    {
+      "id": "high_contrast",
+      "name": "High Contrast",
+      "description": "Strong dark-light contrast. Bold shadows. Dramatic premium look.",
+      "prompt_fragment": "High contrast lighting with strong dark-light separation. Bold defined shadows. Dramatic premium product photography. The contrast makes the product pop."
+    },
+    {
+      "id": "golden_hour",
+      "name": "Golden Hour",
+      "description": "Warm golden light. Sunset quality. Lifestyle and beauty products.",
+      "prompt_fragment": "Warm golden hour lighting. Sunset-quality golden tones. Beautiful warm light wrapping around the product. Lifestyle and beauty photography lighting."
+    },
+    {
+      "id": "rim_light",
+      "name": "Rim Light",
+      "description": "Edge light defining product silhouette. Dark background. Premium tech look.",
+      "prompt_fragment": "Rim lighting defining the product edges and silhouette. Dark background. Premium technology product look. The edge light separates the product from darkness elegantly."
+    },
+    {
+      "id": "softbox_diffused",
+      "name": "Softbox Diffused",
+      "description": "Large softbox overhead. Very soft shadows. Clean e-commerce standard.",
+      "prompt_fragment": "Large softbox diffused lighting from above. Very soft barely-visible shadows. Clean e-commerce standard lighting. The most flattering product lighting."
+    }
+  ],
+  "background_style": [
+    {
+      "id": "pure_white",
+      "name": "Pure White",
+      "description": "Pure white seamless background. Clean marketplace standard. Amazon style.",
+      "prompt_fragment": "Pure white seamless background (#FFFFFF). Ultra clean. Amazon and Trendyol main image standard. Product is the only thing visible."
+    },
+    {
+      "id": "premium_gradient",
+      "name": "Premium Gradient",
+      "description": "Luxury gradient background. Smooth color transition. High-end cosmetic/tech aesthetic.",
+      "prompt_fragment": "Luxury smooth gradient background. Elegant color transition that complements the product. High-end cosmetic and technology brand aesthetic. No hard edges."
+    },
+    {
+      "id": "dark_studio",
+      "name": "Dark Studio",
+      "description": "Dark premium studio background. Product emerges from darkness. Luxury feel.",
+      "prompt_fragment": "Dark premium studio background. Deep charcoal or black. Product illuminated to emerge from the darkness. Luxury high-contrast presentation."
+    },
+    {
+      "id": "marble_surface",
+      "name": "Marble Surface",
+      "description": "Premium marble surface. White or dark marble. Luxury reflections underneath.",
+      "prompt_fragment": "Premium marble surface as base. White Carrara or dark marble with natural veining. Luxury reflections visible on the polished stone. High-end retail display quality."
+    },
+    {
+      "id": "wood_surface",
+      "name": "Wood Surface",
+      "description": "Rich wood surface. Warm tones. Craftsmanship feel. Natural texture.",
+      "prompt_fragment": "Rich natural wood surface. Warm wood tones with visible grain texture. Craftsmanship and quality feeling. The organic texture contrasts beautifully with the product."
+    },
+    {
+      "id": "metal_surface",
+      "name": "Metal Surface",
+      "description": "Brushed metal surface. Industrial premium. Modern tech feel.",
+      "prompt_fragment": "Brushed metal surface with subtle grain. Industrial premium feel. Modern technology aesthetic. Cool tones with metallic reflections."
+    },
+    {
+      "id": "glass_surface",
+      "name": "Glass Surface",
+      "description": "Glass surface with reflections. Clean and modern. Premium minimal.",
+      "prompt_fragment": "Glass surface with subtle premium reflections. Clean modern minimal aesthetic. The transparency and reflections add depth and sophistication."
+    },
+    {
+      "id": "environmental",
+      "name": "Environmental",
+      "description": "Real environment matching product category. Kitchen, bathroom, office, etc.",
+      "prompt_fragment": "Real environmental background matching the product's natural use context. Appropriate to product category. The environment supports the product story without distracting."
+    },
+    {
+      "id": "abstract_tech",
+      "name": "Abstract Technology",
+      "description": "Abstract technology background. Subtle glow patterns. Electronics and innovation.",
+      "prompt_fragment": "Abstract technology background with subtle glowing elements. Circuit-like or geometric patterns barely visible. Modern electronics and innovation aesthetic. Dark with tech accents."
+    },
+    {
+      "id": "editorial_backdrop",
+      "name": "Editorial Backdrop",
+      "description": "Textured photography backdrop. Magazine quality. Fashion and lifestyle.",
+      "prompt_fragment": "Textured premium photography backdrop. Canvas or subtle fabric texture. Magazine editorial quality. Fashion and lifestyle product photography standard."
+    }
+  ],
+  "mood": [
+    {
+      "id": "minimal_luxury",
+      "name": "Minimal Luxury",
+      "description": "Lots of negative space. Very expensive feeling. High-end brand aesthetic.",
+      "prompt_fragment": "Minimal luxury mood. Abundant negative space creating an expensive exclusive feeling. Less is more. High-end fashion brand aesthetic. The emptiness communicates value."
+    },
+    {
+      "id": "editorial_vogue",
+      "name": "Editorial / Vogue",
+      "description": "Magazine editorial quality. Fashion-forward. Aspirational and beautiful.",
+      "prompt_fragment": "Editorial magazine mood — Vogue quality. Fashion-forward aesthetic applied to product photography. Aspirational, beautiful, dramatic. The product is the supermodel."
+    },
+    {
+      "id": "tech_innovation",
+      "name": "Technology / Innovation",
+      "description": "Modern technology feeling. Innovation and progress. Cutting-edge aesthetic.",
+      "prompt_fragment": "Technology innovation mood. Modern cutting-edge feeling. The aesthetic communicates progress, advancement, and future-forward thinking. Clean and intelligent."
+    },
+    {
+      "id": "warm_cozy",
+      "name": "Warm & Cozy",
+      "description": "Warm inviting atmosphere. Comfort and home. Natural and authentic.",
+      "prompt_fragment": "Warm cozy mood. Inviting comfortable atmosphere. Home and hearth feeling. Natural authentic warmth. The image feels like a warm hug."
+    },
+    {
+      "id": "dynamic_action",
+      "name": "Dynamic / Action",
+      "description": "Energy and movement. Exciting and vibrant. Commercial action aesthetic.",
+      "prompt_fragment": "Dynamic action mood. Energy and movement frozen at the perfect moment. Exciting vibrant commercial aesthetic. The image feels alive and in motion."
+    },
+    {
+      "id": "clean_clinical",
+      "name": "Clean & Clinical",
+      "description": "Pristine and precise. Laboratory clean. Scientific precision feel.",
+      "prompt_fragment": "Clean clinical mood. Pristine and precise like a laboratory. Everything perfectly ordered. Scientific precision aesthetic. The cleanliness communicates quality control."
+    },
+    {
+      "id": "industrial_premium",
+      "name": "Industrial Premium",
+      "description": "Raw materials meets luxury. Factory-to-premium aesthetic. Authentic craftsmanship.",
+      "prompt_fragment": "Industrial premium mood. Raw authentic materials meeting luxury presentation. Workshop-to-showroom aesthetic. The mood communicates honest craftsmanship and authentic quality."
+    },
+    {
+      "id": "scandinavian",
+      "name": "Scandinavian",
+      "description": "Nordic minimalism. Light wood, white, clean lines. Calm and balanced.",
+      "prompt_fragment": "Scandinavian design mood. Nordic minimalism with light tones, natural materials, and clean lines. Calm balanced aesthetic. Function meets beauty in the simplest way."
+    },
+    {
+      "id": "classic_luxury",
+      "name": "Classic Luxury",
+      "description": "Traditional luxury. Gold accents, rich textures. Timeless elegance.",
+      "prompt_fragment": "Classic luxury mood. Traditional premium aesthetic with subtle gold or brass accents and rich textures. Timeless elegance that never goes out of style. Heritage quality feeling."
+    },
+    {
+      "id": "modern_sleek",
+      "name": "Modern Sleek",
+      "description": "Contemporary modern design. Sleek surfaces. Urban sophistication.",
+      "prompt_fragment": "Modern sleek mood. Contemporary design aesthetic with smooth surfaces and clean geometry. Urban sophistication. The mood communicates current design trends and metropolitan taste."
+    }
+  ]
+}

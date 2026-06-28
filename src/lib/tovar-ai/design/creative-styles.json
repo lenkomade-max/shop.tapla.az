@@ -1,0 +1,366 @@
+{
+  "description": "40 Creative Styles — WHAT is in the frame. Each style defines composition, product placement, and supporting elements.",
+  "rule": "Pick ONE creative style per card. Never mix multiple creative styles in one image.",
+  "styles": [
+    {
+      "id": "cs01",
+      "name": "Hero Product",
+      "description": "Large product centered. Minimal premium background. Very clean composition. Large headline. Small subtitle. One CTA. The product occupies 70-80% of the frame. Commercial premium style.",
+      "prompt_fragment": "Large product centered in frame occupying 70-80% of the image. Minimal premium background. Very clean composition with large headline space, small subtitle area, and one CTA button. Commercial premium style. Product is the undisputed hero.",
+      "use_for": ["main_cover"],
+      "needs_model": false,
+      "needs_environment": false
+    },
+    {
+      "id": "cs02",
+      "name": "Product + Price",
+      "description": "Large product. Very noticeable price card. Small benefit list. CTA button. Perfect for discounts and promotions.",
+      "prompt_fragment": "Large product with a very noticeable price card displayed prominently. Small benefit list near the price. CTA button visible. Commercial promotion style designed for discounts and special offers.",
+      "use_for": ["main_cover"],
+      "needs_model": false,
+      "needs_environment": false
+    },
+    {
+      "id": "cs03",
+      "name": "Product + Delivery",
+      "description": "Product remains the focus. Fast delivery message. Delivery icon. Marketplace campaign.",
+      "prompt_fragment": "Product remains the main focus. Fast delivery message prominently shown. Delivery truck or shipping icon visible. Marketplace campaign style emphasizing quick shipping. Clean commercial look.",
+      "use_for": ["main_cover"],
+      "needs_model": false,
+      "needs_environment": false
+    },
+    {
+      "id": "cs04",
+      "name": "Premium Feature",
+      "description": "Large product. Three floating feature cards. Premium line icons. Very clean. Technology style.",
+      "prompt_fragment": "Large product with three floating feature cards arranged around it. Premium thin line icons on each card. Very clean composition. Modern technology presentation style. Apple Keynote aesthetic.",
+      "use_for": ["main_cover", "features_detail"],
+      "needs_model": false,
+      "needs_environment": false
+    },
+    {
+      "id": "cs05",
+      "name": "Floating Labels",
+      "description": "Large product. Premium connection lines. Floating labels. Apple keynote presentation style.",
+      "prompt_fragment": "Large product with premium thin connection lines pointing to floating labels. Clean technical presentation. Apple Keynote reveal aesthetic. Labels highlight key specs or features. Dark or white minimal background.",
+      "use_for": ["main_cover", "features_detail"],
+      "needs_model": false,
+      "needs_environment": false
+    },
+    {
+      "id": "cs06",
+      "name": "Product In Hand",
+      "description": "Realistic hand holding the product. Shows actual size. Premium commercial photography.",
+      "prompt_fragment": "Realistic human hand holding the product naturally. The grip shows the actual size and scale of the product. Focus remains on the product — hand is secondary and natural. Premium commercial photography quality. Soft blurred background.",
+      "use_for": ["usage_demo", "main_cover"],
+      "needs_model": true,
+      "needs_environment": false
+    },
+    {
+      "id": "cs07",
+      "name": "Product In Use",
+      "description": "Show real usage. Natural interaction. Product clearly visible. Commercial lifestyle image.",
+      "prompt_fragment": "Show the product being used in a real scenario. Natural authentic interaction between person and product. Product clearly visible and identifiable. Commercial lifestyle photography. Magazine editorial quality. The moment of usage should feel genuine, not staged.",
+      "use_for": ["usage_demo"],
+      "needs_model": true,
+      "needs_environment": true
+    },
+    {
+      "id": "cs08",
+      "name": "Premium Interior",
+      "description": "Luxury realistic environment. Environment supports the product. Never distracts from the product.",
+      "prompt_fragment": "Product placed in a luxury realistic interior environment. The environment supports the product's purpose and category. Environment never distracts from the product — product remains the main subject. Premium interior design photography quality.",
+      "use_for": ["usage_demo", "main_cover"],
+      "needs_model": false,
+      "needs_environment": true
+    },
+    {
+      "id": "cs09",
+      "name": "Before & After",
+      "description": "Split scene. Before. After. Product connects both. Minimal text.",
+      "prompt_fragment": "Split scene showing before and after. Left side: problem or state before using product. Right side: improved result after using product. The product sits at the center connecting both states. Minimal text. Natural transformation story, not infographic style.",
+      "use_for": ["features_detail", "usage_demo"],
+      "needs_model": false,
+      "needs_environment": false
+    },
+    {
+      "id": "cs10",
+      "name": "Macro Detail",
+      "description": "Extreme close-up. Texture. Buttons. Materials. Premium reflections.",
+      "prompt_fragment": "Extreme macro close-up photography. Focus on product texture, buttons, materials, and surface details. Premium reflections visible. Very shallow depth of field with creamy bokeh. Jewelry-catalog quality. The detail shot must communicate high quality and craftsmanship.",
+      "use_for": ["features_detail"],
+      "needs_model": false,
+      "needs_environment": false
+    },
+    {
+      "id": "cs11",
+      "name": "Lifestyle Hero",
+      "description": "Beautiful environment. No people. Product naturally placed. Magazine quality.",
+      "prompt_fragment": "Beautiful aspirational environment with no people. Product naturally placed as if it belongs there. Magazine editorial quality. The environment tells a lifestyle story without needing a human subject. Premium interior or outdoor setting.",
+      "use_for": ["usage_demo", "main_cover"],
+      "needs_model": false,
+      "needs_environment": true
+    },
+    {
+      "id": "cs12",
+      "name": "Premium Showcase",
+      "description": "Product on premium platform. Soft reflections. Luxury lighting. Commercial hero shot.",
+      "prompt_fragment": "Product displayed on a premium platform or pedestal. Soft subtle reflections beneath the product. Luxury studio lighting. Commercial hero shot quality. The platform elevates the perceived value. Clean dark or gradient background.",
+      "use_for": ["main_cover"],
+      "needs_model": false,
+      "needs_environment": false
+    },
+    {
+      "id": "cs13",
+      "name": "Full Set",
+      "description": "Display all included accessories. Perfect alignment. Premium marketplace presentation.",
+      "prompt_fragment": "Display the main product and all included accessories together. Everything perfectly aligned in an organized layout. Premium marketplace presentation showing exactly what the customer receives. Clean composition showing completeness of the package.",
+      "use_for": ["main_cover", "features_detail"],
+      "needs_model": false,
+      "needs_environment": false
+    },
+    {
+      "id": "cs14",
+      "name": "Best Seller",
+      "description": "Premium bestseller trust feeling. Commercial marketplace style.",
+      "prompt_fragment": "Product presented with premium bestseller feeling. Visual cues of popularity and trust. Badge or subtle indicator of top-rated status. Commercial marketplace style. The image communicates 'this is the one everyone chooses'.",
+      "use_for": ["main_cover"],
+      "needs_model": false,
+      "needs_environment": false
+    },
+    {
+      "id": "cs15",
+      "name": "Limited Offer",
+      "description": "Hero product. Promotion card. Discount emphasis. Urgency.",
+      "prompt_fragment": "Hero product with prominent promotion card. Discount percentage or special price visually emphasized. Sense of urgency in the composition. Limited-time offer feeling. The product is desirable and the deal makes it irresistible.",
+      "use_for": ["main_cover"],
+      "needs_model": false,
+      "needs_environment": false
+    },
+    {
+      "id": "cs16",
+      "name": "Feature Spotlight",
+      "description": "One feature dominates. Everything else remains secondary.",
+      "prompt_fragment": "One specific feature of the product completely dominates the frame. Camera angle and composition make this feature the undisputed hero. Everything else about the product remains secondary and minimal. The visual hierarchy makes the feature immediately obvious within 1 second.",
+      "use_for": ["features_detail"],
+      "needs_model": false,
+      "needs_environment": false
+    },
+    {
+      "id": "cs17",
+      "name": "Comparison",
+      "description": "Product compared against a standard alternative. Clean visual comparison.",
+      "prompt_fragment": "The product compared side by side against a standard or inferior alternative. Clean visual comparison showing why this product is better. Not aggressive — informative and premium. The difference should be immediately visible.",
+      "use_for": ["features_detail"],
+      "needs_model": false,
+      "needs_environment": false
+    },
+    {
+      "id": "cs18",
+      "name": "Premium Materials",
+      "description": "Macro materials. Metal. Glass. Leather. Silicone. Wood. Focus on craftsmanship.",
+      "prompt_fragment": "Macro photography focusing exclusively on the materials: metal surfaces, glass reflections, leather texture, silicone softness, wood grain. The focus is on craftsmanship and material quality. Premium product photography celebrating build quality and tactility.",
+      "use_for": ["features_detail"],
+      "needs_model": false,
+      "needs_environment": false
+    },
+    {
+      "id": "cs19",
+      "name": "Technology",
+      "description": "Technology inspired background. Subtle glow. Premium electronics advertisement.",
+      "prompt_fragment": "Technology-inspired background with subtle glowing elements. Dark background with premium tech aesthetic. Subtle circuit-like or data-flow patterns barely visible. Premium electronics advertisement style. Modern and innovative feeling.",
+      "use_for": ["main_cover", "features_detail", "usage_demo"],
+      "needs_model": false,
+      "needs_environment": false
+    },
+    {
+      "id": "cs20",
+      "name": "Dynamic Motion",
+      "description": "Dynamic angle. Movement. Particles. Commercial action shot.",
+      "prompt_fragment": "Dynamic angled composition suggesting movement and action. Floating particles frozen mid-air. Commercial action shot quality. The product appears caught in a moment of dynamic energy. Exciting and vibrant without being chaotic.",
+      "use_for": ["main_cover", "features_detail", "usage_demo"],
+      "needs_model": false,
+      "needs_environment": false
+    },
+    {
+      "id": "cs21",
+      "name": "Exploded View",
+      "description": "Product assembled. Main parts floating nearby. Technical premium presentation.",
+      "prompt_fragment": "The product shown fully assembled with its main components floating nearby in space maintaining their relative positions. Technical premium presentation style. Parts are slightly separated to show internal construction. Apple Keynote reveal aesthetic. Very clean on white or dark background.",
+      "use_for": ["features_detail"],
+      "needs_model": false,
+      "needs_environment": false
+    },
+    {
+      "id": "cs22",
+      "name": "Benefits Around Product",
+      "description": "Product centered. Benefit cards around. Icons. Thin connection lines.",
+      "prompt_fragment": "Product perfectly centered. Benefit cards arranged around the product in a circular or semi-circular layout. Premium icons on each card. Thin elegant connection lines from product to each benefit. Clean modern infographic-aesthetic that remains premium and commercial.",
+      "use_for": ["features_detail", "main_cover"],
+      "needs_model": false,
+      "needs_environment": false
+    },
+    {
+      "id": "cs23",
+      "name": "Strong CTA",
+      "description": "Large CTA. Minimal text. Hero product. Designed for Meta Ads.",
+      "prompt_fragment": "Hero product with a large clear Call To Action button or text. Minimal supporting text — just the essential message. Designed specifically for Meta Ads (Facebook/Instagram feed). The entire composition naturally directs attention to the CTA without looking aggressive.",
+      "use_for": ["main_cover"],
+      "needs_model": false,
+      "needs_environment": false
+    },
+    {
+      "id": "cs24",
+      "name": "Seasonal Campaign",
+      "description": "Seasonal adaptation. Summer. Winter. Holiday. Gift. Environment changes based on season.",
+      "prompt_fragment": "Product placed in a seasonally-appropriate setting. Summer: bright, warm, outdoor hints. Winter: cozy, warm lighting, subtle winter cues. Holiday: festive but elegant. Gift: premium presentation with gift-ready aesthetic. Environment and lighting change to match the seasonal context.",
+      "use_for": ["main_cover", "usage_demo"],
+      "needs_model": false,
+      "needs_environment": true
+    },
+    {
+      "id": "cs25",
+      "name": "Premium Banner",
+      "description": "Wide composition. Huge product. Minimal supporting graphics. Homepage quality.",
+      "prompt_fragment": "Wide horizontal composition suitable for homepage hero banners. Huge product dominating one side or center. Minimal supporting graphics and text. Premium homepage quality. The image should work as a website hero section.",
+      "use_for": ["main_cover"],
+      "needs_model": false,
+      "needs_environment": false
+    },
+    {
+      "id": "cs26",
+      "name": "Clean Marketplace",
+      "description": "Pure white background. Product only. Tiny premium shadows. Looks like Amazon main image.",
+      "prompt_fragment": "Product on pure white background (#FFFFFF). Only the product is visible with tiny premium natural shadows beneath it. Amazon/Trendyol main product image standard. Clean, clinical, marketplace-optimized. Product fills 85% of frame.",
+      "use_for": ["main_cover"],
+      "needs_model": false,
+      "needs_environment": false
+    },
+    {
+      "id": "cs27",
+      "name": "Premium Gradient",
+      "description": "Luxury gradient background. Product floating. Minimal commercial design.",
+      "prompt_fragment": "Product floating above a luxury gradient background. Smooth premium color gradient that complements the product. Minimal commercial design — product and maybe one line of text. Very high-end cosmetic or technology brand aesthetic.",
+      "use_for": ["main_cover", "features_detail", "usage_demo"],
+      "needs_model": false,
+      "needs_environment": false
+    },
+    {
+      "id": "cs28",
+      "name": "Luxury Surface",
+      "description": "Product placed on marble, wood, metal or glass. Premium reflections. Luxury commercial photography.",
+      "prompt_fragment": "Product placed on a luxury surface: marble slab, rich wood, brushed metal, or glass. Premium reflections visible on the surface beneath the product. Luxury commercial photography quality. The surface material communicates premium positioning.",
+      "use_for": ["main_cover", "features_detail", "usage_demo"],
+      "needs_model": false,
+      "needs_environment": false
+    },
+    {
+      "id": "cs29",
+      "name": "Environmental Scene",
+      "description": "Product shown inside its ideal environment. Kitchen. Office. Bathroom. Garage. Gym. Living room. Workshop. Automatically selected based on product category.",
+      "prompt_fragment": "Product shown inside its ideal natural environment. Environment automatically matched to product category: kitchen products in premium kitchens, office products in modern workspaces, bathroom products in spa-like bathrooms, garage/automotive in professional garages, gym equipment in bright modern gyms, living room items in beautiful interiors, workshop tools in professional workshops.",
+      "use_for": ["usage_demo", "main_cover"],
+      "needs_model": false,
+      "needs_environment": true
+    },
+    {
+      "id": "cs30",
+      "name": "Premium Collection",
+      "description": "Several identical products arranged beautifully. Commercial catalog style.",
+      "prompt_fragment": "Several identical units of the product arranged beautifully in formation. Commercial catalog style showing the product in multiple colors or angles simultaneously. Premium retail display aesthetic. Each unit perfectly aligned.",
+      "use_for": ["main_cover", "features_detail", "usage_demo"],
+      "needs_model": false,
+      "needs_environment": false
+    },
+    {
+      "id": "cs31",
+      "name": "Product With Packaging",
+      "description": "Product together with its box. Packaging looks premium.",
+      "prompt_fragment": "Product displayed together with its premium packaging box. Both product and box perfectly aligned and visible. The packaging looks luxury and gift-worthy. Premium unboxing aesthetic. The box communicates quality before it's even opened.",
+      "use_for": ["main_cover", "features_detail", "usage_demo"],
+      "needs_model": false,
+      "needs_environment": false
+    },
+    {
+      "id": "cs32",
+      "name": "Dramatic Lighting",
+      "description": "Focused spotlight. Luxury shadows. Premium reflections. Commercial advertising.",
+      "prompt_fragment": "Focused dramatic spotlight on the product. Deep luxury shadows creating depth and drama. Premium reflections on product surfaces catching the light. High-end commercial advertising photography. The lighting is the hero alongside the product.",
+      "use_for": ["main_cover", "features_detail", "usage_demo"],
+      "needs_model": false,
+      "needs_environment": false
+    },
+    {
+      "id": "cs33",
+      "name": "Floating Product",
+      "description": "Product floating naturally. Luxury particles. Premium lighting.",
+      "prompt_fragment": "Product floating naturally in mid-air as if gravity doesn't exist. Small luxury particles or dust motes suspended around it catching soft light. Premium cinematic lighting. The floating creates a sense of lightness and premium technology. Clean background.",
+      "use_for": ["main_cover", "features_detail", "usage_demo"],
+      "needs_model": false,
+      "needs_environment": false
+    },
+    {
+      "id": "cs34",
+      "name": "Modern Flat Lay",
+      "description": "Top-down composition. Objects arranged beautifully. Commercial flat lay.",
+      "prompt_fragment": "Top-down flat lay composition shot from directly above. Products and supporting objects arranged beautifully on a surface. Commercial flat lay photography style. Everything precisely positioned. Premium Instagram-worthy aesthetic.",
+      "use_for": ["usage_demo", "features_detail"],
+      "needs_model": false,
+      "needs_environment": false
+    },
+    {
+      "id": "cs35",
+      "name": "Symmetrical Layout",
+      "description": "Perfect symmetry. Centered composition. Luxury presentation.",
+      "prompt_fragment": "Perfectly symmetrical composition with the product exactly centered. Everything balanced on both sides. Luxury presentation style. The symmetry creates a sense of order, precision, and premium quality. Clean and satisfying to look at.",
+      "use_for": ["main_cover", "features_detail", "usage_demo"],
+      "needs_model": false,
+      "needs_environment": false
+    },
+    {
+      "id": "cs36",
+      "name": "Angled Perspective",
+      "description": "45-degree angle. Dynamic composition. Modern commercial look.",
+      "prompt_fragment": "Product shot at a 45-degree angle creating dynamic perspective. Modern commercial product photography look. The angle adds energy and dimension without being extreme. Premium shadows following the perspective.",
+      "use_for": ["main_cover", "features_detail", "usage_demo"],
+      "needs_model": false,
+      "needs_environment": false
+    },
+    {
+      "id": "cs37",
+      "name": "Minimal Luxury",
+      "description": "Lots of white space. Only product. One headline. Very expensive feeling.",
+      "prompt_fragment": "Lots of negative white space. Only the product and maximum one headline visible. Very expensive luxury feeling through extreme minimalism. The emptiness around the product communicates exclusivity. High-end fashion brand aesthetic.",
+      "use_for": ["main_cover"],
+      "needs_model": false,
+      "needs_environment": false
+    },
+    {
+      "id": "cs38",
+      "name": "High Contrast",
+      "description": "Premium lighting. Dark-light contrast. Luxury reflections.",
+      "prompt_fragment": "High contrast premium lighting setup. Strong dark-light contrast creating drama and depth. Luxury reflections on product surfaces. The contrast makes the product pop dramatically from the background. Premium black-background product photography.",
+      "use_for": ["main_cover", "features_detail", "usage_demo"],
+      "needs_model": false,
+      "needs_environment": false
+    },
+    {
+      "id": "cs39",
+      "name": "Glassmorphism",
+      "description": "Glass cards. Soft blur. Premium gradients. Luxury UI inspired.",
+      "prompt_fragment": "Glassmorphism design aesthetic applied to product presentation. Glass-like transparent cards with soft background blur. Premium gradient overlays. Luxury UI-inspired commercial look. Modern Apple-design-language aesthetic. Frosted glass effects.",
+      "use_for": ["main_cover", "features_detail", "usage_demo"],
+      "needs_model": false,
+      "needs_environment": false
+    },
+    {
+      "id": "cs40",
+      "name": "Editorial",
+      "description": "Looks like Vogue. Luxury catalog. Magazine photography.",
+      "prompt_fragment": "Editorial magazine photography quality. Looks like a Vogue or luxury catalog spread. The product is the supermodel. High fashion aesthetic applied to product photography. Dramatic, beautiful, aspirational. Magazine cover quality composition and lighting.",
+      "use_for": ["main_cover", "features_detail", "usage_demo"],
+      "needs_model": false,
+      "needs_environment": false
+    }
+  ]
+}

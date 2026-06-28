@@ -1,0 +1,246 @@
+{
+  "description": "Marketing Styles — WHAT message we communicate. Each style defines the selling strategy, not the visual composition.",
+  "rule": "Pick ONE marketing style per card. The marketing style defines the primary message. Never mix multiple marketing messages in one image.",
+  "styles": [
+    {
+      "id": "ms01",
+      "name": "Price First",
+      "description": "Price dominates. Product supports the price. Perfect for promotions.",
+      "tone": "promotional",
+      "best_for": ["main_cover"],
+      "prompt_fragment": "The price is the hero message. Product supports the attractive price point. The visual communication says 'incredible value'."
+    },
+    {
+      "id": "ms02",
+      "name": "Discount",
+      "description": "Focus on sale. Old price crossed out. New price highlighted. Limited offer feeling.",
+      "tone": "promotional",
+      "best_for": ["main_cover"],
+      "prompt_fragment": "Discount-focused message. Old price visibly crossed out, new lower price prominently displayed. The image communicates a limited-time sale opportunity. Savings emphasized."
+    },
+    {
+      "id": "ms03",
+      "name": "Feature First",
+      "description": "One feature becomes the hero. Product supports it. Technical excellence showcased.",
+      "tone": "technical",
+      "best_for": ["features_detail", "main_cover"],
+      "prompt_fragment": "One specific feature is the marketing hero. The product supports and proves the feature claim. The visual communication says 'this capability sets it apart from everything else'."
+    },
+    {
+      "id": "ms04",
+      "name": "Premium Quality",
+      "description": "Communicate luxury. Premium materials. Excellent craftsmanship. Best-in-class quality.",
+      "tone": "luxury",
+      "best_for": ["main_cover", "features_detail"],
+      "prompt_fragment": "Premium quality is the core message. Luxury materials and excellent craftsmanship are visually evident. The image communicates 'this is the best quality you can buy'."
+    },
+    {
+      "id": "ms05",
+      "name": "Complete Set",
+      "description": "Show everything included. Highlight completeness. All-in-one value proposition.",
+      "tone": "informative",
+      "best_for": ["main_cover", "features_detail"],
+      "prompt_fragment": "The complete set message: everything the customer needs is included. All accessories and components visible. The visual communication says 'you get everything in one purchase — no extras needed'."
+    },
+    {
+      "id": "ms06",
+      "name": "Bestseller",
+      "description": "Communicate popularity. Most purchased. Customer favorite. Social proof through sales volume.",
+      "tone": "trust",
+      "best_for": ["main_cover"],
+      "prompt_fragment": "Bestseller message: this is the most popular choice. Visual cues of high sales volume and customer preference. The image communicates 'thousands of customers already chose this — you should too'."
+    },
+    {
+      "id": "ms07",
+      "name": "New Arrival",
+      "description": "Product feels fresh. Recently launched. Modern and cutting-edge. Latest version available.",
+      "tone": "exciting",
+      "best_for": ["main_cover"],
+      "prompt_fragment": "New arrival message: fresh, just launched, the latest thing. Visual cues of newness and modernity. The image communicates 'be the first to own the newest technology'."
+    },
+    {
+      "id": "ms08",
+      "name": "Fast Delivery",
+      "description": "Highlight delivery speed. Nationwide shipping. Get it tomorrow. Convenience of quick receipt.",
+      "tone": "service",
+      "best_for": ["main_cover"],
+      "prompt_fragment": "Fast delivery is the marketing focus. Visual emphasis on shipping speed and convenience. The image communicates 'order today, receive it incredibly fast — no waiting'."
+    },
+    {
+      "id": "ms09",
+      "name": "Easy To Use",
+      "description": "Show how simple the product is. Natural usage. No complexity. Intuitive operation.",
+      "tone": "friendly",
+      "best_for": ["usage_demo", "features_detail"],
+      "prompt_fragment": "Ease of use is the core message. The product looks simple, intuitive, and approachable. No complexity visible. The visual communication says 'anyone can use this — it just works'."
+    },
+    {
+      "id": "ms10",
+      "name": "Professional",
+      "description": "Product designed for professionals. Commercial environment. Pro-grade quality and reliability.",
+      "tone": "authoritative",
+      "best_for": ["main_cover", "usage_demo"],
+      "prompt_fragment": "Professional-grade message: this is the tool that professionals choose. Commercial environment context. The image communicates 'serious professionals trust this product for their work'."
+    },
+    {
+      "id": "ms11",
+      "name": "Home Use",
+      "description": "Comfort. Family. Daily use. Perfect for home and personal life.",
+      "tone": "warm",
+      "best_for": ["usage_demo", "main_cover"],
+      "prompt_fragment": "Home use message: comfort, family, everyday life. Warm domestic context. The image communicates 'this product makes your home life better and more comfortable'."
+    },
+    {
+      "id": "ms12",
+      "name": "Compact",
+      "description": "Emphasize portability. Small size. Easy storage. Minimal footprint. Perfect for small spaces.",
+      "tone": "practical",
+      "best_for": ["main_cover", "features_detail"],
+      "prompt_fragment": "Compact and space-saving message. The product's small size and portability are emphasized. The image communicates 'fits anywhere, stores easily, takes minimal space'."
+    },
+    {
+      "id": "ms13",
+      "name": "Multi-Purpose",
+      "description": "Show several use cases. Different scenarios. One product solves multiple problems.",
+      "tone": "practical",
+      "best_for": ["features_detail", "usage_demo"],
+      "prompt_fragment": "Multi-purpose versatility message. Visual cues showing the product works in different scenarios. The image communicates 'one product replaces several — incredible versatility'."
+    },
+    {
+      "id": "ms14",
+      "name": "Durability",
+      "description": "Focus on strong materials. Long lifetime. Heavy-duty feeling. Built to last.",
+      "tone": "confident",
+      "best_for": ["features_detail", "main_cover"],
+      "prompt_fragment": "Durability and longevity message. Visual emphasis on robust construction and strong materials. The image communicates 'built to last — this product will serve you for years'."
+    },
+    {
+      "id": "ms15",
+      "name": "Performance",
+      "description": "Focus on power. Speed. Efficiency. Top-level performance metrics.",
+      "tone": "exciting",
+      "best_for": ["main_cover", "features_detail"],
+      "prompt_fragment": "High performance message: power, speed, efficiency. The product looks fast, capable, and powerful. The image communicates 'maximum performance that outperforms everything in its class'."
+    },
+    {
+      "id": "ms16",
+      "name": "Technology",
+      "description": "Innovation. Modern engineering. Advanced functions. Cutting-edge technology.",
+      "tone": "innovative",
+      "best_for": ["main_cover", "features_detail"],
+      "prompt_fragment": "Technology and innovation message. The product embodies modern engineering and advanced technology. The image communicates 'this is the future — advanced technology made accessible'."
+    },
+    {
+      "id": "ms17",
+      "name": "Smart Product",
+      "description": "AI-powered. Automation. Digital lifestyle. Intelligent features.",
+      "tone": "innovative",
+      "best_for": ["main_cover", "features_detail"],
+      "prompt_fragment": "Smart intelligent product message. AI-powered or automated features are the hero. The image communicates 'smart technology that thinks for you — intelligent automation for modern life'."
+    },
+    {
+      "id": "ms18",
+      "name": "Safety",
+      "description": "Highlight protection. Secure use. Reliable construction. Safety-first design.",
+      "tone": "trust",
+      "best_for": ["main_cover", "features_detail"],
+      "prompt_fragment": "Safety and protection message. Visual cues of secure construction and reliable safety features. The image communicates 'your safety is guaranteed — protected by design'."
+    },
+    {
+      "id": "ms19",
+      "name": "Comfort",
+      "description": "Focus on ergonomics. Easy handling. Convenience. Designed for human comfort.",
+      "tone": "warm",
+      "best_for": ["usage_demo", "features_detail"],
+      "prompt_fragment": "Comfort and ergonomics message. The product looks comfortable to use and hold. The image communicates 'designed for your comfort — feels natural and effortless'."
+    },
+    {
+      "id": "ms20",
+      "name": "Lifestyle",
+      "description": "Sell the lifestyle, not just the product. Aspirational daily life. Beautiful context creates desire.",
+      "tone": "aspirational",
+      "best_for": ["usage_demo", "main_cover"],
+      "prompt_fragment": "Lifestyle aspiration message. The image sells the lifestyle that comes with the product, not just the product itself. Beautiful aspirational context. The image communicates 'owning this product means living this beautiful life'."
+    },
+    {
+      "id": "ms21",
+      "name": "Problem → Solution",
+      "description": "Present a common problem. Immediately solve it using the product. Clear transformation.",
+      "tone": "informative",
+      "best_for": ["usage_demo", "features_detail"],
+      "prompt_fragment": "Problem-to-solution message. A common frustration or problem is clearly implied, and the product is the immediate solution. The image communicates 'this product solves the exact problem you have right now'."
+    },
+    {
+      "id": "ms22",
+      "name": "Transformation",
+      "description": "Before state. After state. Visible improvement achieved through the product.",
+      "tone": "aspirational",
+      "best_for": ["usage_demo", "features_detail"],
+      "prompt_fragment": "Transformation message. Visible improvement from before to after using the product. The image communicates 'see the difference — this product creates real visible results'."
+    },
+    {
+      "id": "ms23",
+      "name": "Gift",
+      "description": "Gift-ready presentation. Premium packaging. Holiday or special occasion feeling. Perfect present.",
+      "tone": "warm",
+      "best_for": ["main_cover"],
+      "prompt_fragment": "Gift message: the product as the perfect gift. Premium gift-ready presentation. Festive or special occasion feeling. The image communicates 'this is the gift they will love — already perfectly presented'."
+    },
+    {
+      "id": "ms24",
+      "name": "Family",
+      "description": "Parents. Kids. Home. Togetherness. Product brings family together.",
+      "tone": "warm",
+      "best_for": ["usage_demo", "main_cover"],
+      "prompt_fragment": "Family message: togetherness, home, loved ones. Warm family context. The image communicates 'this product creates moments of joy for the whole family'."
+    },
+    {
+      "id": "ms25",
+      "name": "Business",
+      "description": "Commercial use. Office. Restaurant. Salon. Clinic. Workshop. Professional environment.",
+      "tone": "authoritative",
+      "best_for": ["main_cover", "usage_demo"],
+      "prompt_fragment": "Business and commercial use message. Product shown in professional business environment. The image communicates 'built for business — this product delivers in commercial settings'."
+    },
+    {
+      "id": "ms26",
+      "name": "Trusted Choice",
+      "description": "Reliable. Professional. Customer confidence. Proven track record.",
+      "tone": "trust",
+      "best_for": ["main_cover"],
+      "prompt_fragment": "Trusted choice message. Visual cues of reliability and professional trust. The image communicates 'this is the reliable choice you can depend on with confidence'."
+    },
+    {
+      "id": "ms27",
+      "name": "Premium Brand",
+      "description": "Luxury positioning. Minimalistic. High-end. Aspirational brand identity.",
+      "tone": "luxury",
+      "best_for": ["main_cover"],
+      "prompt_fragment": "Premium brand positioning message. Luxury minimalistic aesthetic. High-end brand identity. The image communicates 'this is a premium brand — owning it elevates your status'."
+    },
+    {
+      "id": "ms28",
+      "name": "Value For Money",
+      "description": "Excellent value. Affordable quality. Smart purchase decision. Best bang for the buck.",
+      "tone": "practical",
+      "best_for": ["main_cover"],
+      "prompt_fragment": "Value for money message. Excellent quality at an accessible price. The image communicates 'smart purchase — you get premium quality without the premium price tag'."
+    },
+    {
+      "id": "ms29",
+      "name": "Limited Stock",
+      "description": "Scarcity. High demand. Limited availability. Act now before it's gone.",
+      "tone": "urgent",
+      "best_for": ["main_cover"],
+      "prompt_fragment": "Limited availability message. Visual cues of scarcity and high demand. The image communicates 'this won't last — get it before it's gone'."
+    },
+    {
+      "id": "ms30",
+      "name": "Call To Action",
+      "description": "Entire composition naturally directs attention to Buy Now, Order Today, Contact Us, Learn More, Shop Now — without looking aggressive.",
+      "tone": "action",
+      "best_for": ["main_cover"],
+      "prompt_fragment": "Call to action message. The entire composition naturally guides the eye toward the action button. Buy Now, Order Today, Shop Now — the CTA is clear and natural, never aggressive. The image communicates 'take the next step — it's easy and obvious'."
+    }
+  ]
+}
