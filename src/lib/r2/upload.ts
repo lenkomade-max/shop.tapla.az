@@ -5,6 +5,7 @@
 import { S3Client, DeleteObjectCommand } from '@aws-sdk/client-s3'
 import { Upload } from '@aws-sdk/lib-storage'
 import type { CardResult } from '@/lib/tovar-ai/types'
+import { addWatermark } from '@/lib/watermark'
 
 // ─── Конфигурация ─────────────────────────────────────────────────────────────
 
@@ -109,7 +110,17 @@ export async function uploadImage(
 
   console.log(`[R2] Uploading "${key}" — ${(base64.length / 1024).toFixed(0)} KB base64`)
 
-  const buffer = Buffer.from(base64, 'base64')
+  // Watermark — защита фото от кражи
+  let watermarkedBase64 = base64
+  try {
+    watermarkedBase64 = await addWatermark(base64)
+    console.log(`[R2] Watermark applied for "${key}"`)
+  } catch (wmErr) {
+    // Если watermark упал — загружаем оригинал (не блокируем загрузку)
+    console.warn(`[R2] Watermark failed for "${key}", uploading original: ${wmErr instanceof Error ? wmErr.message : String(wmErr)}`)
+  }
+
+  const buffer = Buffer.from(watermarkedBase64, 'base64')
   console.log(`[R2] Decoded buffer: ${(buffer.length / 1024).toFixed(0)} KB`)
 
   const upload = new Upload({
