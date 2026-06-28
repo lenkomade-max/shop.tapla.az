@@ -63,18 +63,20 @@ export function ProductCard({ product, onQuickView }: ProductCardProps) {
           />
         </Link>
 
-        <div className="absolute inset-0 bg-neutral-950/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-4 pointer-events-none z-10">
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onQuickView?.(product);
-            }}
-            className="bg-white/95 text-neutral-900 text-[10px] tracking-widest font-semibold uppercase px-4 py-2.5 hover:bg-neutral-950 hover:text-white transition-colors duration-300 pointer-events-auto cursor-pointer"
-          >
-            SÜRƏTLİ BAXIŞ
-          </button>
-        </div>
+        {isHovered && (
+          <div className="absolute inset-0 bg-neutral-950/20 z-10 flex items-end justify-center pb-4 pointer-events-none transition-opacity duration-300">
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onQuickView?.(product);
+              }}
+              className="bg-white/95 text-neutral-900 text-[10px] tracking-widest font-semibold uppercase px-4 py-2.5 hover:bg-neutral-950 hover:text-white transition-colors duration-300 pointer-events-auto cursor-pointer"
+            >
+              SÜRƏTLİ BAXIŞ
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="flex-1 p-3 sm:p-4 flex flex-col justify-between">
@@ -84,14 +86,14 @@ export function ProductCard({ product, onQuickView }: ProductCardProps) {
             <div className="flex items-baseline gap-1.5 min-w-0 shrink-0">
               <span
                 className={clsx(
-                  'text-sm sm:text-lg font-bold tracking-tight whitespace-nowrap',
+                  'text-base sm:text-xl font-bold tracking-tight whitespace-nowrap',
                   hasDiscount ? 'text-blue-600' : 'text-neutral-900'
                 )}
               >
                 {product.price.toFixed(2)} ₼
               </span>
               {hasDiscount && (
-                <span className="text-[10px] sm:text-xs text-neutral-400 line-through shrink-0">
+                <span className="text-xs sm:text-sm text-neutral-400 line-through shrink-0">
                   {product.originalPrice!.toFixed(2)} ₼
                 </span>
               )}
@@ -116,7 +118,7 @@ export function ProductCard({ product, onQuickView }: ProductCardProps) {
           </div>
 
           <Link href={`/products/${product.slug}`} className="block group/title">
-            <h4 className="text-xs sm:text-sm font-semibold tracking-widest uppercase text-neutral-900 mb-0.5 hover:text-neutral-600 transition-colors line-clamp-2">
+            <h4 className="text-xs sm:text-sm font-semibold tracking-widest uppercase text-neutral-900 mb-0.5 hover:text-neutral-600 transition-colors line-clamp-3">
               {product.name}
             </h4>
           </Link>
