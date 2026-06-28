@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { saveHeroSlide, deleteHeroSlide, reorderHeroSlides } from '@/lib/actions';
-import { ImageUp, Trash2, GripVertical, Eye, EyeOff, Sun, Moon, ExternalLink, Plus, X } from 'lucide-react';
+import { ImageUp, Trash2, GripVertical, Eye, EyeOff, Sun, Moon, ExternalLink, Plus, X, Search } from 'lucide-react';
 
 interface HeroSlide {
   id: string;
@@ -18,7 +18,13 @@ interface HeroSlide {
   is_active: boolean;
 }
 
-export function AdminHeroClient({ slides: initialSlides }: { slides: HeroSlide[] }) {
+interface ProductItem {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+export function AdminHeroClient({ slides: initialSlides, products }: { slides: HeroSlide[]; products: ProductItem[] }) {
   const [slides, setSlides] = useState<HeroSlide[]>(initialSlides);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showNewForm, setShowNewForm] = useState(false);
@@ -88,7 +94,7 @@ export function AdminHeroClient({ slides: initialSlides }: { slides: HeroSlide[]
             Новый слайд
           </div>
           <div className="p-4">
-            <SlideForm slides={slides} onSaved={handleSaved} />
+            <SlideForm products={products} slides={slides} onSaved={handleSaved} />
           </div>
         </div>
       )}
@@ -106,7 +112,7 @@ export function AdminHeroClient({ slides: initialSlides }: { slides: HeroSlide[]
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <div className="text-sm font-semibold truncate">{slide.title || 'Без заголовка'}</div>
+                <div className="text-sm font-semibold truncate">{slide.title || '(фото без текста)'}</div>
                 <div className="text-[10px] text-neutral-400 truncate">{slide.tag}</div>
               </div>
               <div className="flex items-center gap-1.5">
@@ -130,7 +136,7 @@ export function AdminHeroClient({ slides: initialSlides }: { slides: HeroSlide[]
             {/* Edit form or summary */}
             {editingId === slide.id ? (
               <div className="p-4 border-t border-neutral-100">
-                <SlideForm slide={slide} slides={slides} onSaved={handleSaved} />
+                <SlideForm slide={slide} products={products} slides={slides} onSaved={handleSaved} />
                 <button
                   onClick={() => setEditingId(null)}
                   className="mt-2 text-xs text-neutral-400 hover:text-neutral-700"
@@ -226,14 +232,19 @@ export function AdminHeroClient({ slides: initialSlides }: { slides: HeroSlide[]
 function SlideForm({
   slide,
   slides,
+  products,
   onSaved,
 }: {
   slide?: HeroSlide;
   slides: HeroSlide[];
+  products: ProductItem[];
   onSaved: () => void;
 }) {
   const [uploading, setUploading] = useState(false);
   const [imagePreview, setImagePreview] = useState(slide?.image || '');
+  const [href, setHref] = useState(slide?.href || '/#products');
+  const [productSearch, setProductSearch] = useState('');
+  const [showProductList, setShowProductList] = useState(false);
 
   const uploadImage = async (file: File) => {
     setUploading(true);
@@ -258,11 +269,22 @@ function SlideForm({
     if (url) setImagePreview(url);
   };
 
+  const filtered = productSearch
+    ? products.filter(p => p.name?.toLowerCase().includes(productSearch.toLowerCase()) || p.slug?.includes(productSearch.toLowerCase()))
+    : products;
+
+  const pickProduct = (slug: string) => {
+    setHref(`/products/${slug}`);
+    setShowProductList(false);
+    setProductSearch('');
+  };
+
   return (
     <form
       onSubmit={async (e) => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
+        formData.set('href', href);
         if (slide) formData.set('id', slide.id);
         await saveHeroSlide(formData);
         onSaved();
@@ -271,6 +293,7 @@ function SlideForm({
     >
       {slide && <input type="hidden" name="id" value={slide.id} />}
       <input type="hidden" name="sort_order" value={String(slide?.sort_order ?? slides.length)} />
+      <input type="hidden" name="href" value={href} />
 
       {/* Image */}
       <div>
@@ -305,28 +328,29 @@ function SlideForm({
         </div>
       </div>
 
-      {/* Tag + Title */}
+      {/* Tag */}
       <div>
         <label className="block text-[10px] tracking-wider font-semibold text-neutral-500 mb-1">Тэг (микро-лейбл сверху)</label>
         <input
           name="tag"
           defaultValue={slide?.tag || ''}
-          placeholder="ELEKTRONIKADA ƏN YAXŞI SEÇİMLƏR"
+          placeholder="ELEKTRONIKADA ƏN YAXŞI SEÇİMLƏR — оставь пустым если не нужно"
           className="w-full border border-neutral-200 rounded px-2 py-1.5 text-xs"
         />
       </div>
 
+      {/* Title */}
       <div>
         <label className="block text-[10px] tracking-wider font-semibold text-neutral-500 mb-1">Заголовок</label>
         <input
           name="title"
           defaultValue={slide?.title || ''}
-          required
-          placeholder="TAPLA MARKETPLACE"
+          placeholder="Оставь пустым если только фото"
           className="w-full border border-neutral-200 rounded px-2 py-1.5 text-xs"
         />
       </div>
 
+      {/* Subtitle */}
       <div>
         <label className="block text-[10px] tracking-wider font-semibold text-neutral-500 mb-1">Подзаголовок</label>
         <input
@@ -337,6 +361,7 @@ function SlideForm({
         />
       </div>
 
+      {/* Description */}
       <div>
         <label className="block text-[10px] tracking-wider font-semibold text-neutral-500 mb-1">Описание</label>
         <textarea
@@ -349,24 +374,77 @@ function SlideForm({
       </div>
 
       <div className="grid grid-cols-2 gap-4">
+        {/* Action text */}
         <div>
           <label className="block text-[10px] tracking-wider font-semibold text-neutral-500 mb-1">Текст кнопки</label>
           <input
             name="action_text"
-            defaultValue={slide?.action_text || 'MƏHSULLARI GÖR'}
+            defaultValue={slide?.action_text || ''}
+            placeholder="MƏHSULLARI GÖR"
             className="w-full border border-neutral-200 rounded px-2 py-1.5 text-xs"
           />
         </div>
+
+        {/* URL with product selector */}
         <div>
           <label className="block text-[10px] tracking-wider font-semibold text-neutral-500 mb-1">Ссылка (URL)</label>
           <div className="relative">
-            <input
-              name="href"
-              defaultValue={slide?.href || '/#products'}
-              placeholder="/products/..."
-              className="w-full border border-neutral-200 rounded px-2 py-1.5 text-xs font-mono pr-7"
-            />
-            <ExternalLink className="absolute right-2 top-1/2 -translate-y-1/2 h-3 w-3 text-neutral-300" />
+            <div className="flex gap-1">
+              <input
+                value={href}
+                onChange={(e) => setHref(e.target.value)}
+                placeholder="/products/..."
+                className="w-full border border-neutral-200 rounded px-2 py-1.5 text-xs font-mono"
+              />
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setShowProductList(!showProductList)}
+                  className="border border-neutral-200 rounded px-2 py-1.5 text-xs text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50"
+                >
+                  <Search className="h-3 w-3" />
+                </button>
+                {showProductList && (
+                  <div className="absolute right-0 top-8 w-72 bg-white border border-neutral-200 rounded-lg shadow-xl z-20">
+                    <div className="p-2 border-b border-neutral-100">
+                      <input
+                        type="text"
+                        value={productSearch}
+                        onChange={(e) => setProductSearch(e.target.value)}
+                        placeholder="Поиск товара..."
+                        className="w-full border border-neutral-200 rounded px-2 py-1 text-xs"
+                        autoFocus
+                      />
+                    </div>
+                    <div className="max-h-48 overflow-y-auto">
+                      <button
+                        type="button"
+                        onClick={() => { setHref('/#products'); setShowProductList(false); setProductSearch(''); }}
+                        className="w-full text-left px-3 py-1.5 text-xs hover:bg-neutral-50 text-neutral-500"
+                      >
+                        — Без товара (/products)
+                      </button>
+                      {filtered.map(p => (
+                        <button
+                          key={p.id}
+                          type="button"
+                          onClick={() => pickProduct(p.slug)}
+                          className="w-full text-left px-3 py-1.5 text-xs hover:bg-neutral-50 flex items-center gap-2"
+                        >
+                          <ExternalLink className="h-3 w-3 text-neutral-300 flex-shrink-0" />
+                          <span className="truncate">{p.name || p.slug}</span>
+                          <span className="text-[10px] text-neutral-400 flex-shrink-0">/products/{p.slug}</span>
+                        </button>
+                      ))}
+                      {filtered.length === 0 && (
+                        <div className="px-3 py-4 text-xs text-neutral-400 text-center">Ничего не найдено</div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+            <ExternalLink className="absolute right-8 top-1/2 -translate-y-1/2 h-3 w-3 text-neutral-300 pointer-events-none" />
           </div>
         </div>
       </div>

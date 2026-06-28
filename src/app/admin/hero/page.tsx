@@ -31,7 +31,21 @@ async function getSlides(): Promise<HeroSlide[]> {
   return [];
 }
 
+async function getProducts(): Promise<Array<{ id: string; name: string; slug: string }>> {
+  try {
+    const { data } = await supabaseAdmin
+      .from('products')
+      .select('id, name, slug')
+      .eq('status', 'active')
+      .order('name', { ascending: true });
+    if (data) return data as Array<{ id: string; name: string; slug: string }>;
+  } catch (err) {
+    console.error('Failed to fetch products:', err);
+  }
+  return [];
+}
+
 export default async function AdminHeroPage() {
-  const slides = await getSlides();
-  return <AdminHeroClient slides={slides} />;
+  const [slides, products] = await Promise.all([getSlides(), getProducts()]);
+  return <AdminHeroClient slides={slides} products={products} />;
 }
