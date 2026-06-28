@@ -160,17 +160,78 @@ export default function TermsPage() {
             </Section>
 
             <Section title="9. Geri Qaytarma və Mübadilə">
+              <div className="bg-amber-50 border border-amber-200 p-5 mb-4">
+                <p className="text-xs font-semibold text-amber-800 mb-1">MÜHÜM</p>
+                <p className="text-[13px] text-amber-900 leading-relaxed">
+                  Aşağıdakı maddələr qanunvericiliklə müəyyən edilmiş minimum tələbləri əks etdirir.
+                  TAPLA MARKETPLACE platformasında geri qaytarma proseduru yalnız ciddi formal
+                  tələblərin tam yerinə yetirilməsi şərtilə həyata keçirilir. Hər hansı bir tələbin
+                  pozulması geri qaytarmanın rədd edilməsi üçün əsas ola bilər.
+                </p>
+              </div>
+
               <p>
-                9.1. Geri qaytarma və mübadilə qaydaları TAPLA MARKETPLACE-in ayrıca <a href="/qaytarma-siyaseti" className="text-neutral-950 underline underline-offset-4 decoration-neutral-300 hover:decoration-neutral-950 transition-colors">Qaytarma Siyasətində</a> müəyyən edilmişdir.
+                9.1. Geri qaytarma və mübadilə ilə bağlı bütün prosedur qaydaları, o cümlədən
+                RMA (Return Merchandise Authorization) sistemi, ekspertiza şərtləri, qəbul
+                meyarları və müddətlər TAPLA MARKETPLACE-in ayrıca
+                <a href="/qaytarma-siyaseti" className="text-neutral-950 underline underline-offset-4 decoration-neutral-300 hover:decoration-neutral-950 transition-colors"> Qaytarma Siyasətində</a>
+                müəyyən edilmişdir. Bu Siyasətə istinad etmədən heç bir geri qaytarma tələbinə
+                baxılmır.
               </p>
+
               <p>
-                9.2. "İstehlakçıların hüquqlarının müdafiəsi haqqında" Qanunun 14-cü maddəsinə uyğun olaraq, istifadəçi qida olmayan məhsulu 14 (on dörd) gün ərzində dəyişdirmək hüququna malikdir. Bu hüquq ilk növbədə məhsulun dəyişdirilməsini (eyni və ya analoji məhsulla) nəzərdə tutur, pulun qaytarılmasını deyil. Pulun qaytarılması yalnız analoji məhsul mövcud olmadıqda həyata keçirilir.
+                9.2. "İstehlakçıların hüquqlarının müdafiəsi haqqında" Qanunun 14-cü maddəsinə
+                əsasən, istifadəçi qida olmayan, layiqli keyfiyyətə malik məhsulu 14 (on dörd)
+                təqvim günü ərzində dəyişdirmək hüququna malikdir. Bu hüquq yalnız məhsulun
+                dəyişdirilməsini (eyni və ya analoji məhsulla) nəzərdə tutur. Pulun qaytarılması
+                yalnız analoji məhsul satıcıda mövcud olmadıqda həyata keçirilir. Dəyişdirmə
+                tələbinin təmin olunması üçün istifadəçi aşağıdakı bütün şərtləri yerinə
+                yetirməlidir:
               </p>
-              <p>
-                9.3. "Elektron ticarət haqqında" Qanunun 9-cu maddəsinə əsasən, istifadəçi elektron ticarət əməliyyatından 7 (yeddi) iş günü ərzində imtina etmək hüququna malikdir. Qanunla nəzərdə tutulmuş istisnalar (fərdiləşdirilmiş məhsullar, açılmış audiovizual materiallar, tez xarab olan məhsullar) bu hüquqdan kənardır.
+              <ul className="list-disc pl-6 space-y-1">
+                <li>Məhsul heç bir formada istifadə edilməmiş, sınaqdan keçirilməmiş, quraşdırılmamış və ya işə salınmamış olmalıdır;</li>
+                <li>Məhsulun orijinal qablaşdırması açılmamış, zədələnməmiş, üzərində hər hansı yazı, etiket, stiker və ya zədə olmamalıdır;</li>
+                <li>Məhsulun bütün fabrik pleymbələri, qoruyucu təbəqələri, markalanması və seriya nömrələri toxunulmaz qalmalıdır;</li>
+                <li>Məhsulla birlikdə verilən bütün aksesuarlar, kabel, adapter, qulaqlıq, sənədlər, istifadəçi təlimatları və zəmanət kartı tam şəkildə təqdim edilməlidir;</li>
+                <li>Alış sənədi (elektron və ya çap formasında) təqdim edilməlidir;</li>
+                <li>RMA nömrəsi alınmış və məhsulun qablaşdırmasında qeyd edilmiş olmalıdır.</li>
+              </ul>
+              <p className="mt-2">
+                Yuxarıdakı şərtlərdən hər hansı birinin yerinə yetirilməməsi dəyişdirmə tələbinin
+                rədd edilməsi üçün kifayət qədər əsasdır. Bu halda məhsul istifadəçiyə geri
+                göndərilir və bütün göndərmə xərcləri istifadəçi tərəfindən ödənilir.
               </p>
+
               <p>
-                9.4. Geri qaytarılan məhsullar orijinal qablaşdırmada, istifadə edilməmiş vəziyyətdə, bütün etiketlər və aksesuarlarla birlikdə olmalıdır. Bu tələblərə əməl edilmədikdə, TAPLA məhsulu qəbul etməmək hüququna malikdir.
+                9.3. "Elektron ticarət haqqında" Qanunun 9-cu maddəsinə əsasən, istifadəçi
+                elektron ticarət əməliyyatından 7 (yeddi) iş günü ərzində imtina etmək
+                hüququna malikdir. İmtina hüququnun həyata keçirilməsi üçün aşağıdakı
+                prosedura ciddi riayət edilməlidir:
+              </p>
+              <ul className="list-disc pl-6 space-y-1">
+                <li>İstifadəçi imtina barədə TAPLA-ya yazılı bildiriş göndərməlidir. Bildiriş yalnız <a href="mailto:support@tapla.az" className="text-neutral-950 underline underline-offset-4 decoration-neutral-300">support@tapla.az</a> ünvanına göndərilmiş e-poçt vasitəsilə qəbul edilir. Bildirişdə sifariş nömrəsi, imtina səbəbi və istifadəçinin tam adı göstərilməlidir;</li>
+                <li>İstifadəçi bildirişi göndərdikdən sonra 7 (yeddi) iş günü ərzində məhsulu TAPLA və ya satıcı tərəfindən göstərilən ünvana qaytarmalıdır. Müəyyən edilmiş müddətdə qaytarılmayan məhsullar üzrə imtina hüququ itirilmiş hesab edilir;</li>
+                <li>İmtina zamanı məhsulun qaytarılması üçün çatdırılma xərcləri tam həcmdə istifadəçi tərəfindən qarşılanır;</li>
+                <li>Məhsul orijinal qablaşdırmada, istifadə edilməmiş, bütün etiketlər, pleymbələr, aksesuarlar və sənədlərlə birlikdə olmalıdır. Məhsulun əmtəə görünüşünün, istehlak xassələrinin və ya qablaşdırmasının hər hansı formada dəyişdirilməsi və ya zədələnməsi imtinanın rədd edilməsi üçün əsasdır;</li>
+                <li>Məhsulun dəyərinin azalmasına səbəb olan hər hansı istifadə, sınaq, quraşdırma və ya digər hərəkətlərə görə istifadəçi maliyyə məsuliyyəti daşıyır. Bu halda geri qaytarılan məbləğ məhsulun dəyərindən azaldıla bilər.</li>
+              </ul>
+
+              <p>
+                9.4. Geri qaytarma prosesi aşağıdakı ardıcıllıqla həyata keçirilir:
+              </p>
+              <ul className="list-disc pl-6 space-y-1">
+                <li>İstifadəçi tərəfindən RMA nömrəsi alınmalıdır. RMA nömrəsi olmadan göndərilən məhsullar qəbul edilmir və geri qaytarılır;</li>
+                <li>Məhsul satıcı və ya TAPLA tərəfindən qəbul edildikdən sonra 10 (on) iş günü ərzində ekspertiza və yoxlamadan keçirilir. İstehsal qüsuru şübhəsi olduqda ekspertiza müddəti 30 (otuz) iş gününədək uzadıla bilər. Ekspertiza müddəti ərzində bütün geri qaytarma proseduru dayandırılır;</li>
+                <li>Məhsulun orijinal qablaşdırmasının, etiketlərinin, pleymbələrinin və ya aksesuarlarının olmaması, habelə hər hansı zədə, deformasiya, cızıq, çat, aşınma, maye təması və ya digər istifadə əlamətləri müəyyən edildikdə, geri qaytarma rədd edilir;</li>
+                <li>Geri qaytarma rədd edildikdə, məhsul istifadəçiyə onun hesabına geri göndərilir. Bu halda heç bir geri ödəmə həyata keçirilmir;</li>
+                <li>Bütün tələblər yerinə yetirildikdə, geri ödəmə qərarın qəbul edildiyi andan etibarən 14 (on dörd) iş günü ərzində həyata keçirilir. Geri ödəmə yalnız ilkin ödəniş vasitəsi ilə həyata keçirilir. Çatdırılma xərcləri, qaytarma göndərmə xərcləri, vergilər və rüsumlar geri qaytarılmır.</li>
+              </ul>
+
+              <p>
+                9.5. Qanunla nəzərdə tutulmuş istisnalar (fərdiləşdirilmiş məhsullar, açılmış
+                audio və video yazıları, proqram təminatı, tez xarab olan məhsullar, gigiyena
+                vasitələri və Nazirlər Kabinetinin 114 nömrəli Qərarı ilə müəyyən edilmiş digər
+                məhsullar) bu bəndin tətbiqindən kənardır.
               </p>
             </Section>
 
