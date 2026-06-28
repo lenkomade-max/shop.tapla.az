@@ -16,6 +16,7 @@ const HERO_FALLBACK = [
     image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&q=80&w=1200&h=1600',
     actionText: 'MƏHSULLARI GÖR',
     href: '/#products',
+    overlay: true,
   },
   {
     id: 2,
@@ -26,6 +27,7 @@ const HERO_FALLBACK = [
     image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&q=80&w=1200&h=1600',
     actionText: 'KƏŞF ET',
     href: '/products/macbook-air-m3',
+    overlay: true,
   },
   {
     id: 3,
@@ -36,6 +38,7 @@ const HERO_FALLBACK = [
     image: 'https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?auto=format&fit=crop&q=80&w=1200&h=1600',
     actionText: 'ƏTRAFLI BAX',
     href: '/products/samsung-galaxy-s25-ultra',
+    overlay: true,
   },
 ];
 
@@ -66,7 +69,7 @@ export function Hero({ slides: propSlides }: { slides?: typeof HERO_FALLBACK }) 
           <motion.div
             key={index}
             initial={{ opacity: 0, scale: 1.03 }}
-            animate={{ opacity: 0.5, scale: 1 }}
+            animate={{ opacity: slides[index].overlay ? 0.5 : 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.98 }}
             transition={{ duration: 0.8, ease: 'easeOut' }}
             className="relative w-full h-full"
@@ -80,6 +83,11 @@ export function Hero({ slides: propSlides }: { slides?: typeof HERO_FALLBACK }) 
             />
           </motion.div>
         </AnimatePresence>
+
+        {/* Gradient overlay for readability when overlay=false */}
+        {!slides[index].overlay && (
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+        )}
       </div>
 
       {/* Elegant Editorial Text Grid Overlay */}

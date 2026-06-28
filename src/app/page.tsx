@@ -10,7 +10,7 @@ import { ReviewsSection } from '@/components/sections/ReviewsSection';
 import { FAQ } from '@/components/sections/FAQ';
 import { ValueProps } from '@/components/sections/ValueProps';
 
-export const revalidate = 3600; // Cache data for 1 hour
+export const dynamic = 'force-dynamic';
 
 export default async function Home() {
   // Concurrent server-side fetch calls
@@ -35,6 +35,7 @@ export default async function Home() {
           image: (s.image as string) || '',
           actionText: (s.action_text as string) || 'MƏHSULLARI GÖR',
           href: (s.href as string) || '/#products',
+          overlay: s.overlay !== false,
         }))
       ),
   ]);
