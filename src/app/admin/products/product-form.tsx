@@ -93,21 +93,28 @@ export function ProductForm({ product, error }: Props) {
     if (fileInputRef.current) fileInputRef.current.value = ''
   }, [uploadToR2, setImages])
 
-  // ─── Вставка из буфера (Ctrl+V / Cmd+V) ──────────────────────────────
-  const handlePaste = useCallback(async (e: React.ClipboardEvent) => {
-    const items = e.clipboardData?.items
-    if (!items) return
-    for (const item of Array.from(items)) {
-      if (item.type.startsWith('image/')) {
-        e.preventDefault()
-        const blob = item.getAsFile()
-        if (blob) {
-          const url = await uploadToR2(blob)
-          if (url) setImages(prev => [...prev.filter(Boolean), url])
+  // ─── Вставка из буфера (Ctrl+V / Cmd+V) — глобальный ──────────────
+  useEffect(() => {
+    const onPasteGlobal = async (e: globalThis.ClipboardEvent) => {
+      const tag = (e.target as HTMLElement)?.tagName
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return
+
+      const items = e.clipboardData?.items
+      if (!items) return
+      for (const item of Array.from(items)) {
+        if (item.type.startsWith('image/')) {
+          e.preventDefault()
+          const blob = item.getAsFile()
+          if (blob) {
+            const url = await uploadToR2(blob)
+            if (url) setImages(prev => [...prev.filter(Boolean), url])
+          }
+          break
         }
-        break
       }
     }
+    document.addEventListener('paste', onPasteGlobal)
+    return () => document.removeEventListener('paste', onPasteGlobal)
   }, [uploadToR2, setImages])
 
   function onNameChange(v: string) {
@@ -239,8 +246,6 @@ export function ProductForm({ product, error }: Props) {
           onDrop={handleFileDrop}
           onDragOver={e => { e.preventDefault(); setUploadDragOver(true) }}
           onDragLeave={() => setUploadDragOver(false)}
-          onPaste={handlePaste}
-          tabIndex={0}
           onClick={() => fileInputRef.current?.click()}
           className={`flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 cursor-pointer transition mb-4 outline-none focus:border-black ${
             uploadDragOver ? 'border-black bg-zinc-50' : 'border-zinc-300 hover:border-zinc-400'
