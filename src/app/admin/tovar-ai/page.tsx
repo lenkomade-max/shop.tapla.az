@@ -97,7 +97,7 @@ function slugify(text: string): string {
 
 export default function TovarAIPage() {
   // ─── Общие состояния ──────────────────────────────────────────────────
-  const [mode, setMode] = useState<Mode>('test')
+  const [mode, setMode] = useState<Mode>('product')
   const [stage, setStage] = useState<Stage>('idle')
   const [cards, setCards] = useState<CardData[]>([])
   const [cardPrompts, setCardPrompts] = useState<CardPromptData[]>([])
