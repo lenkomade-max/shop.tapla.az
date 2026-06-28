@@ -405,3 +405,77 @@ export async function deleteCategory(formData: FormData) {
   revalidatePath('/admin/categories')
   revalidatePath('/', 'layout')
 }
+
+// ——— Hero Slides CRUD ———
+
+export interface HeroSlideData {
+  sort_order: number
+  tag: string
+  title: string
+  subtitle: string
+  description: string
+  image: string
+  action_text: string
+  href: string
+  overlay: boolean
+  is_active: boolean
+}
+
+export async function saveHeroSlide(formData: FormData): Promise<void> {
+  if (!(await checkAuth())) redirect('/admin')
+
+  const id = formData.get('id') as string | null
+
+  const payload: HeroSlideData = {
+    sort_order: Number(formData.get('sort_order')) || 0,
+    tag: (formData.get('tag') as string) || '',
+    title: (formData.get('title') as string) || '',
+    subtitle: (formData.get('subtitle') as string) || '',
+    description: (formData.get('description') as string) || '',
+    image: (formData.get('image') as string) || '',
+    action_text: (formData.get('action_text') as string) || 'MƏHSULLARI GÖR',
+    href: (formData.get('href') as string) || '/#products',
+    overlay: formData.get('overlay') === 'on',
+    is_active: formData.get('is_active') === 'on',
+  }
+
+  const { error } = id
+    ? await supabaseAdmin.from('hero_slides').update(payload).eq('id', id)
+    : await supabaseAdmin.from('hero_slides').insert(payload)
+
+  if (error) {
+    console.error('Save hero slide error:', error)
+    redirect(`/admin/hero?error=${encodeURIComponent(error.message)}`)
+  }
+
+  revalidatePath('/admin/hero')
+  revalidatePath('/', 'layout')
+  redirect('/admin/hero')
+}
+
+export async function deleteHeroSlide(formData: FormData) {
+  if (!(await checkAuth())) return
+  const id = formData.get('id') as string
+  if (!id) return
+  await supabaseAdmin.from('hero_slides').delete().eq('id', id)
+  revalidatePath('/admin/hero')
+  revalidatePath('/', 'layout')
+}
+
+export async function reorderHeroSlides(formData: FormData) {
+  if (!(await checkAuth())) return
+  const ids = formData.getAll('ids') as string[]
+  const orders = formData.getAll('orders') as string[]
+
+  if (ids.length !== orders.length) return
+
+  for (let i = 0; i < ids.length; i++) {
+    await supabaseAdmin
+      .from('hero_slides')
+      .update({ sort_order: Number(orders[i]) })
+      .eq('id', ids[i])
+  }
+
+  revalidatePath('/admin/hero')
+  revalidatePath('/', 'layout')
+}

@@ -21,6 +21,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
               <Link href="/admin/orders" className="hover:text-black">Заказы</Link>
               <Link href="/admin/tovar-ai" className="hover:text-black">Tovar.AI</Link>
               <Link href="/admin/categories" className="hover:text-black">Категории</Link>
+              <Link href="/admin/hero" className="hover:text-black">Hero</Link>
             </nav>
           </div>
           <form action={logoutAction}>

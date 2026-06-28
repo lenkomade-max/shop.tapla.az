@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 
-const HERO_SLIDES = [
+const HERO_FALLBACK = [
   {
     id: 1,
     tag: 'ELEKTRONIKADA ƏN YAXŞI SEÇİMLƏR',
@@ -39,22 +39,23 @@ const HERO_SLIDES = [
   },
 ];
 
-export function Hero() {
+export function Hero({ slides: propSlides }: { slides?: typeof HERO_FALLBACK }) {
+  const slides = propSlides || HERO_FALLBACK;
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setIndex((prev) => (prev + 1) % HERO_SLIDES.length);
+      setIndex((prev) => (prev + 1) % slides.length);
     }, 6000);
     return () => clearInterval(timer);
   }, []);
 
   const handleNext = () => {
-    setIndex((prev) => (prev + 1) % HERO_SLIDES.length);
+    setIndex((prev) => (prev + 1) % slides.length);
   };
 
   const handlePrev = () => {
-    setIndex((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
+    setIndex((prev) => (prev - 1 + slides.length) % slides.length);
   };
 
   return (
@@ -71,8 +72,8 @@ export function Hero() {
             className="relative w-full h-full"
           >
             <Image
-              src={HERO_SLIDES[index].image}
-              alt={HERO_SLIDES[index].title}
+              src={slides[index].image}
+              alt={slides[index].title}
               fill
               priority
               className="object-cover object-center"
@@ -96,33 +97,33 @@ export function Hero() {
               >
                 {/* Micro Tag */}
                 <span className="inline-block text-[10px] sm:text-xs font-bold tracking-[0.2em] text-neutral-300 uppercase">
-                  {HERO_SLIDES[index].tag}
+                  {slides[index].tag}
                 </span>
 
                 {/* Main Heading */}
                 <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-light tracking-[0.05em] leading-tight text-white">
-                  {HERO_SLIDES[index].title}
+                  {slides[index].title}
                 </h1>
 
                 {/* Secondary Title */}
                 <h2 className="text-base sm:text-lg md:text-xl font-light tracking-[0.2em] text-amber-100 uppercase">
-                  {HERO_SLIDES[index].subtitle}
+                  {slides[index].subtitle}
                 </h2>
 
                 {/* Paragraph */}
                 <p className="text-xs sm:text-sm md:text-base text-neutral-300 font-sans font-light max-w-lg leading-relaxed pt-2">
-                  {HERO_SLIDES[index].description}
+                  {slides[index].description}
                 </p>
 
                 {/* CTA Action */}
                 <div className="pt-6">
-                  <a href={HERO_SLIDES[index].href}>
+                  <a href={slides[index].href}>
                     <Button
                       variant="secondary"
                       size="lg"
                       className="hover:bg-neutral-950 hover:text-white hover:border-white transition-all duration-300"
                     >
-                      {HERO_SLIDES[index].actionText}
+                      {slides[index].actionText}
                     </Button>
                   </a>
                 </div>
@@ -151,7 +152,7 @@ export function Hero() {
 
       {/* Rhythmic Slide Indicators */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex space-x-2.5">
-        {HERO_SLIDES.map((_, idx) => (
+        {slides.map((_, idx) => (
           <button
             key={idx}
             onClick={() => setIndex(idx)}
