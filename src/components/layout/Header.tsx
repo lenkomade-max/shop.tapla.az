@@ -10,7 +10,7 @@ import { Container } from '@/components/ui/Container';
 import { AnnouncementBar } from './AnnouncementBar';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { AuthButton } from '@/components/auth/AuthButton';
 
 export function Header() {
@@ -24,6 +24,9 @@ export function Header() {
     isCartOpen,
     setIsCartOpen,
   } = useCart();
+
+  const pathname = usePathname();
+  const isHomePage = pathname === '/';
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -58,12 +61,12 @@ export function Header() {
   return (
     <>
       <div className="absolute top-0 left-0 right-0 z-40">
-        {!isScrolled && !isMobileMenuOpen && !isSearchOpen && <AnnouncementBar />}
+        {isHomePage && !isScrolled && !isMobileMenuOpen && !isSearchOpen && <AnnouncementBar />}
         <header
           className={`transition-all duration-500 font-sans ${
-            isScrolled || isMobileMenuOpen || isSearchOpen
-              ? 'fixed top-0 left-0 right-0 z-40 bg-white shadow-md py-4 text-neutral-900 border-b border-neutral-100'
-              : 'relative bg-transparent text-white py-6'
+            isHomePage && !isScrolled && !isMobileMenuOpen && !isSearchOpen
+              ? 'relative bg-transparent text-white py-6'
+              : 'fixed top-0 left-0 right-0 z-40 bg-white shadow-md py-4 text-neutral-900 border-b border-neutral-100'
           }`}
         >
         <Container>
