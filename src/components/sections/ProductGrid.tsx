@@ -11,18 +11,33 @@ import { useCart } from '@/store/CartContext';
 import { Star, CheckCircle, ShoppingBag, Minimize2, ZoomIn } from 'lucide-react';
 import Image from 'next/image';
 import { clsx } from 'clsx';
+import Link from 'next/link';
 
 interface ProductGridProps {
   products: Product[];
 }
 
+// Карта: старые category names → новые root slugs (для демо-товаров)
+const CATEGORY_NAME_MAP: Record<string, string> = {
+  'Notebook / Ultrabook': 'elektronika',
+  'Smartfon / Planşet': 'telefonlar-ve-plansetler',
+  'Aksesuar / Qadjet': 'aqilli-saat-ve-gadget',
+  'Planşet': 'telefonlar-ve-plansetler',
+};
+
 const CATEGORIES = [
   { label: 'HAMSINI GÖSTƏR', value: 'all' },
-  { label: 'NOTEBOOK / ULTRABOOK', value: 'Notebook / Ultrabook' },
-  { label: 'SMARTFON / PLANŞET', value: 'Smartfon / Planşet' },
-  { label: 'AKSESUAR / QADJET', value: 'Aksesuar / Qadjet' },
-  { label: 'PLANŞET', value: 'Planşet' },
+  { label: 'QULAQLIQ & AUDIO', value: 'qulaqliq-ve-audio' },
+  { label: 'TELEFON & PLANŞET', value: 'telefonlar-ve-plansetler' },
+  { label: 'MƏİŞƏT TEXNİKASI', value: 'kicik-meiset-texnikasi' },
+  { label: 'SAAT & GADGET', value: 'aqilli-saat-ve-gadget' },
+  { label: 'ELEKTRONIKA', value: 'elektronika' },
 ];
+
+function getProductCategoryValue(product: Product): string {
+  const mapped = CATEGORY_NAME_MAP[product.category];
+  return mapped || '';
+}
 
 export function ProductGrid({ products }: ProductGridProps) {
   const { addToCart } = useCart();
@@ -34,7 +49,7 @@ export function ProductGrid({ products }: ProductGridProps) {
 
   const filteredProducts = selectedCategory === 'all'
     ? products
-    : products.filter(p => p.category === selectedCategory);
+    : products.filter(p => getProductCategoryValue(p) === selectedCategory);
 
   const handleOpenQuickView = (product: Product) => {
     setQuickViewProduct(product);
@@ -71,7 +86,7 @@ export function ProductGrid({ products }: ProductGridProps) {
         </div>
 
         {/* Category Filter Tabs */}
-        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 mb-12 sm:mb-16 border-b border-neutral-100 pb-4">
+        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 mb-8 sm:mb-12 border-b border-neutral-100 pb-4">
           {CATEGORIES.map((cat) => (
             <button
               key={cat.value}
@@ -86,6 +101,16 @@ export function ProductGrid({ products }: ProductGridProps) {
               {cat.label}
             </button>
           ))}
+        </div>
+
+        {/* Link to all category pages */}
+        <div className="text-center mb-10">
+          <Link
+            href="/products"
+            className="text-[10px] tracking-widest font-semibold uppercase underline underline-offset-4 text-neutral-500 hover:text-neutral-900 transition-colors"
+          >
+            Bütün kateqoriyalara bax
+          </Link>
         </div>
 
         {/* Products Grid */}

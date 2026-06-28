@@ -141,3 +141,18 @@ export interface NavigationItem {
   isBadge?: boolean;
   badgeText?: string;
 }
+
+// --- Category types ---
+
+export interface Category {
+  id: string;
+  slug: string;
+  title: string;
+  description?: string;
+  image?: string;
+  parentId: string | null;
+  children?: Category[];
+  sortOrder: number;
+  status: 'active' | 'draft';
+  productCount?: number;
+}

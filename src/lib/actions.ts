@@ -92,6 +92,7 @@ export async function saveProduct(formData: FormData): Promise<void> {
     status: formData.get('status') || 'active',
     how_to_use: formData.get('howToUse') || '',
     ingredients: formData.get('ingredients') || null,
+    supplier_url: formData.get('supplierUrl') || null,
     is_new: formData.get('isNew') === 'true',
     try_on_enabled: formData.get('tryOnEnabled') === 'true',
     images,
@@ -113,6 +114,106 @@ export async function saveProduct(formData: FormData): Promise<void> {
   revalidatePath('/products');
   revalidatePath('/', 'layout');
   redirect('/admin/products');
+}
+
+/**
+ * Создаёт товар из AI-сгенерированных данных (Tovar.AI product mode).
+ * Возвращает ID созданного товара.
+ */
+export async function createProductFromAI(
+  productData: {
+    name: string
+    slug: string
+    title: string
+    subtitle: string
+    description: string
+    category: string
+    price: number
+    benefits: string[]
+    how_to_use: string
+    ingredients?: string | null
+    tags: string[]
+    images: string[]
+    supplier_url?: string
+  },
+  status: 'active' | 'draft' = 'draft',
+): Promise<string | null> {
+  if (!(await checkAuth())) return null
+
+  // Проверка уникальности slug
+  let slug = productData.slug
+  const { data: existing } = await supabaseAdmin
+    .from('products')
+    .select('id')
+    .eq('slug', slug)
+    .maybeSingle()
+  if (existing) {
+    let counter = 2
+    while (true) {
+      const candidate = `${slug}-${counter}`
+      const { data: dup } = await supabaseAdmin
+        .from('products')
+        .select('id')
+        .eq('slug', candidate)
+        .maybeSingle()
+      if (!dup) { slug = candidate; break }
+      counter++
+    }
+  }
+
+  const { data: product, error } = await supabaseAdmin
+    .from('products')
+    .insert({
+      name: productData.name,
+      slug,
+      title: productData.title,
+      subtitle: productData.subtitle,
+      description: productData.description,
+      category: productData.category,
+      price: productData.price,
+      status,
+      benefits: productData.benefits,
+      how_to_use: productData.how_to_use,
+      ingredients: productData.ingredients || null,
+      tags: productData.tags,
+      images: productData.images,
+      supplier_url: productData.supplier_url || null,
+    })
+    .select('id')
+    .single()
+
+  if (error) {
+    console.error('createProductFromAI error:', error)
+    return null
+  }
+
+  revalidatePath('/admin/products')
+  revalidatePath('/products')
+  revalidatePath('/', 'layout')
+
+  return (product as unknown as { id: string }).id
+}
+
+/**
+ * Меняет статус товара на 'active' (публикация).
+ */
+export async function publishProduct(productId: string): Promise<boolean> {
+  if (!(await checkAuth())) return false
+
+  const { error } = await supabaseAdmin
+    .from('products')
+    .update({ status: 'active', updated_at: new Date().toISOString() })
+    .eq('id', productId)
+
+  if (error) {
+    console.error('publishProduct error:', error)
+    return false
+  }
+
+  revalidatePath('/admin/products')
+  revalidatePath('/products')
+  revalidatePath('/', 'layout')
+  return true
 }
 
 export interface CheckoutFormData {
@@ -229,4 +330,54 @@ export async function submitOrder(formData: CheckoutFormData) {
     orderNumber: `TPL-${String(o.id).slice(0, 6).toUpperCase()}`,
     isGuest: !session?.user,
   }
+}
+
+// ——— Category CRUD ———
+
+export async function saveCategory(formData: FormData): Promise<void> {
+  if (!(await checkAuth())) redirect('/admin')
+
+  const id = formData.get('id') as string | null
+  const slug = formData.get('slug') as string
+  const title = formData.get('title') as string
+  const parentId = formData.get('parentId') as string | null
+  const sortOrder = Number(formData.get('sortOrder')) || 0
+  const status = (formData.get('status') as string) || 'active'
+  const description = (formData.get('description') as string) || null
+  const errorBase = 'admin/categories'
+
+  if (!slug || !title) {
+    redirect(`/${errorBase}?error=Slug+and+title+required`)
+  }
+
+  const payload: Record<string, unknown> = {
+    slug,
+    title,
+    description,
+    parent_id: parentId || null,
+    sort_order: sortOrder,
+    status,
+  }
+
+  const { error } = id
+    ? await supabaseAdmin.from('categories').update(payload).eq('id', id)
+    : await supabaseAdmin.from('categories').insert(payload)
+
+  if (error) {
+    console.error('Save category error:', error)
+    redirect(`/${errorBase}?error=${encodeURIComponent(error.message)}`)
+  }
+
+  revalidatePath('/admin/categories')
+  revalidatePath('/', 'layout')
+  redirect('/admin/categories')
+}
+
+export async function deleteCategory(formData: FormData) {
+  if (!(await checkAuth())) return
+  const id = formData.get('id') as string
+  if (!id) return
+  await supabaseAdmin.from('categories').delete().eq('id', id)
+  revalidatePath('/admin/categories')
+  revalidatePath('/', 'layout')
 }

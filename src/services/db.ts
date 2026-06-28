@@ -1,6 +1,6 @@
 import { supabaseAdmin } from '@/lib/supabase/admin';
-import { PRODUCTS, REVIEWS, FAQS, RITUAL_STEPS, BENEFITS_LIST } from '@/constants/data';
-import { Product, Review, FAQ, Benefit } from '@/types';
+import { PRODUCTS, REVIEWS, FAQS, RITUAL_STEPS, BENEFITS_LIST, CATEGORIES } from '@/constants/data';
+import { Product, Review, FAQ, Benefit, Category } from '@/types';
 
 function slugify(text: string): string {
   return text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim();
@@ -55,6 +55,39 @@ function mapFAQ(row: Record<string, unknown>): FAQ {
     answer: row.answer as string,
     category: row.category as string,
   };
+}
+
+function mapCategory(row: Record<string, unknown>): Category {
+  return {
+    id: row.id as string,
+    slug: row.slug as string,
+    title: row.title as string,
+    description: row.description as string | undefined,
+    image: row.image as string | undefined,
+    parentId: row.parent_id as string | null,
+    sortOrder: Number(row.sort_order) || 0,
+    status: (row.status as 'active' | 'draft') || 'active',
+    productCount: row.product_count != null ? Number(row.product_count) : undefined,
+  };
+}
+
+function buildCategoryTree(flat: Category[]): Category[] {
+  const map = new Map<string, Category>();
+  const roots: Category[] = [];
+
+  for (const cat of flat) {
+    map.set(cat.id, { ...cat, children: [] });
+  }
+
+  for (const cat of map.values()) {
+    if (cat.parentId && map.has(cat.parentId)) {
+      map.get(cat.parentId)!.children!.push(cat);
+    } else if (!cat.parentId) {
+      roots.push(cat);
+    }
+  }
+
+  return roots.sort((a, b) => a.sortOrder - b.sortOrder);
 }
 
 export const dbService = {
@@ -169,6 +202,106 @@ export const dbService = {
       return FAQS.filter(f => f.category.toLowerCase() === category.toLowerCase());
     }
     return FAQS;
+  },
+
+  // ——— Категории ———
+
+  async getCategories(): Promise<Category[]> {
+    try {
+      if (supabaseAdmin) {
+        const { data, error } = await supabaseAdmin
+          .from('categories')
+          .select('*')
+          .eq('status', 'active')
+          .order('sort_order', { ascending: true });
+        if (!error && data && data.length > 0) {
+          return (data as Record<string, unknown>[]).map(mapCategory);
+        }
+      }
+    } catch (err) {
+      console.warn('DB categories fetch failed, using local fallback:', err);
+    }
+    return CATEGORIES.filter(c => c.status === 'active');
+  },
+
+  async getCategoryTree(): Promise<Category[]> {
+    const flat = await this.getCategories();
+    return buildCategoryTree(flat);
+  },
+
+  async getCategoryBySlug(slug: string): Promise<Category | null> {
+    try {
+      if (supabaseAdmin) {
+        const { data, error } = await supabaseAdmin
+          .from('categories')
+          .select('*')
+          .eq('slug', slug)
+          .eq('status', 'active')
+          .maybeSingle();
+        if (!error && data) {
+          const cat = mapCategory(data as Record<string, unknown>);
+
+          // Get children
+          const { data: children } = await supabaseAdmin
+            .from('categories')
+            .select('*')
+            .eq('parent_id', cat.id)
+            .eq('status', 'active')
+            .order('sort_order', { ascending: true });
+          if (children) {
+            cat.children = (children as Record<string, unknown>[]).map(mapCategory);
+          }
+
+          return cat;
+        }
+      }
+    } catch (err) {
+      console.warn(`DB category fetch for slug ${slug} failed, using local fallback:`, err);
+    }
+
+    const cat = CATEGORIES.find(c => c.slug === slug);
+    if (cat) {
+      cat.children = CATEGORIES.filter(c => c.parentId === cat.id && c.status === 'active')
+        .sort((a, b) => a.sortOrder - b.sortOrder);
+    }
+    return cat || null;
+  },
+
+  async getProductsByCategory(categorySlug: string): Promise<Product[]> {
+    try {
+      if (supabaseAdmin) {
+        // Find the category and all its descendant IDs
+        const { data: catData } = await supabaseAdmin
+          .from('categories')
+          .select('id')
+          .eq('slug', categorySlug)
+          .eq('status', 'active')
+          .maybeSingle();
+
+        if (catData) {
+          const { data: subCats } = await supabaseAdmin
+            .from('categories')
+            .select('id')
+            .eq('status', 'active')
+            .or(`id.eq.${catData.id},parent_id.eq.${catData.id}`);
+
+          const catIds = subCats?.map(c => c.id) || [catData.id];
+
+          const { data, error } = await supabaseAdmin
+            .from('products')
+            .select('*')
+            .eq('status', 'active')
+            .in('category_id', catIds);
+          if (!error && data && data.length > 0) {
+            return (data as Record<string, unknown>[]).map(mapProduct);
+          }
+        }
+      }
+    } catch (err) {
+      console.warn(`DB products by category fetch for ${categorySlug} failed, using local fallback:`, err);
+    }
+
+    return PRODUCTS;
   },
 
   async getRitualSteps() {

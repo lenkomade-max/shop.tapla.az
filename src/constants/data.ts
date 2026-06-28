@@ -1,14 +1,15 @@
-import { Product, Review, FAQ, Benefit, NavigationItem } from '../types';
+import { Product, Review, FAQ, Benefit, NavigationItem, Category } from '../types';
 
 export const NAVIGATION_ITEMS: NavigationItem[] = [
   {
     label: 'MƏHSULLAR',
-    href: '/#products',
+    href: '/products',
     children: [
-      { label: 'Notebook / Ultrabook', href: '/#products?cat=notebook' },
-      { label: 'Smartfon / Planşet', href: '/#products?cat=phone' },
-      { label: 'TV / Audio Sistemlər', href: '/#products?cat=tv' },
-      { label: 'Aksesuar / Qadjetlər', href: '/#products?cat=accessories' },
+      { label: 'Qulaqlıq & Audio', href: '/category/qulaqliq-ve-audio' },
+      { label: 'Telefonlar & Planşetlər', href: '/category/telefonlar-ve-plansetler' },
+      { label: 'Kiçik Məişət Texnikası', href: '/category/kicik-meiset-texnikasi' },
+      { label: 'Ağıllı Saat & Gadget', href: '/category/aqilli-saat-ve-gadget' },
+      { label: 'Sağlamlıq & İdman', href: '/category/saglamliq-ve-idman' },
     ],
   },
   {
@@ -310,6 +311,96 @@ export const RITUAL_STEPS = [
     image: 'https://picsum.photos/id/3/800/800',
     actionText: 'ÇATDIRILMA HAQQINDA',
     href: '#faq',
+  },
+];
+
+// ——— Категории (статический fallback для Supabase) ———
+export const CATEGORIES: Category[] = [
+  {
+    id: 'cat-root-1', slug: 'qulaqliq-ve-audio', title: 'Qulaqlıq & Audio',
+    description: 'Simsiz qulaqlıqlar, TWS, dinamiklər, kolonkalar',
+    parentId: null, sortOrder: 1, status: 'active',
+  },
+  {
+    id: 'cat-sub-1-1', slug: 'tws-qulaqliq', title: 'Simsiz Qulaqlıq (TWS)',
+    parentId: 'cat-root-1', sortOrder: 1, status: 'active',
+  },
+  {
+    id: 'cat-sub-1-2', slug: 'dinamik-kolonka', title: 'Dinamik / Kolonka',
+    parentId: 'cat-root-1', sortOrder: 2, status: 'active',
+  },
+  {
+    id: 'cat-sub-1-3', slug: 'qulaqustu-qulaqliq', title: 'Qulaqüstü Qulaqlıq',
+    parentId: 'cat-root-1', sortOrder: 3, status: 'active',
+  },
+  {
+    id: 'cat-root-2', slug: 'telefonlar-ve-plansetler', title: 'Telefonlar & Planşetlər',
+    description: 'Düyməli telefonlar, smartfonlar, planşetlər',
+    parentId: null, sortOrder: 2, status: 'active',
+  },
+  {
+    id: 'cat-sub-2-1', slug: 'duymeli-telefon', title: 'Düyməli Telefon',
+    parentId: 'cat-root-2', sortOrder: 1, status: 'active',
+  },
+  {
+    id: 'cat-sub-2-2', slug: 'smartfon', title: 'Smartfon (Android)',
+    parentId: 'cat-root-2', sortOrder: 2, status: 'active',
+  },
+  {
+    id: 'cat-sub-2-3', slug: 'planset', title: 'Planşet',
+    parentId: 'cat-root-2', sortOrder: 3, status: 'active',
+  },
+  {
+    id: 'cat-sub-2-4', slug: 'tel-aksesuar', title: 'Tel Aksesuar',
+    parentId: 'cat-root-2', sortOrder: 4, status: 'active',
+  },
+  {
+    id: 'cat-root-3', slug: 'kicik-meiset-texnikasi', title: 'Kiçik Məişət Texnikası',
+    description: 'Fenlər, sərinkeşlər, tozsoranlar, ütülər, mətbəx texnikası',
+    parentId: null, sortOrder: 3, status: 'active',
+  },
+  {
+    id: 'cat-sub-3-1', slug: 'fen-serinkes', title: 'Fen / Sərinkeş',
+    parentId: 'cat-root-3', sortOrder: 1, status: 'active',
+  },
+  {
+    id: 'cat-sub-3-2', slug: 'temizlik', title: 'Təmizlik Texnikası',
+    parentId: 'cat-root-3', sortOrder: 2, status: 'active',
+  },
+  {
+    id: 'cat-sub-3-3', slug: 'metbex', title: 'Mətbəx Texnikası',
+    parentId: 'cat-root-3', sortOrder: 3, status: 'active',
+  },
+  {
+    id: 'cat-root-4', slug: 'aqilli-saat-ve-gadget', title: 'Ağıllı Saat & Gadget',
+    description: 'Smart saatlar, powerbanklər, oyun aksesuarları',
+    parentId: null, sortOrder: 4, status: 'active',
+  },
+  {
+    id: 'cat-sub-4-1', slug: 'smart-saat', title: 'Smart Saat',
+    parentId: 'cat-root-4', sortOrder: 1, status: 'active',
+  },
+  {
+    id: 'cat-sub-4-2', slug: 'powerbank', title: 'Powerbank',
+    parentId: 'cat-root-4', sortOrder: 2, status: 'active',
+  },
+  {
+    id: 'cat-sub-4-3', slug: 'oyun-aksesuari', title: 'Oyun Aksesuarı',
+    parentId: 'cat-root-4', sortOrder: 3, status: 'active',
+  },
+  {
+    id: 'cat-sub-4-4', slug: 'diger-gadget', title: 'Digər Gadgetlər',
+    parentId: 'cat-root-4', sortOrder: 4, status: 'active',
+  },
+  {
+    id: 'cat-root-5', slug: 'saglamliq-ve-idman', title: 'Sağlamlıq & İdman',
+    description: 'Masaj cihazları, qaçış aparatları, fitnes',
+    parentId: null, sortOrder: 5, status: 'active',
+  },
+  {
+    id: 'cat-root-6', slug: 'elektronika', title: 'Elektronika',
+    description: 'Noutbuklar, DJI, kameralar, günəş panelləri',
+    parentId: null, sortOrder: 6, status: 'active',
   },
 ];
 

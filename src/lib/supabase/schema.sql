@@ -29,10 +29,69 @@ CREATE TABLE IF NOT EXISTS products (
   shades JSONB DEFAULT '[]'::jsonb,
   is_new BOOLEAN DEFAULT false,
   try_on_enabled BOOLEAN DEFAULT false,
+  supplier_url TEXT,                -- Tovar.AI: ссылка на страницу поставщика
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS idx_products_slug ON products(slug);
+
+-- ============================================================================
+-- 1.5 CATEGORIES (иерархическая структура)
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS categories (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  slug TEXT UNIQUE NOT NULL,
+  title TEXT NOT NULL,
+  description TEXT,
+  image TEXT,
+  parent_id UUID REFERENCES categories(id) ON DELETE SET NULL,
+  sort_order INT NOT NULL DEFAULT 0,
+  status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'draft')),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_categories_parent ON categories(parent_id);
+CREATE INDEX IF NOT EXISTS idx_categories_slug ON categories(slug);
+
+-- Добавляем category_id в products
+ALTER TABLE products ADD COLUMN IF NOT EXISTS category_id UUID REFERENCES categories(id) ON DELETE SET NULL;
+
+-- ============================================================================
+-- Сеед данных: категории (на основе ассортимента magazam_az)
+-- ============================================================================
+INSERT INTO categories (slug, title, description, sort_order) VALUES
+  ('qulaqliq-ve-audio', 'Qulaqlıq & Audio', 'Simsiz qulaqlıqlar, TWS, dinamiklər, kolonkalar', 1),
+  ('telefonlar-ve-plansetler', 'Telefonlar & Planşetlər', 'Düyməli telefonlar, smartfonlar, planşetlər, aksesuarlar', 2),
+  ('kicik-meiset-texnikasi', 'Kiçik Məişət Texnikası', 'Fenlər, sərinkeşlər, tozsoranlar, ütülər, mətbəx texnikası', 3),
+  ('aqilli-saat-ve-gadget', 'Ağıllı Saat & Gadget', 'Smart saatlar, powerbanklər, oyun aksesuarları', 4),
+  ('saglamliq-ve-idman', 'Sağlamlıq & İdman', 'Masaj cihazları, qaçış aparatları, fitnes', 5),
+  ('elektronika', 'Elektronika', 'Noutbuklar, DJI, kameralar, günəş panelləri', 6);
+
+-- Подкатегории: Qulaqlıq & Audio
+INSERT INTO categories (slug, title, description, parent_id, sort_order) VALUES
+  ('tws-qulaqliq', 'Simsiz Qulaqlıq (TWS)', 'AirPods, TWS, bluetooth qulaqlıqlar', (SELECT id FROM categories WHERE slug = 'qulaqliq-ve-audio'), 1),
+  ('dinamik-kolonka', 'Dinamik / Kolonka', 'Bluetooth kolonkalar, səs sistemi', (SELECT id FROM categories WHERE slug = 'qulaqliq-ve-audio'), 2),
+  ('qulaqustu-qulaqliq', 'Qulaqüstü Qulaqlıq', 'Böyük ölçülü qulaqlıqlar, oyun qulaqlıqları', (SELECT id FROM categories WHERE slug = 'qulaqliq-ve-audio'), 3);
+
+-- Подкатегории: Telefonlar & Planşetlər
+INSERT INTO categories (slug, title, description, parent_id, sort_order) VALUES
+  ('duymeli-telefon', 'Düyməli Telefon', 'Nokia, Samsung E seriyası, Vertu', (SELECT id FROM categories WHERE slug = 'telefonlar-ve-plansetler'), 1),
+  ('smartfon', 'Smartfon (Android)', 'Android telefonlar, DOOV, QIN', (SELECT id FROM categories WHERE slug = 'telefonlar-ve-plansetler'), 2),
+  ('planset', 'Planşet', 'Android planşetlər, uşaq planşetləri', (SELECT id FROM categories WHERE slug = 'telefonlar-ve-plansetler'), 3),
+  ('tel-aksesuar', 'Tel Aksesuar', 'Çantalar, qoruyucu şüşələr, kabellər', (SELECT id FROM categories WHERE slug = 'telefonlar-ve-plansetler'), 4);
+
+-- Подкатегории: Kiçik Məişət Texnikası
+INSERT INTO categories (slug, title, description, parent_id, sort_order) VALUES
+  ('fen-serinkes', 'Fen / Sərinkeş', 'Saç qurudanlar, ventilyatorlar, mini sərinkeşlər', (SELECT id FROM categories WHERE slug = 'kicik-meiset-texnikasi'), 1),
+  ('temizlik', 'Təmizlik Texnikası', 'Tozsoranlar, xalça yuyan maşınlar', (SELECT id FROM categories WHERE slug = 'kicik-meiset-texnikasi'), 2),
+  ('metbex', 'Mətbəx Texnikası', 'Frituzlər, ütülər, hava soyuducular', (SELECT id FROM categories WHERE slug = 'kicik-meiset-texnikasi'), 3);
+
+-- Подкатегории: Ağıllı Saat & Gadget
+INSERT INTO categories (slug, title, description, parent_id, sort_order) VALUES
+  ('smart-saat', 'Smart Saat', 'Ağıllı saatlar, uşaq saatları, SIM kartlı saatlar', (SELECT id FROM categories WHERE slug = 'aqilli-saat-ve-gadget'), 1),
+  ('powerbank', 'Powerbank', 'Portativ enerji yığıcılar, günəş panelli', (SELECT id FROM categories WHERE slug = 'aqilli-saat-ve-gadget'), 2),
+  ('oyun-aksesuari', 'Oyun Aksesuarı', 'Coyistiklər, oyun pultları', (SELECT id FROM categories WHERE slug = 'aqilli-saat-ve-gadget'), 3),
+  ('diger-gadget', 'Digər Gadgetlər', 'WiFi kameralar, mini klaviaturalar', (SELECT id FROM categories WHERE slug = 'aqilli-saat-ve-gadget'), 4);
 
 -- ============================================================================
 -- 2. LANDINGS
@@ -221,7 +280,39 @@ CREATE TABLE IF NOT EXISTS user_cart (
 CREATE INDEX IF NOT EXISTS idx_user_cart_user ON user_cart(auth_user_id);
 
 -- ============================================================================
--- 11. RLS POLICIES (публичное чтение, защита админки)
+-- 11. TOVAR AI GENERATIONS
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS tovar_ai_generations (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  product_id UUID REFERENCES products(id) ON DELETE SET NULL,
+  source_photo TEXT NOT NULL,
+  product_analysis JSONB,
+  prompts_json JSONB,
+  cards JSONB DEFAULT '[]'::jsonb,
+  qa_results JSONB DEFAULT '[]'::jsonb,
+  status TEXT NOT NULL DEFAULT 'pending'
+    CHECK (status IN ('pending','analyzing','planning','generating','checking','done','failed')),
+  error TEXT,
+  cost DECIMAL(10,4) DEFAULT 0,
+  -- v2: product mode
+  mode TEXT DEFAULT 'test' CHECK (mode IN ('test', 'product')),
+  supplier_url TEXT,
+  product_data JSONB,
+  ready_for_publish BOOLEAN DEFAULT false,
+  image_urls JSONB DEFAULT '[]'::jsonb,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_tovar_ai_gen_product ON tovar_ai_generations(product_id);
+CREATE INDEX IF NOT EXISTS idx_tovar_ai_gen_status ON tovar_ai_generations(status);
+CREATE INDEX IF NOT EXISTS idx_tovar_ai_gen_mode ON tovar_ai_generations(mode);
+
+DROP TRIGGER IF EXISTS tovar_ai_gen_updated_at ON tovar_ai_generations;
+CREATE TRIGGER tovar_ai_gen_updated_at BEFORE UPDATE ON tovar_ai_generations
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+-- ============================================================================
+-- 12. RLS POLICIES (публичное чтение, защита админки)
 -- ============================================================================
 
 -- Products: anon может читать активные
@@ -254,6 +345,11 @@ DROP POLICY IF EXISTS "anon can read active landings" ON landings;
 CREATE POLICY "anon can read active landings" ON landings
   FOR SELECT TO anon USING (status = 'active');
 
+-- Categories: публичное чтение активных
+DROP POLICY IF EXISTS "anon can read active categories" ON categories;
+CREATE POLICY "anon can read active categories" ON categories
+  FOR SELECT TO anon USING (status = 'active');
+
 -- Media: публичное чтение
 DROP POLICY IF EXISTS "anon can read media" ON media;
 CREATE POLICY "anon can read media" ON media
@@ -270,7 +366,7 @@ CREATE POLICY "anon can insert leads" ON leads
   FOR INSERT TO anon WITH CHECK (true);
 
 -- ============================================================================
--- 12. TRIGGER: auto-update updated_at (чисто технический, без бизнес-логики)
+-- 13. TRIGGER: auto-update updated_at (чисто технический, без бизнес-логики)
 -- ============================================================================
 CREATE OR REPLACE FUNCTION update_updated_at()
 RETURNS TRIGGER AS $$
@@ -286,6 +382,10 @@ CREATE TRIGGER products_updated_at BEFORE UPDATE ON products
 
 DROP TRIGGER IF EXISTS landings_updated_at ON landings;
 CREATE TRIGGER landings_updated_at BEFORE UPDATE ON landings
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+DROP TRIGGER IF EXISTS categories_updated_at ON categories;
+CREATE TRIGGER categories_updated_at BEFORE UPDATE ON categories
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
 DROP TRIGGER IF EXISTS orders_updated_at ON orders;
