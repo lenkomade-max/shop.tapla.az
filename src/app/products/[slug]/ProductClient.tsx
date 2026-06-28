@@ -457,32 +457,9 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-6 gap-2">
               {relatedProducts.map((relProduct) => (
-                <div key={relProduct.id} className="relative group bg-white border border-neutral-100 hover:shadow-lg transition-all duration-300">
-                  <div className="relative aspect-[4/5] w-full overflow-hidden bg-neutral-50">
-                    <Image
-                      src={relProduct.images[0]}
-                      alt={relProduct.name}
-                      fill
-                      sizes="(max-w-7xl): 25vw, 100vw"
-                      className="object-cover transition-transform duration-500 group-hover:scale-102"
-                    />
-                  </div>
-                  <div className="p-4 space-y-2">
-                    <h3 className="text-xs font-bold tracking-wider uppercase text-neutral-900 line-clamp-1">{relProduct.name}</h3>
-                    <p className="text-[10px] text-neutral-400 line-clamp-1">{relProduct.subtitle}</p>
-                    <div className="flex items-baseline justify-between pt-2">
-                      <span className="text-xs font-bold font-mono">{relProduct.price.toFixed(2)} ₼</span>
-                      <Link 
-                        href={`/products/${relProduct.id}`}
-                        className="text-[10px] font-bold uppercase tracking-widest text-neutral-900 underline group-hover:text-neutral-600 transition-colors"
-                      >
-                        ƏTRAFLI
-                      </Link>
-                    </div>
-                  </div>
-                </div>
+                <ProductCard key={relProduct.id} product={relProduct} />
               ))}
             </div>
           </div>

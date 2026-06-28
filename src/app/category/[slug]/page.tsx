@@ -121,7 +121,7 @@ export default async function CategoryPage({ params }: Props) {
 
       {/* Products Grid */}
       <div className="bg-white">
-        <div className="container mx-auto max-w-6xl px-4 py-10">
+        <div className="container mx-auto max-w-6xl px-2 sm:px-3 py-10">
           {products.length > 0 ? (
             <>
               <div className="flex items-center justify-between mb-8">
@@ -130,7 +130,7 @@ export default async function CategoryPage({ params }: Props) {
                 </h2>
                 <span className="text-xs text-neutral-400">{products.length} ədəd</span>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-2 lg:grid-cols-6 gap-2">
                 {products.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}

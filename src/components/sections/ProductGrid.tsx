@@ -71,7 +71,7 @@ export function ProductGrid({ products }: ProductGridProps) {
 
   return (
     <Section id="products" py="lg">
-      <Container>
+      <Container className="!px-2 sm:!px-3">
         {/* Header */}
         <div className="max-w-3xl mx-auto text-center space-y-3 mb-12">
           <span className="text-[10px] tracking-[0.25em] font-bold text-neutral-400 uppercase">
@@ -114,7 +114,7 @@ export function ProductGrid({ products }: ProductGridProps) {
         </div>
 
         {/* Products Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-2 lg:grid-cols-6 gap-2">
           {filteredProducts.map((product) => (
             <ProductCard
               key={product.id}

@@ -1,6 +1,6 @@
-import Link from 'next/link'
 import type { Metadata } from 'next'
 import { dbService } from '@/services/db'
+import { ProductCard } from '@/components/cards/ProductCard'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,20 +13,12 @@ export default async function ProductsPage() {
   const products = await dbService.getProducts()
 
   return (
-    <div className="min-h-screen py-20 px-4">
-      <div className="container mx-auto max-w-6xl">
-        <h1 className="text-4xl font-bold mb-8">Məhsullar</h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="min-h-screen py-20 px-2 sm:px-3">
+      <div className="mx-auto max-w-7xl">
+        <h1 className="text-4xl font-bold mb-8 px-2">Məhsullar</h1>
+        <div className="grid grid-cols-2 lg:grid-cols-6 gap-2">
           {products.map((product) => (
-            <Link
-              key={product.slug}
-              href={`/products/${product.slug}`}
-              className="group p-6 rounded-xl border border-gray-200 hover:border-gray-400 transition-colors"
-            >
-              <span className="text-xs uppercase tracking-widest text-gray-500">{product.category}</span>
-              <h2 className="text-xl font-semibold mt-2 group-hover:underline">{product.name}</h2>
-              <p className="text-lg font-bold mt-2">{product.price} ₼</p>
-            </Link>
+            <ProductCard key={product.id} product={product} />
           ))}
         </div>
       </div>

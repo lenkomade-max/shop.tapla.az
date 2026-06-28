@@ -30,7 +30,7 @@ export function ProductCard({ product, onQuickView }: ProductCardProps) {
   return (
     <div
       id={`product-card-${product.id}`}
-      className="group relative flex flex-col bg-white border border-neutral-100 hover:shadow-xl transition-all duration-500 overflow-hidden"
+      className="group relative flex flex-col bg-white rounded-xl hover:shadow-xl transition-all duration-500 overflow-hidden"
       onMouseEnter={() => {
         setIsHovered(true);
         if (product.images.length > 1) {
@@ -49,7 +49,7 @@ export function ProductCard({ product, onQuickView }: ProductCardProps) {
         )}
       </div>
 
-      <div className="relative w-full aspect-[4/5] bg-neutral-50 overflow-hidden">
+      <div className="relative w-full aspect-[4/5] bg-neutral-50 overflow-hidden rounded-t-xl">
         <Link href={`/products/${product.slug}`} className="block w-full h-full relative">
           <Image
             src={product.images[activeImageIndex] || product.images[0]}
