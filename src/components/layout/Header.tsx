@@ -122,9 +122,14 @@ export function Header() {
             <div className="flex justify-center text-center">
               <Link
                 href="/"
-                className="text-2xl sm:text-3xl font-serif tracking-[0.25em] font-light hover:opacity-90 transition-opacity uppercase"
+                className="flex flex-col items-center hover:opacity-90 transition-opacity"
               >
-                TAPLA
+                <span className="text-2xl sm:text-3xl font-serif tracking-[0.25em] font-light uppercase">
+                  TAPLA
+                </span>
+                <span className="text-[10px] sm:text-xs tracking-[0.12em] font-sans font-medium uppercase text-neutral-500 mt-0.5">
+                  MARKETPLACE
+                </span>
               </Link>
             </div>
 
