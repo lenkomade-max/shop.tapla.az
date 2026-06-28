@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { saveHeroSlide, deleteHeroSlide, reorderHeroSlides } from '@/lib/actions';
 import { ImageUp, Trash2, GripVertical, Eye, EyeOff, Sun, Moon, ExternalLink, Plus, X } from 'lucide-react';
 
@@ -22,16 +22,10 @@ export function AdminHeroClient({ slides: initialSlides }: { slides: HeroSlide[]
   const [slides, setSlides] = useState<HeroSlide[]>(initialSlides);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showNewForm, setShowNewForm] = useState(false);
-  const [reorder, setReorder] = useState<Record<string, number>>({});
 
   const handleSaved = () => {
     setEditingId(null);
     setShowNewForm(false);
-    window.location.reload();
-  };
-
-  const handleReorderSave = async (formData: FormData) => {
-    await reorderHeroSlides(formData);
     window.location.reload();
   };
 
@@ -160,17 +154,19 @@ export function AdminHeroClient({ slides: initialSlides }: { slides: HeroSlide[]
                   >
                     Редактировать
                   </button>
-                  <form action={deleteHeroSlide} className="inline">
-                    <input type="hidden" name="id" value={slide.id} />
-                    <button
-                      type="submit"
-                      className="text-xs text-red-400 hover:text-red-600 px-2 py-1"
-                      onClick={e => { if (!confirm('Удалить слайд?')) e.preventDefault() }}
-                    >
-                      <Trash2 className="h-3 w-3 inline mr-0.5" />
-                      Удалить
-                    </button>
-                  </form>
+                  <button
+                    onClick={async () => {
+                      if (!confirm('Удалить слайд?')) return;
+                      const formData = new FormData();
+                      formData.set('id', slide.id);
+                      await deleteHeroSlide(formData);
+                      window.location.reload();
+                    }}
+                    className="text-xs text-red-400 hover:text-red-600 px-2 py-1"
+                  >
+                    <Trash2 className="h-3 w-3 inline mr-0.5" />
+                    Удалить
+                  </button>
                 </div>
               </div>
             )}
@@ -186,7 +182,15 @@ export function AdminHeroClient({ slides: initialSlides }: { slides: HeroSlide[]
 
       {/* Reorder */}
       {slides.length > 1 && (
-        <form action={handleReorderSave} className="mt-6 p-4 border border-neutral-200 rounded-lg bg-neutral-50">
+        <form
+          onSubmit={async (e) => {
+            e.preventDefault();
+            const fd = new FormData(e.currentTarget);
+            await reorderHeroSlides(fd);
+            window.location.reload();
+          }}
+          className="mt-6 p-4 border border-neutral-200 rounded-lg bg-neutral-50"
+        >
           <h3 className="text-xs font-semibold tracking-wider text-neutral-500 mb-3">Порядок слайдов</h3>
           <div className="space-y-1.5">
             {slides.map((slide, i) => (

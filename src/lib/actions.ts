@@ -421,8 +421,8 @@ export interface HeroSlideData {
   is_active: boolean
 }
 
-export async function saveHeroSlide(formData: FormData): Promise<void> {
-  if (!(await checkAuth())) redirect('/admin')
+export async function saveHeroSlide(formData: FormData): Promise<{ ok: true } | { ok: false; error: string }> {
+  if (!(await checkAuth())) return { ok: false, error: 'Not authenticated' }
 
   const id = formData.get('id') as string | null
 
@@ -445,37 +445,35 @@ export async function saveHeroSlide(formData: FormData): Promise<void> {
 
   if (error) {
     console.error('Save hero slide error:', error)
-    redirect(`/admin/hero?error=${encodeURIComponent(error.message)}`)
+    return { ok: false, error: error.message }
   }
 
-  revalidatePath('/admin/hero')
-  revalidatePath('/', 'layout')
-  redirect('/admin/hero')
+  return { ok: true }
 }
 
-export async function deleteHeroSlide(formData: FormData) {
-  if (!(await checkAuth())) return
+export async function deleteHeroSlide(formData: FormData): Promise<{ ok: true } | { ok: false; error: string }> {
+  if (!(await checkAuth())) return { ok: false, error: 'Not authenticated' }
   const id = formData.get('id') as string
-  if (!id) return
-  await supabaseAdmin.from('hero_slides').delete().eq('id', id)
-  revalidatePath('/admin/hero')
-  revalidatePath('/', 'layout')
+  if (!id) return { ok: false, error: 'No id' }
+  const { error } = await supabaseAdmin.from('hero_slides').delete().eq('id', id)
+  if (error) return { ok: false, error: error.message }
+  return { ok: true }
 }
 
-export async function reorderHeroSlides(formData: FormData) {
-  if (!(await checkAuth())) return
+export async function reorderHeroSlides(formData: FormData): Promise<{ ok: true } | { ok: false; error: string }> {
+  if (!(await checkAuth())) return { ok: false, error: 'Not authenticated' }
   const ids = formData.getAll('ids') as string[]
   const orders = formData.getAll('orders') as string[]
 
-  if (ids.length !== orders.length) return
+  if (ids.length !== orders.length) return { ok: false, error: 'Mismatch' }
 
   for (let i = 0; i < ids.length; i++) {
-    await supabaseAdmin
+    const { error } = await supabaseAdmin
       .from('hero_slides')
       .update({ sort_order: Number(orders[i]) })
       .eq('id', ids[i])
+    if (error) return { ok: false, error: error.message }
   }
 
-  revalidatePath('/admin/hero')
-  revalidatePath('/', 'layout')
+  return { ok: true }
 }
