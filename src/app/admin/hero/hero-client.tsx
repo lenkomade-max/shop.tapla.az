@@ -255,7 +255,16 @@ function SlideForm({
   };
 
   return (
-    <form action={onSaved} className="space-y-4">
+    <form
+      onSubmit={async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        if (slide) formData.set('id', slide.id);
+        await saveHeroSlide(formData);
+        onSaved();
+      }}
+      className="space-y-4"
+    >
       {slide && <input type="hidden" name="id" value={slide.id} />}
       <input type="hidden" name="sort_order" value={String(slide?.sort_order ?? slides.length)} />
 
