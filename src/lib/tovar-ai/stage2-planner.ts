@@ -492,7 +492,7 @@ Pick based on role + product data (MUST fill the frame). ONLY use blocks that ar
 - Quality: "PREMIUM MATERİAL", "ORİJİNAL KEYFİYYƏT", "YÜNGÜL DİZAYN"
 - Delivery: "SÜRƏTLİ ÇATDIRILMA" (generic marketplace — allowed). NEVER "pulsuz" unless stated.
 - Warranty: ONLY if explicitly mentioned in provider description. Never invent "zəmanət".
-- Price: ONLY if explicitly provided (never invent!)
+- Price: ONLY if provided. ALWAYS with AZN (e.g. "29 AZN", "149 AZN"). Never bare numbers.
 - CTA: "İNDİ AL", "SƏBƏTƏ AT"
 - Badges: "YENİ", "BESTSELLER", "PREMIUM"
 
@@ -683,7 +683,7 @@ function buildUserPrompt(
     providerDescription || 'Not provided',
     '',
     '## Product Price (ONLY if explicitly provided)',
-    priceAz || 'NO PRICE — do NOT invent any price',
+    priceAz || 'NO PRICE — do NOT invent any price. If price is given, always include AZN (e.g. \"29 AZN\").',
     '',
     '## Delivery & Warranty Rules',
     'Fast delivery ("SÜRƏTLİ ÇATDIRILMA") is a generic marketplace claim — allowed.',
@@ -1025,7 +1025,7 @@ export async function planCardPrompts(
       `Motion Energy: ${motionItem?.prompt_fragment || sharedVt.motion}.`,
       `COMPOSITION VARIATION: ${variation.name} — ${variation.prompt_fragment}`,
       `COMMERCIAL DENSITY for this role: ${densityInfo.instruction} Use ${densityInfo.blocks} commercial blocks. Fill the frame — no dead zones.`,
-      hasProviderPrice ? `PRODUCT PRICE: ${priceAz}. Display this price on price-related cards (offer, bundle, hero, cta). Use it in commercial blocks.` : '⛔ NO PRICE: Do NOT invent or display any price on any card.',
+      hasProviderPrice ? `PRODUCT PRICE: ${priceAz}. Display this price on price-related cards. ALWAYS include "AZN" with the number (e.g. "29 AZN", not just "29"). Use it in commercial blocks.` : '⛔ NO PRICE: Do NOT invent or display any price.',
       !hasWarranty ? '⛔ NO WARRANTY: Description does NOT mention warranty. Do NOT invent warranty terms ("2 il zəmanət", "14 gün geri qaytarma").' : `WARRANTY mentioned in description — can display.`,
       'Delivery: Generic fast delivery claim is OK ("SÜRƏTLİ ÇATDIRILMA"). NEVER claim "pulsuz" or "free" unless explicitly stated.',
       `ADVERTISING ROLE: ${card.role}. ${ROLE_DESCRIPTIONS[card.role as CardRole] || card.role}.`,
