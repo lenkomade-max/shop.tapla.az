@@ -1,95 +1,72 @@
 // ============================================================================
 // Watermark — накладывает полупрозрачный логотип TAPLA в центр изображения
-// Используется для защиты фото товаров от кражи.
 //
-// Подход: рендерим SVG-текст на прозрачный холст, затем композитим на фото.
-// Два шага надёжнее чем одношаговый composite(SVG) — не все версии librsvg
-// корректно обрабатывают SVG при прямом composite.
+// ПОДХОД: пререндеренный PNG (public/images/wm-overlay.png)
+//   → ресайз под размер фото → composite в центр
+//
+// Почему не SVG на лету? Vercel serverless НЕ ИМЕЕТ системных шрифтов.
+// librsvg рендерит <text> пустым → watermark невидим.
+// Пререндеренный PNG: только composite, без текстового рендера.
 // ============================================================================
 
 import sharp from 'sharp'
+import fs from 'fs'
+import path from 'path'
 
-const WATERMARK_OPACITY = 0.15 // 15%
+// ─── Кеш оверлея (читаем с диска один раз) ─────────────────────────────────
 
-/**
- * Создаёт SVG-строку с водяным знаком TAPLA.
- */
-function buildSvg(width: number, height: number): string {
-  const cx = Math.round(width / 2)
-  const minDim = Math.min(width, height)
+let _overlayBuffer: Buffer | null = null
 
-  const taplaSize = Math.round(minDim * 0.11)
-  const subSize = Math.round(minDim * 0.05)
-  const gap = Math.round(minDim * 0.02)
+function loadOverlayBuffer(): Buffer {
+  if (_overlayBuffer) return _overlayBuffer
 
-  const blockH = taplaSize + gap + subSize
-  const blockTop = Math.round((height - blockH) / 2)
-  const taplaY = blockTop + Math.round(taplaSize / 2)
-  const subY = blockTop + taplaSize + gap + Math.round(subSize / 2)
+  const candidates = [
+    path.join(process.cwd(), 'public/images/wm-overlay.png'),
+    path.join(process.cwd(), '.next/standalone/public/images/wm-overlay.png'),
+  ]
 
-  const O = WATERMARK_OPACITY
+  for (const p of candidates) {
+    try {
+      _overlayBuffer = fs.readFileSync(p)
+      console.log('[Watermark] Loaded overlay:', p, `(${(_overlayBuffer.length / 1024).toFixed(1)} KB)`)
+      return _overlayBuffer
+    } catch { /* next */ }
+  }
 
-  // Два слоя текста: тёмный (тень) + белый (основной)
-  // Это даёт контраст на ЛЮБОМ фоне (светлом и тёмном)
-  const shadowOffset = Math.max(2, Math.round(minDim * 0.003))
-
-  return [
-    `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">`,
-    // ── Тень (чёрная, размытая) ──
-    `<filter id="shadow"><feDropShadow dx="${shadowOffset}" dy="${shadowOffset}" stdDeviation="${shadowOffset}" flood-color="black" flood-opacity="0.5"/></filter>`,
-    `<g filter="url(#shadow)">`,
-    // TAPLA — тень
-    `<text x="${cx}" y="${taplaY}" text-anchor="middle" dominant-baseline="central"`,
-    ` font-family="Georgia,'Times New Roman',serif" font-size="${taplaSize}" font-weight="bold"`,
-    ` letter-spacing="${Math.round(taplaSize * 0.25)}" fill="white" fill-opacity="${O}">TAPLA</text>`,
-    // MARKETPLACE — тень
-    `<text x="${cx}" y="${subY}" text-anchor="middle" dominant-baseline="central"`,
-    ` font-family="Georgia,'Times New Roman',serif" font-size="${subSize}"`,
-    ` letter-spacing="${Math.round(subSize * 0.35)}" fill="white" fill-opacity="${O * 0.85}">MARKETPLACE</text>`,
-    `</g>`,
-    // ── Основной текст (белый, без тени, чуть ярче) ──
-    `<text x="${cx}" y="${taplaY}" text-anchor="middle" dominant-baseline="central"`,
-    ` font-family="Georgia,'Times New Roman',serif" font-size="${taplaSize}" font-weight="bold"`,
-    ` letter-spacing="${Math.round(taplaSize * 0.25)}" fill="white" fill-opacity="${O}">TAPLA</text>`,
-    `<text x="${cx}" y="${subY}" text-anchor="middle" dominant-baseline="central"`,
-    ` font-family="Georgia,'Times New Roman',serif" font-size="${subSize}"`,
-    ` letter-spacing="${Math.round(subSize * 0.35)}" fill="white" fill-opacity="${O * 0.85}">MARKETPLACE</text>`,
-    `</svg>`,
-  ].join('')
+  throw new Error(`[Watermark] wm-overlay.png not found. Checked: ${candidates.join(', ')}`)
 }
 
-/**
- * Накладывает водяной знак TAPLA на изображение.
- * Двухшаговый метод: SVG → прозрачный PNG → composite на фото.
- */
-export async function addWatermark(
-  base64: string,
-  options?: { opacity?: number },
-): Promise<string> {
+// ─── Основная функция ──────────────────────────────────────────────────────
+
+export async function addWatermark(base64: string): Promise<string> {
   const inputBuffer = Buffer.from(base64, 'base64')
+  const meta = await sharp(inputBuffer).metadata()
+  const imgW = meta.width || 800
+  const imgH = meta.height || 800
+  const minDim = Math.min(imgW, imgH)
 
-  const metadata = await sharp(inputBuffer).metadata()
-  const width = metadata.width || 800
-  const height = metadata.height || 800
+  // Загружаем пререндеренный оверлей
+  const overlayRaw = loadOverlayBuffer()
+  const overlayMeta = await sharp(overlayRaw).metadata()
+  const ovW = overlayMeta.width || 2400
+  const ovH = overlayMeta.height || 400
 
-  const svg = buildSvg(width, height)
+  // Ресайз оверлея: ширина = 85% от меньшей стороны фото
+  const targetW = Math.round(minDim * 0.85)
+  const targetH = Math.round(targetW * (ovH / ovW))
 
-  // Шаг 1: рендерим SVG на прозрачный холст того же размера
-  const overlay = await sharp({
-    create: {
-      width,
-      height,
-      channels: 4,
-      background: { r: 0, g: 0, b: 0, alpha: 0 },
-    },
-  })
-    .composite([{ input: Buffer.from(svg), top: 0, left: 0 }])
+  const overlay = await sharp(overlayRaw)
+    .resize(targetW, targetH)
     .png()
     .toBuffer()
 
-  // Шаг 2: композитим полученный оверлей на исходное изображение
+  // Позиция: геометрический центр
+  const left = Math.round((imgW - targetW) / 2)
+  const top = Math.round((imgH - targetH) / 2)
+
+  // Композит
   const result = await sharp(inputBuffer)
-    .composite([{ input: overlay, top: 0, left: 0 }])
+    .composite([{ input: overlay, top, left }])
     .png()
     .toBuffer()
 
