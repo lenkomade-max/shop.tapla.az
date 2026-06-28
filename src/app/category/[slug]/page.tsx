@@ -75,7 +75,7 @@ export default async function CategoryPage({ params }: Props) {
 
       {/* Category Header */}
       <div className="bg-white border-b border-neutral-100">
-        <div className="container mx-auto max-w-6xl px-4 py-10 sm:py-14">
+        <div className="container mx-auto max-w-6xl px-1 py-10 sm:py-14">
           <h1 className="text-3xl sm:text-4xl font-bold text-neutral-900 font-serif">
             {category.title}
           </h1>
@@ -121,7 +121,7 @@ export default async function CategoryPage({ params }: Props) {
 
       {/* Products Grid */}
       <div>
-        <div className="container mx-auto max-w-6xl px-2 sm:px-3 py-10">
+        <div className="container mx-auto max-w-6xl px-1 py-10">
           {products.length > 0 ? (
             <>
               <div className="flex items-center justify-between mb-8">
@@ -130,7 +130,7 @@ export default async function CategoryPage({ params }: Props) {
                 </h2>
                 <span className="text-xs text-neutral-400">{products.length} ədəd</span>
               </div>
-              <div className="grid grid-cols-2 lg:grid-cols-6 gap-2">
+              <div className="grid grid-cols-2 lg:grid-cols-6 gap-px">
                 {products.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}

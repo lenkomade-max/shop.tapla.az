@@ -457,7 +457,7 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
               </Link>
             </div>
 
-            <div className="grid grid-cols-2 lg:grid-cols-6 gap-2">
+            <div className="grid grid-cols-2 lg:grid-cols-6 gap-px">
               {relatedProducts.map((relProduct) => (
                 <ProductCard key={relProduct.id} product={relProduct} />
               ))}
