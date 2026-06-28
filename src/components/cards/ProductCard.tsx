@@ -63,7 +63,7 @@ export function ProductCard({ product, onQuickView }: ProductCardProps) {
           />
         </Link>
 
-        <div className="absolute inset-0 bg-neutral-950/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-4 pointer-events-none">
+        <div className="absolute inset-0 bg-neutral-950/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-4 pointer-events-none z-10">
           <button
             onClick={(e) => {
               e.preventDefault();
@@ -80,17 +80,24 @@ export function ProductCard({ product, onQuickView }: ProductCardProps) {
       <div className="flex-1 p-3 sm:p-4 flex flex-col justify-between">
         <div>
           {/* Price + Stars row */}
-          <div className="flex items-center justify-between mb-1.5">
-            <span
-              className={clsx(
-                'text-sm sm:text-lg font-bold tracking-tight',
-                hasDiscount ? 'text-blue-600' : 'text-neutral-900'
+          <div className="flex items-center justify-between gap-2 mb-1.5">
+            <div className="flex items-baseline gap-1.5 min-w-0 shrink-0">
+              <span
+                className={clsx(
+                  'text-sm sm:text-lg font-bold tracking-tight whitespace-nowrap',
+                  hasDiscount ? 'text-blue-600' : 'text-neutral-900'
+                )}
+              >
+                {product.price.toFixed(2)} ₼
+              </span>
+              {hasDiscount && (
+                <span className="text-[10px] sm:text-xs text-neutral-400 line-through shrink-0">
+                  {product.originalPrice!.toFixed(2)} ₼
+                </span>
               )}
-            >
-              {product.price.toFixed(2)} ₼
-            </span>
+            </div>
 
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 shrink-0">
               <div className="flex text-amber-400">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <Star
@@ -108,17 +115,8 @@ export function ProductCard({ product, onQuickView }: ProductCardProps) {
             </div>
           </div>
 
-          {/* Old price (if discounted) */}
-          {hasDiscount && (
-            <div className="mb-1.5">
-              <span className="text-[11px] text-neutral-400 line-through">
-                {product.originalPrice!.toFixed(2)} ₼
-              </span>
-            </div>
-          )}
-
           <Link href={`/products/${product.slug}`} className="block group/title">
-            <h4 className="text-xs sm:text-sm font-semibold tracking-widest uppercase text-neutral-900 mb-0.5 hover:text-neutral-600 transition-colors">
+            <h4 className="text-xs sm:text-sm font-semibold tracking-widest uppercase text-neutral-900 mb-0.5 hover:text-neutral-600 transition-colors line-clamp-2">
               {product.name}
             </h4>
           </Link>
