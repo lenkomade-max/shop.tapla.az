@@ -122,6 +122,7 @@ export default function TovarAIPage() {
   const [savedProductId, setSavedProductId] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [categories, setCategories] = useState<Array<{ id: string; slug: string; title: string; parent_id: string | null }>>([])
+  const [cardCount, setCardCount] = useState(3)
 
   // Загружаем категории при монтировании
   useEffect(() => {
@@ -212,6 +213,7 @@ export default function TovarAIPage() {
           priceAz: price.trim() || undefined,
           mode: mode,
           supplierUrl: supplierUrl.trim() || undefined,
+          cardCount: cardCount,
         }),
       })
 
@@ -239,7 +241,7 @@ export default function TovarAIPage() {
       setStage('error')
       setElapsed(((Date.now() - start) / 1000))
     }
-  }, [photo, description, price, mode, supplierUrl])
+  }, [photo, description, price, mode, supplierUrl, cardCount])
 
   // ─── Регенерация одной карточки ───────────────────────────────────────
 
@@ -519,6 +521,34 @@ export default function TovarAIPage() {
             <p className="mt-1 text-xs text-zinc-400">
               Link saxlanılır, AI analiz etmir. Əl ilə əlavə edirsiniz.
             </p>
+          </div>
+
+          {/* Card count + format info */}
+          <div className="rounded-xl border bg-white p-6 shadow-sm">
+            <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-zinc-500">
+              5. Kart sayı &amp; format
+            </h3>
+
+            {/* Card count slider */}
+            <div className="flex items-center gap-4 mb-4">
+              <span className="text-xs text-zinc-500 w-16 shrink-0">Kart sayı:</span>
+              <input
+                type="range"
+                min={1}
+                max={10}
+                value={cardCount}
+                onChange={e => setCardCount(Number(e.target.value))}
+                disabled={isBusy}
+                className="flex-1 accent-black"
+              />
+              <span className="w-8 text-center text-sm font-bold tabular-nums">{cardCount}</span>
+            </div>
+
+            {/* Format info */}
+            <div className="flex items-center gap-2 rounded-lg bg-zinc-50 px-3 py-2 text-xs text-zinc-500">
+              <span className="font-mono text-zinc-700">4:5</span>
+              portret format (1080×1350) — məhsul kartı üçün optimal
+            </div>
           </div>
 
           {/* Кнопка генерации */}

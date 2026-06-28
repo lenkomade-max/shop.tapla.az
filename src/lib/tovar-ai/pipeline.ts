@@ -69,6 +69,7 @@ export async function runTovarAIPipeline(
   let enrichedData: EnricherOutput | undefined
 
   const isProductMode = input.mode === 'product'
+  const cardCount = clampCardCount(input.cardCount ?? config.DEFAULT_CARD_COUNT)
 
   try {
     // ─── STAGE 1: Vision Analysis ────────────────────────────────────
@@ -116,7 +117,7 @@ export async function runTovarAIPipeline(
 
           // ─── STAGE 3: Parallel Image Generation ────────────────────
           console.log('[Pipeline] Stage 3 — Image Generation (parallel)')
-          const cardsToGen = p.cards.slice(0, config.DEFAULT_CARD_COUNT)
+          const cardsToGen = p.cards.slice(0, cardCount)
           const c = await generateAllCards(cardsToGen, photoBase64)
           console.log(`[Pipeline] Stage 3 ✅ — ${c.length}/${cardsToGen.length} cards generated`)
 
@@ -199,10 +200,10 @@ export async function runTovarAIPipeline(
 
       // ─── STAGE 3: Parallel Image Generation ────────────────────────
       status = 'generating'
-      callbacks?.onStageChange?.(status, `Generating ${config.DEFAULT_CARD_COUNT} cards...`)
+      callbacks?.onStageChange?.(status, `Generating ${cardCount} cards...`)
       console.log('[Pipeline] Stage 3 — Image Generation (parallel)')
 
-      const cardsToGenerate = prompts.cards.slice(0, config.DEFAULT_CARD_COUNT)
+      const cardsToGenerate = prompts.cards.slice(0, cardCount)
 
       cards = await generateAllCards(cardsToGenerate, photoBase64)
       console.log(`[Pipeline] Stage 3 ✅ — ${cards.length}/${cardsToGenerate.length} cards generated`)
@@ -236,7 +237,7 @@ export async function runTovarAIPipeline(
 
     // Приблизительная стоимость (OpenRouter цены)
     totalCost = estimateCost(
-      config.DEFAULT_CARD_COUNT,
+      cardCount,
       cards.reduce((sum, c) => sum + c.attempt, 0),
     )
 
@@ -445,4 +446,9 @@ function cleanSlug(raw: string): string {
   if (slug.length > 60) slug = slug.slice(0, 60).replace(/-[^-]*$/, '')
   if (!slug || slug.length < 2) slug = 'mehsul'
   return slug
+}
+
+function clampCardCount(n: number): number {
+  if (!Number.isFinite(n) || n < 1) return TOVAR_AI_CONFIG.DEFAULT_CARD_COUNT
+  return Math.min(Math.round(n), 10)
 }

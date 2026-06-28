@@ -146,6 +146,7 @@ export interface PipelineInput {
   priceAz?: string // цена (напр. "29 AZN") — только если задана юзером
   mode?: PipelineMode // 'test' (по умолч.) | 'product'
   supplierUrl?: string // URL поставщика (только в product mode)
+  cardCount?: number // сколько карточек генерить (1-10, по умолч. 3)
 }
 
 export interface GenerationRecord {
@@ -260,7 +261,7 @@ export const TOVAR_AI_CONFIG = {
   // Настройки генерации
   DEFAULT_CARD_COUNT: 3,
   IMAGE_SIZE: '1K' as '1K' | '2K',
-  ASPECT_RATIO: '1:1',
+  ASPECT_RATIO: '4:5', // портрет, совпадает с ProductCard aspect-[4/5]
   MAX_RETRIES: 2,
 
   // OpenRouter
