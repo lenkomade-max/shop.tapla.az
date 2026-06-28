@@ -1,0 +1,23 @@
+{
+  "description": "20+ visual effects — automatically selected based on product category and style",
+  "rule": "Choose 1-2 effects max. Effects must enhance premium feel, never distract from product.",
+  "effects": [
+    {"id": "soft_glow", "label": "Soft Glow", "for": ["beauty", "electronics", "premium"]},
+    {"id": "reflection", "label": "Premium Reflection", "for": ["electronics", "luxury", "glass surfaces"]},
+    {"id": "water_splash", "label": "Water Splash", "for": ["kitchen", "bathroom", "cleaning"]},
+    {"id": "steam", "label": "Steam", "for": ["kitchen", "beauty", "bathroom"]},
+    {"id": "spark", "label": "Spark", "for": ["electronics", "tools", "automotive"]},
+    {"id": "motion_blur", "label": "Motion Blur", "for": ["sports", "automotive", "action"]},
+    {"id": "particles", "label": "Floating Particles", "for": ["premium", "cosmetics", "technology"]},
+    {"id": "dust_motes", "label": "Floating Dust", "for": ["premium", "luxury", "warm interiors"]},
+    {"id": "light_rays", "label": "Light Rays", "for": ["premium", "spiritual", "home"]},
+    {"id": "bubbles", "label": "Bubbles", "for": ["beauty", "bathroom", "skincare"]},
+    {"id": "luxury_highlights", "label": "Luxury Highlights", "for": ["luxury", "jewelry", "premium"]},
+    {"id": "energy_glow", "label": "Energy Glow", "for": ["electronics", "gaming", "tech"]},
+    {"id": "foam", "label": "Foam", "for": ["beauty", "cleaning", "bathroom"]},
+    {"id": "ice_frost", "label": "Ice / Frost", "for": ["kitchen", "beverage", "cold products"]},
+    {"id": "lens_flare", "label": "Subtle Lens Flare", "for": ["automotive", "outdoor", "premium"]},
+    {"id": "smoke_mist", "label": "Smoke / Mist", "for": ["electronics", "dramatic", "premium"]},
+    {"id": "none", "label": "No effects", "for": ["all"]}
+  ]
+}

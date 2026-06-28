@@ -1,0 +1,24 @@
+{
+  "description": "18 product positioning options",
+  "rule": "Pick the position that best showcases the product for this card's purpose",
+  "positions": [
+    "Center front",
+    "Slightly left",
+    "Slightly right",
+    "Perspective angle",
+    "45° rotated",
+    "Floating mid-air",
+    "On surface",
+    "In hand",
+    "On table",
+    "On premium surface",
+    "Suspended with shadows",
+    "Macro close-up (partial)",
+    "Diagonal tilt",
+    "Low angle hero shot",
+    "Top-down flat lay",
+    "Side profile",
+    "Front 3/4 classic",
+    "Rear 3/4"
+  ]
+}

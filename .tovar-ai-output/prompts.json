@@ -1,42 +1,40 @@
 {
-  "style_lock": {
-    "color_palette": "warm tones, gold + white + grey",
-    "lighting": "studio lighting, soft shadows, 2 sources from left and top",
-    "background_style": "clean gradient, minimal, no patterns",
-    "typography_style": "bold sans-serif headlines, light body text",
-    "overall_mood": "premium, modern, clean"
-  },
+  "style_name": "s01-white-studio+s03-product-in-use+s06-macro-detail",
   "cards": [
     {
       "index": 1,
       "purpose": "main_cover",
-      "prompt_en": "E-commerce product card for TAPLA marketplace, 1:1 square format. Showcase the massager filling 60-70% of the frame, front-facing with a hero angle. Use premium studio lighting with soft shadows from two sources, left and top. Set against a clean gradient background in warm tones. Include bold sans-serif headline text in Azerbaijani Latin script: 'ÜZ BAXIMI MASSAJERİ'. Ensure magazine-cover quality composition to capture attention.",
+      "prompt_en": "Create a premium marketplace product image.\n\nThe image must look like a professional e-commerce product photograph suitable for Amazon, Trendyol, Temu, AliExpress Premium, Shopify or a modern online marketplace.\n\nGenerate ONE image only.\nNever create collages.\nNever create split layouts.\nNever create multiple panels.\nNever create infographic grids.\nOne image = one marketing message.\n\nThe product must occupy approximately 60-80% of the frame.\nUse realistic premium photography.\nLuxury commercial lighting.\nPhotorealistic.\nNatural materials.\nStudio quality.\nModern advertising style.\nHigh-end product photography.\nUltra realistic.\n8K.\n\nThe product is always the main subject.\nDo not change the product shape.\nDo not invent new product parts.\nRemove all watermarks, stickers, logos and packaging unless requested.\nLeave enough negative space for optional text placement.\nGenerate images suitable for Meta Ads and marketplace galleries.\n\nCRITICAL — Analyze the uploaded product before generating the image. Determine automatically: product category, materials, intended use, target customer, suitable environment, appropriate lighting, realistic accessories, correct hand position if applicable, realistic usage scenario, luxury commercial style.\n\nDo not reuse the same environment for every product.\nBeauty products should receive skincare environments.\nElectronics should receive modern technology environments.\nKitchen products should receive premium kitchens.\nAutomotive products should receive automotive environments.\nFitness products should receive sports environments.\nOffice products should receive office environments.\nPet products should receive home environments. Marketing angle: premium. Layout: C. Product position: 45° rotated. Background: Soft white studio. Visual effects: soft_glow. STYLE: White Studio. Premium e-commerce product photography. Product shot on pure white seamless background. Soft studio shadows. Subtle premium reflections on surfaces. Apple Store quality. Minimal. Product is the only subject. Ultra realistic. 8K. Commercial lighting. Composition: Product occupies 70-80% of frame, centered, front 3/4 angle. Lighting: Even three-point studio, softbox main, subtle rim light, no harsh shadows. Render this text on the image: LED TERAPİYA — ERQONOMİK DİZAYN. A premium T-shaped LED facial massager floating in the center of a soft white studio. The device is white with a sleek, glossy finish and a subtle purple LED light glowing from the head. High-end commercial product photography, sharp focus, clean composition with ample negative space, 8K resolution, professional studio lighting with soft shadows.",
       "text_overlay_az": [
-        "ÜZ BAXIMI MASSAJERİ"
+        "LED TERAPİYA",
+        "ERQONOMİK DİZAYN"
       ],
-      "composition": "Product centered, hero angle, clean gradient background",
       "needs_model": false,
-      "reference_weight": 0.7
+      "composition": "C",
+      "reference_weight": 0.8
     },
     {
       "index": 2,
       "purpose": "usage_demo",
-      "prompt_en": "E-commerce product card for TAPLA marketplace, 1:1 square format. Depict a woman aged 20-55 using the massager naturally in a luxurious bathroom setting. Capture the scene with warm studio lighting, soft shadows from left and top. The background should be minimal and elegant, emphasizing the product's use. Highlight the ergonomic design and LED therapy feature.",
-      "text_overlay_az": [],
-      "composition": "Woman using product in bathroom, warm lighting, minimal background",
+      "prompt_en": "Create a premium marketplace product image.\n\nThe image must look like a professional e-commerce product photograph suitable for Amazon, Trendyol, Temu, AliExpress Premium, Shopify or a modern online marketplace.\n\nGenerate ONE image only.\nNever create collages.\nNever create split layouts.\nNever create multiple panels.\nNever create infographic grids.\nOne image = one marketing message.\n\nThe product must occupy approximately 60-80% of the frame.\nUse realistic premium photography.\nLuxury commercial lighting.\nPhotorealistic.\nNatural materials.\nStudio quality.\nModern advertising style.\nHigh-end product photography.\nUltra realistic.\n8K.\n\nThe product is always the main subject.\nDo not change the product shape.\nDo not invent new product parts.\nRemove all watermarks, stickers, logos and packaging unless requested.\nLeave enough negative space for optional text placement.\nGenerate images suitable for Meta Ads and marketplace galleries.\n\nCRITICAL — Analyze the uploaded product before generating the image. Determine automatically: product category, materials, intended use, target customer, suitable environment, appropriate lighting, realistic accessories, correct hand position if applicable, realistic usage scenario, luxury commercial style.\n\nDo not reuse the same environment for every product.\nBeauty products should receive skincare environments.\nElectronics should receive modern technology environments.\nKitchen products should receive premium kitchens.\nAutomotive products should receive automotive environments.\nFitness products should receive sports environments.\nOffice products should receive office environments.\nPet products should receive home environments. Marketing angle: lifestyle. Layout: G. Product position: in hand. Background: Modern bathroom. STYLE: Product In Use. Premium lifestyle photography. A real person naturally using the product. Focus on the authentic interaction between hands and product. Relaxed facial expression, not exaggerated. Natural movement moment. Magazine editorial style. Ultra realistic. 8K. Commercial quality. Shallow depth of field on background. Composition: Person using product naturally, product visually prominent, shallow DOF. Lighting: Natural window light, soft shadows, warm neutral tone. Render this text on the image: GÜNDƏLİK QULLUQ. Close-up of a woman's hand holding a white T-shaped facial massager against her cheek in a bright, modern, minimalist bathroom. Soft natural morning light, shallow depth of field with the background blurred, authentic and relaxed atmosphere, high-quality editorial magazine style, 8K resolution.",
+      "text_overlay_az": [
+        "GÜNDƏLİK QULLUQ"
+      ],
       "needs_model": true,
+      "composition": "G",
       "reference_weight": 0.5
     },
     {
       "index": 3,
       "purpose": "features_detail",
-      "prompt_en": "E-commerce product card for TAPLA marketplace, 1:1 square format. Focus on close-ups and macro shots of the massager, highlighting the ergonomic handle and LED lighting panel. Use studio lighting with soft shadows from left and top. Present an infographic style with callouts in Azerbaijani Latin script: 'LED İŞIQ TERAPİYASI', 'ERQONOMİK DİZAYN'. Ensure the background is a clean gradient in warm tones.",
+      "prompt_en": "Create a premium marketplace product image.\n\nThe image must look like a professional e-commerce product photograph suitable for Amazon, Trendyol, Temu, AliExpress Premium, Shopify or a modern online marketplace.\n\nGenerate ONE image only.\nNever create collages.\nNever create split layouts.\nNever create multiple panels.\nNever create infographic grids.\nOne image = one marketing message.\n\nThe product must occupy approximately 60-80% of the frame.\nUse realistic premium photography.\nLuxury commercial lighting.\nPhotorealistic.\nNatural materials.\nStudio quality.\nModern advertising style.\nHigh-end product photography.\nUltra realistic.\n8K.\n\nThe product is always the main subject.\nDo not change the product shape.\nDo not invent new product parts.\nRemove all watermarks, stickers, logos and packaging unless requested.\nLeave enough negative space for optional text placement.\nGenerate images suitable for Meta Ads and marketplace galleries.\n\nCRITICAL — Analyze the uploaded product before generating the image. Determine automatically: product category, materials, intended use, target customer, suitable environment, appropriate lighting, realistic accessories, correct hand position if applicable, realistic usage scenario, luxury commercial style.\n\nDo not reuse the same environment for every product.\nBeauty products should receive skincare environments.\nElectronics should receive modern technology environments.\nKitchen products should receive premium kitchens.\nAutomotive products should receive automotive environments.\nFitness products should receive sports environments.\nOffice products should receive office environments.\nPet products should receive home environments. Marketing angle: features. Layout: features_row. Product position: macro close-up. Background: Soft white studio. Visual effects: luxury_highlights. STYLE: Macro Detail. Extreme macro product photography. Close-up of product materials, buttons, texture, craftsmanship details. Very shallow depth of field. Bokeh background. Premium jewelry-catalog quality. The detail must sell the quality. Ultra realistic. 8K. Natural light reflections on surfaces. Composition: Extreme close-up on one key detail, 90% of frame filled with texture/materials. Lighting: Soft directional light raking across surface to emphasize texture, subtle fill. Render this text on the image: TƏK DÜYMƏ — BƏNÖVŞƏYİ LED — KOMPAKT. Extreme macro close-up of a white T-shaped facial massager, focusing on the smooth ABS-plastic texture and the single power button. The purple LED indicator is softly illuminated. Jewelry-catalog quality, sharp details, bokeh background, natural light reflections on the glossy surface, 8K resolution.",
       "text_overlay_az": [
-        "LED İŞIQ TERAPİYASI",
-        "ERQONOMİK DİZAYN"
+        "TƏK DÜYMƏ",
+        "BƏNÖVŞƏYİ LED",
+        "KOMPAKT"
       ],
-      "composition": "Close-ups, macro shots, infographic style",
       "needs_model": false,
+      "composition": "features_row",
       "reference_weight": 0.8
     }
   ]

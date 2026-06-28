@@ -1,0 +1,28 @@
+{
+  "description": "22 marketing angles — one image = one clear advertising message",
+  "rule": "Pick ONE angle per card. Never mix angles in one image.",
+  "angles": [
+    {"id": "premium", "label": "Premium", "tone": "Aspirational, luxury, best quality"},
+    {"id": "price", "label": "Price", "tone": "Best value, affordable, deal-focused"},
+    {"id": "discount", "label": "Discount", "tone": "Sale, limited price, urgency"},
+    {"id": "features", "label": "Features", "tone": "Technical, detailed, specification-driven"},
+    {"id": "comparison", "label": "Comparison", "tone": "Better than alternatives, superior"},
+    {"id": "durability", "label": "Durability", "tone": "Built to last, reliable, strong"},
+    {"id": "lifestyle", "label": "Lifestyle", "tone": "Aspirational daily life, beautiful context"},
+    {"id": "fast_delivery", "label": "Fast Delivery", "tone": "Quick, convenient, ready now"},
+    {"id": "professional", "label": "Professional Quality", "tone": "Pro-grade, serious, trusted"},
+    {"id": "easy_to_use", "label": "Easy To Use", "tone": "Simple, intuitive, no friction"},
+    {"id": "gift", "label": "Gift", "tone": "Perfect present, premium unboxing"},
+    {"id": "problem_solution", "label": "Problem → Solution", "tone": "Before/after transformation"},
+    {"id": "best_seller", "label": "Best Seller", "tone": "Popular, proven, trusted by many"},
+    {"id": "limited_offer", "label": "Limited Offer", "tone": "Scarce, exclusive, act now"},
+    {"id": "new_arrival", "label": "New Arrival", "tone": "Fresh, latest, cutting-edge"},
+    {"id": "top_choice", "label": "Top Choice", "tone": "Editor's pick, expert recommended"},
+    {"id": "complete_set", "label": "Complete Set", "tone": "Everything included, all-in-one"},
+    {"id": "portable", "label": "Portable", "tone": "Compact, travel-ready, lightweight"},
+    {"id": "compact", "label": "Compact", "tone": "Space-saving, minimal footprint"},
+    {"id": "luxury", "label": "Luxury", "tone": "Exclusive, elite, highest tier"},
+    {"id": "commercial", "label": "Commercial Use", "tone": "Business-grade, heavy-duty"},
+    {"id": "home_use", "label": "Home Use", "tone": "Domestic, cozy, everyday comfort"}
+  ]
+}

@@ -90,7 +90,20 @@ export async function generateSingleCard(
   const imageBase64 = extractImageBase64(data)
 
   if (!imageBase64) {
-    // Модель вернула текст вместо картинки — ретрай бессмыслен, сразу ошибка
+    // Проверяем — Google safety refusal или реальная ошибка
+    const msgContent = (data as Record<string,unknown>).choices as Array<Record<string,unknown>> | undefined
+    const text = msgContent?.[0]?.message as Record<string,unknown> | undefined
+    const refusal = typeof text?.content === 'string' ? text.content : ''
+    const isSafetyRefusal = refusal.includes("can't help with that") || refusal.includes('language model')
+
+    if (isSafetyRefusal && attempt <= config.MAX_RETRIES) {
+      // Safety filter сработал случайно — ретрай с задержкой
+      const waitMs = 2000 + Math.random() * 3000
+      console.warn(`[Stage 3] Card ${card.index} - safety filter (attempt ${attempt}/${config.MAX_RETRIES}), waiting ${(waitMs/1000).toFixed(1)}s...`)
+      await sleep(waitMs)
+      return generateSingleCard(card, photoBase64, attempt + 1)
+    }
+
     console.error('[Stage 3] Model returned no image for card', card.index)
     console.error('[Stage 3] Response keys:', Object.keys(data as Record<string,unknown>))
     throw new Error(`Stage 3: No image in response for card ${card.index}`)
@@ -178,9 +191,6 @@ function extractImageBase64(data: unknown): string | null {
   if (typeof content === 'string' && content.startsWith('data:image')) {
     return content.replace(/^data:image\/\w+;base64,/, '')
   }
-
-  // DEBUG: показываем структуру ответа при промахе
-  console.error('[Stage 3] DEBUG response structure:', JSON.stringify(data, null, 2).slice(0, 2000))
 
   return null
 }

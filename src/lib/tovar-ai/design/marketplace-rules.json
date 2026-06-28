@@ -1,0 +1,15 @@
+{
+  "description": "Marketplace & ad creative rules — image must convert, not just look good",
+  "rules": [
+    "Image must immediately communicate value within 2 seconds of viewing",
+    "Product must be recognizable without zooming — even on mobile",
+    "Text should remain readable on mobile screens — test at 200px wide",
+    "Price blocks should be visually dominant when included",
+    "CTA must naturally attract attention without overwhelming composition",
+    "Image should look trustworthy, commercial, and conversion-focused — not artistic",
+    "Every design should resemble a professionally designed Meta Ads or marketplace creative created by an experienced e-commerce marketing team",
+    "If text is present, it must answer: what is it + why should I care",
+    "Image works standalone — no context needed",
+    "Looks native on: Amazon, Trendyol, AliExpress, Wildberries, Meta Ads, TikTok Shop"
+  ]
+}

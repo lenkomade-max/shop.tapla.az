@@ -1,0 +1,15 @@
+{
+  "description": "Composition rules — enforced in every generated image",
+  "rules": [
+    "Maximum three benefit boxes — never overload",
+    "Product always dominates the frame — it is the hero",
+    "Text never covers important product parts",
+    "Whitespace is mandatory — minimum 15% breathing room",
+    "Everything aligned to invisible grid",
+    "Premium visual hierarchy: product → headline → benefits → CTA",
+    "Designed for mobile viewing first — readable at small sizes",
+    "Single clear focal point per image",
+    "Background supports product without competing for attention",
+    "No more than 2 font sizes per image"
+  ]
+}

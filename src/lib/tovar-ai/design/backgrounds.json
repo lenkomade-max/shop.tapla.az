@@ -1,0 +1,16 @@
+{
+  "description": "25+ backgrounds — adapt to product category automatically",
+  "rule": "Choose environment matching product context and marketing angle",
+  "categories": {
+    "beauty_skincare": ["Spa bathroom", "Marble vanity", "Soft white studio", "Modern bathroom with plants"],
+    "electronics_tech": ["Modern tech desk", "Minimal workspace", "Dark studio with edge light", "Abstract technology surface"],
+    "kitchen": ["Premium kitchen marble island", "Warm kitchen natural light", "Clean modern kitchen", "Wooden countertop"],
+    "fitness_sports": ["Bright modern gym", "Morning workout space", "Clean studio athletic", "Outdoor natural light"],
+    "office": ["Clean modern desk", "Executive office minimal", "Home office natural light", "Professional workspace"],
+    "automotive": ["Garage studio", "Automotive bay premium", "Showroom", "Road context blurred"],
+    "home_decor": ["Luxury living room", "Modern apartment", "Minimal interior", "Cozy natural light room"],
+    "pet": ["Natural home setting", "Bright living room", "Clean floor surface", "Outdoor garden light"],
+    "fashion_accessories": ["Boutique display", "Marble surface", "Soft textured background", "Minimal luxury surface"],
+    "universal": ["Luxury gradient", "Soft white studio", "Dark premium studio", "Marble surface", "Minimal modern", "Abstract premium"]
+  }
+}

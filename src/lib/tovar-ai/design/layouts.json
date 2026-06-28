@@ -1,0 +1,62 @@
+{
+  "description": "8 layout templates — structural composition of the image",
+  "rule": "Pick ONE layout per card. Adapt text zones to the assigned layout.",
+  "layouts": [
+    {
+      "id": "A",
+      "name": "Vertical Stack",
+      "structure": "Headline top → Large product center → 3 benefit cards below → CTA bottom",
+      "best_for": ["main_cover", "features_detail"],
+      "text_zones": "top headline, 3 small badges below product"
+    },
+    {
+      "id": "B",
+      "name": "Split Left-Right",
+      "structure": "Large product left 55% → Headline + benefit boxes right 45% → CTA bottom right",
+      "best_for": ["main_cover"],
+      "text_zones": "right column: headline + 3 benefit lines"
+    },
+    {
+      "id": "C",
+      "name": "Floating Hero",
+      "structure": "Huge product center → Floating labels around → Price card bottom → Minimal background",
+      "best_for": ["main_cover", "features_detail"],
+      "text_zones": "floating callout labels near product features, price badge bottom"
+    },
+    {
+      "id": "D",
+      "name": "Headline + Product + Offer",
+      "structure": "Bold headline top → Product center 65% → Large offer/badge bottom",
+      "best_for": ["main_cover"],
+      "text_zones": "top headline, bottom offer badge with price"
+    },
+    {
+      "id": "F",
+      "name": "Price First",
+      "structure": "Price large top → Huge product center 55% → Benefits row below → CTA",
+      "best_for": ["main_cover"],
+      "text_zones": "top price, 3 benefit labels below"
+    },
+    {
+      "id": "G",
+      "name": "Problem → Solution",
+      "structure": "Problem context top → Product as solution center → Result/benefit bottom → CTA",
+      "best_for": ["usage_demo"],
+      "text_zones": "before context subtle, after benefit prominent"
+    },
+    {
+      "id": "H",
+      "name": "Pure Product",
+      "structure": "Only product 75% frame → Premium background → Minimal single typography line",
+      "best_for": ["main_cover"],
+      "text_zones": "one line bottom, very minimal"
+    },
+    {
+      "id": "features_row",
+      "name": "Feature Row",
+      "structure": "Product 45% top → 4 feature icons/callouts row below → Detail labels",
+      "best_for": ["features_detail"],
+      "text_zones": "feature labels under each icon"
+    }
+  ]
+}

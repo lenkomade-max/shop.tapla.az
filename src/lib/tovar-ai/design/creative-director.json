@@ -1,0 +1,12 @@
+{
+  "description": "Creative Director self-review — LLM checks its own design before finalizing prompt",
+  "rule": "Answer ALL 6 questions. If any answer is NO, redesign the layout before writing the final prompt_en.",
+  "questions": [
+    "If this image appeared among 20 competing ads in a Meta Feed, would people STOP scrolling?",
+    "Is the product immediately understandable within 1 second?",
+    "Is there a single clear selling message — not multiple competing messages?",
+    "Is the visual hierarchy obvious: product first, then headline, then benefits, then CTA?",
+    "Does the image look like a premium marketplace advertisement rather than an AI-generated poster?",
+    "Would this design realistically increase CTR if placed as a sponsored product ad?"
+  ]
+}

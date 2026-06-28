@@ -1,6 +1,7 @@
 // ============================================================================
-// Stage 2: Prompt Planner
-// 12 стилей + авто-адаптация → в промпты. LLM → только контент и AZ текст.
+// Stage 2: Creative Director + Prompt Planner
+// 12 стилей + 8 design-библиотек + авто-адаптация → в промпты
+// LLM = Creative Director: выбирает угол, лэйаут, позицию, фон, эффекты
 // ============================================================================
 
 import * as fs from 'node:fs'
@@ -10,18 +11,13 @@ import { TOVAR_AI_CONFIG, type VisionOutput, type PromptsOutput } from './types'
 // ─── ФОТО-СТИЛИ (12 шт, из JSON) ───────────────────────────────────────────
 
 interface PhotoStyle {
-  id: string
-  name: string
-  prompt_prefix: string
-  forbidden: string[]
-  composition: string
-  lighting: string
-  use_for: string[]
-  needs_model: boolean
-  needs_environment: boolean
+  id: string; name: string; prompt_prefix: string; forbidden: string[]
+  composition: string; lighting: string; use_for: string[]
+  needs_model: boolean; needs_environment: boolean
 }
 
 const STYLES_DIR = path.join(__dirname, 'styles')
+const DESIGN_DIR = path.join(__dirname, 'design')
 
 function loadAllPhotoStyles(): PhotoStyle[] {
   return fs.readdirSync(STYLES_DIR)
@@ -29,7 +25,11 @@ function loadAllPhotoStyles(): PhotoStyle[] {
     .map(f => JSON.parse(fs.readFileSync(path.join(STYLES_DIR, f), 'utf-8')) as PhotoStyle)
 }
 
-// ─── БАЗОВЫЙ ПРОМПТ (из GPT— самая важная часть, вшивается в КАЖДЫЙ запрос) ──
+function loadDesignLibrary(name: string): string {
+  return fs.readFileSync(path.join(DESIGN_DIR, name), 'utf-8')
+}
+
+// ─── БАЗОВЫЙ ПРОМПТ (оригинал, без правок) ────────────────────────────────
 
 const BASE_PROMPT = `Create a premium marketplace product image.
 
@@ -63,112 +63,166 @@ Generate images suitable for Meta Ads and marketplace galleries.
 CRITICAL — Analyze the uploaded product before generating the image. Determine automatically: product category, materials, intended use, target customer, suitable environment, appropriate lighting, realistic accessories, correct hand position if applicable, realistic usage scenario, luxury commercial style.
 
 Do not reuse the same environment for every product.
-Beauty products → skincare environments.
-Electronics → modern technology environments.
-Kitchen products → premium kitchens.
-Fitness products → sports environments.
-Office products → office environments.
-Pet products → natural home settings.
-Automotive → automotive environments.`
+Beauty products should receive skincare environments.
+Electronics should receive modern technology environments.
+Kitchen products should receive premium kitchens.
+Automotive products should receive automotive environments.
+Fitness products should receive sports environments.
+Office products should receive office environments.
+Pet products should receive home environments.`
 
-// ─── SYSTEM PROMPT ─────────────────────────────────────────────────────────
+// ─── SYSTEM PROMPT — Creative Director ─────────────────────────────────────
 
-const SYSTEM_PROMPT = `You are a product content writer for TAPLA MARKETPLACE (Azerbaijan).
+const SYSTEM_PROMPT = `You are a Creative Director for TAPLA MARKETPLACE (Azerbaijan). You design advertising creatives for e-commerce, not just images.
 
-Given: product analysis + selected photo style for each card.
-Your job: write product-specific image description + Azerbaijani text overlays.
+Given: product analysis + photo style per card + design libraries.
+Your job: select marketing strategy, layout, positioning, background, effects for each of 3 cards.
 
 ## 3 CARDS
 
-Card 1 (main_cover):
-- Product hero shot, fills 60-70% of frame
-- Magazine-cover quality, STOP the scroll
-- Large headline in AZ, optional badge
-
-Card 2 (usage_demo):
-- Product being used naturally
-- If product needs human: person using it
-- If needs lifestyle: product in beautiful interior
-- Create desire through context
-
-Card 3 (features_detail):
-- Close-ups, details, macro shots
-- Infographic style: callouts, labels
-- Communicate quality and features
+Card 1 (main_cover): Hero shot. Product dominant. STOP the scroll. Magazine quality. Large AZ headline.
+Card 2 (usage_demo): Product in use. Lifestyle context. Create desire.
+Card 3 (features_detail): Details, quality, features. Infographic style.
 
 ## TEXT RULES
-- ALL visible text: AZERBAIJANI LATIN SCRIPT ONLY
-- NEVER English. NEVER Russian. NEVER Cyrillic.
-- Short: 3-5 words max per headline
-- Examples: "LED TERAPİYA", "3 REJİM", "ERQONOMİK DİZAYN"
+- ALL visible text: AZERBAIJANI LATIN SCRIPT ONLY. NEVER English. NEVER Russian. NEVER Cyrillic.
+- Short: 3-5 words per headline. Examples: "LED TERAPİYA", "3 REJİM", "ERQONOMİK DİZAYN"
 
-## PROMPT RULES
-- Each prompt_en under 250 words
-- Full English sentences
-- Reference original photo for product fidelity
+## PROCESS
+1. Pick ONE marketing angle per card (from marketing_angles library)
+2. Pick ONE layout per card (from layouts library)
+3. Select position, background, visual effects for each card
+4. Run Creative Director self-review (all 6 questions MUST be YES)
+5. If any question = NO, redesign and try again
+6. Write the final image description
+
+## PROMT RULES
+- Each prompt_en under 300 words
+- Full English sentences for Nano Banana 2
+- Reference original photo for product shape/color fidelity
+- CREATE A NEW IMAGE — do not edit the reference photo
 
 Output ONLY valid JSON. No markdown.`
 
-const USER_PROMPT_TEMPLATE = `Create 3 image prompts for this product.
+// ─── USER PROMPT (собирается динамически с design-библиотеками) ────────────
 
-## PHOTO STYLES ASSIGNED (use these exact prefixes in each card)
+function buildUserPrompt(
+  s1: PhotoStyle, s2: PhotoStyle, s3: PhotoStyle,
+  analysis: VisionOutput,
+  providerDescription?: string,
+  characteristics?: Record<string, string>,
+): string {
+  const DESIGN = {
+    marketing_angles: loadDesignLibrary('marketing-angles.json'),
+    layouts: loadDesignLibrary('layouts.json'),
+    positions: loadDesignLibrary('positions.json'),
+    backgrounds: loadDesignLibrary('backgrounds.json'),
+    visual_effects: loadDesignLibrary('visual-effects.json'),
+    composition_rules: loadDesignLibrary('composition-rules.json'),
+    marketplace_rules: loadDesignLibrary('marketplace-rules.json'),
+    creative_director: loadDesignLibrary('creative-director.json'),
+  }
 
-CARD 1 STYLE: {STYLE1_NAME} — {STYLE1_PREFIX}
-
-CARD 2 STYLE: {STYLE2_NAME} — {STYLE2_PREFIX}
-
-CARD 3 STYLE: {STYLE3_NAME} — {STYLE3_PREFIX}
-
-## Product Analysis
-{ANALYSIS}
-
-## Provider Description
-{DESCRIPTION}
-
-## Characteristics
-{CHARACTERISTICS}
-
-## REQUIREMENTS
-- Each card must be ONE IMAGE only. Never collages. Never split layouts. Never multiple panels. Never infographic grids.
-- Product occupies 60-80% of frame.
-- Realistic premium photography. Ultra realistic. 8K.
-- Leave negative space for text placement.
-- Remove all watermarks, stickers, logos, packaging.
-
-Return JSON:
-{
-  "cards": [
-    {
-      "index": 1,
-      "purpose": "main_cover",
-      "prompt_en": "Product-specific scene description in English. Under 250 words. DO NOT include style prefix — it will be added automatically.",
-      "text_overlay_az": ["HEADLINE AZ"],
-      "needs_model": false
-    },
-    {
-      "index": 2,
-      "purpose": "usage_demo",
-      "prompt_en": "...",
-      "text_overlay_az": [],
-      "needs_model": true
-    },
-    {
-      "index": 3,
-      "purpose": "features_detail",
-      "prompt_en": "...",
-      "text_overlay_az": ["FEATURE 1 AZ", "FEATURE 2 AZ"],
-      "needs_model": false
-    }
-  ]
+  // Собираем через конкатенацию (JSON контент может ломать template literals)
+  return [
+    'Create 3 image prompts for this product. Act as Creative Director.',
+    '',
+    '## DESIGN LIBRARIES — use these to build each card',
+    '',
+    '### Marketing Angles (pick ONE per card)',
+    DESIGN.marketing_angles,
+    '',
+    '### Layouts (pick ONE per card)',
+    DESIGN.layouts,
+    '',
+    '### Product Positions',
+    DESIGN.positions,
+    '',
+    '### Backgrounds',
+    DESIGN.backgrounds,
+    '',
+    '### Visual Effects',
+    DESIGN.visual_effects,
+    '',
+    '### Composition Rules (MUST follow)',
+    DESIGN.composition_rules,
+    '',
+    '### Marketplace Rules (MUST follow)',
+    DESIGN.marketplace_rules,
+    '',
+    '### Creative Director Self-Review (MUST pass all 6)',
+    DESIGN.creative_director,
+    '',
+    '## PHOTO STYLES ASSIGNED',
+    '',
+    'CARD 1 STYLE: ' + s1.name + ' — ' + s1.prompt_prefix,
+    'CARD 2 STYLE: ' + s2.name + ' — ' + s2.prompt_prefix,
+    'CARD 3 STYLE: ' + s3.name + ' — ' + s3.prompt_prefix,
+    '',
+    '## Product Analysis',
+    JSON.stringify(analysis, null, 2),
+    '',
+    '## Provider Description',
+    providerDescription || 'Not provided',
+    '',
+    '## Characteristics',
+    (characteristics && Object.keys(characteristics).length > 0 ? JSON.stringify(characteristics) : 'None'),
+    '',
+    'Return JSON:',
+    '{',
+    '  "cards": [',
+    '    {',
+    '      "index": 1,',
+    '      "purpose": "main_cover",',
+    '      "marketing_angle": "premium",',
+    '      "layout": "C",',
+    '      "product_position": "45° rotated",',
+    '      "background": "Soft white studio",',
+    '      "visual_effects": ["soft_glow"],',
+    '      "creative_director_passed": true,',
+    '      "prompt_en": "Full product scene description in English. Under 300 words.",',
+    '      "text_overlay_az": ["HEADLINE AZ"],',
+    '      "needs_model": false',
+    '    },',
+    '    {',
+    '      "index": 2,',
+    '      "purpose": "usage_demo",',
+    '      "marketing_angle": "lifestyle",',
+    '      "layout": "G",',
+    '      "product_position": "in hand",',
+    '      "background": "Modern bathroom",',
+    '      "visual_effects": [],',
+    '      "creative_director_passed": true,',
+    '      "prompt_en": "...",',
+    '      "text_overlay_az": [],',
+    '      "needs_model": true',
+    '    },',
+    '    {',
+    '      "index": 3,',
+    '      "purpose": "features_detail",',
+    '      "marketing_angle": "features",',
+    '      "layout": "features_row",',
+    '      "product_position": "macro close-up",',
+    '      "background": "Soft white studio",',
+    '      "visual_effects": ["luxury_highlights"],',
+    '      "creative_director_passed": true,',
+    '      "prompt_en": "...",',
+    '      "text_overlay_az": ["FEATURE 1 AZ", "FEATURE 2 AZ"],',
+    '      "needs_model": false',
+    '    }',
+    '  ]',
+    '}',
+    '',
+    'RULES:',
+    '- text_overlay_az: AZERBAIJANI LATIN ONLY. Empty array [] if no text.',
+    '- Every card must have creative_director_passed = true.',
+    '- Do NOT invent new styles — use the assigned photo style.',
+    '- One image = one marketing message.',
+    '- prompt_en writes product scene only — style prefix, design libraries, and rules are added automatically.',
+    '',
+    'Respond ONLY with the JSON.',
+  ].join('\n')
 }
-
-RULES:
-- text_overlay_az: AZERBAIJANI LATIN ONLY. Empty array if no text.
-- prompt_en: Write what to show — the style prefix is added automatically.
-- Do NOT invent style changes — use the assigned photo style for each card.
-- One image = one marketing message.
-
-Respond ONLY with the JSON.`
 
 // ─── ВЫБОР СТИЛЯ ДЛЯ КАЖДОЙ КАРТОЧКИ (код, не LLM) ────────────────────────
 
@@ -228,24 +282,13 @@ export async function planCardPrompts(
   const config = TOVAR_AI_CONFIG
   const styles = loadAllPhotoStyles()
 
-  // Выбираем стиль для каждой карточки
   const s1 = pickStyle('main_cover', analysis, styles)
   const s2 = pickStyle('usage_demo', analysis, styles)
   const s3 = pickStyle('features_detail', analysis, styles)
 
   console.log(`[Stage 2] Styles: card1=${s1.id}, card2=${s2.id}, card3=${s3.id}`)
 
-  // Отправляем LLM: назначенные стили + анализ товара
-  const userPrompt = USER_PROMPT_TEMPLATE
-    .replace('{STYLE1_NAME}', s1.name)
-    .replace('{STYLE1_PREFIX}', s1.prompt_prefix)
-    .replace('{STYLE2_NAME}', s2.name)
-    .replace('{STYLE2_PREFIX}', s2.prompt_prefix)
-    .replace('{STYLE3_NAME}', s3.name)
-    .replace('{STYLE3_PREFIX}', s3.prompt_prefix)
-    .replace('{ANALYSIS}', JSON.stringify(analysis, null, 2))
-    .replace('{DESCRIPTION}', providerDescription || 'Not provided')
-    .replace('{CHARACTERISTICS}', characteristics && Object.keys(characteristics).length > 0 ? JSON.stringify(characteristics) : 'None')
+  const userPrompt = buildUserPrompt(s1, s2, s3, analysis, providerDescription, characteristics)
 
   const body = {
     model: config.PLANNER_MODEL,
@@ -255,7 +298,7 @@ export async function planCardPrompts(
     ],
     response_format: { type: 'json_object' },
     temperature: 0.3,
-    max_tokens: 4096,
+    max_tokens: 8192,
   }
 
   const response = await fetch(`${config.OPENROUTER_BASE_URL}/chat/completions`, {
@@ -274,30 +317,59 @@ export async function planCardPrompts(
 
   const data = await response.json()
   const raw = data.choices?.[0]?.message?.content || ''
-  const parsed = parseJSON<{ cards: PromptsOutput['cards'] }>(raw)
+  const parsed = parseJSON<{
+    cards: Array<PromptsOutput['cards'][number] & {
+      marketing_angle?: string; layout?: string
+      product_position?: string; background?: string
+      visual_effects?: string[]; creative_director_passed?: boolean
+    }>
+  }>(raw)
 
   if (!Array.isArray(parsed.cards) || parsed.cards.length < 3) {
     throw new Error(`Stage 2: Expected 3 cards, got ${parsed.cards?.length || 0}`)
   }
 
-  // ПРИНУДИТЕЛЬНО вшиваем: [BASE] + [стиль] + [контент LLM] в каждом промпте
+  // Сборка финального промпта: [BASE] + [дизайн-решения] + [стиль] + [контент]
   const styleMap = [s1, s2, s3]
+
   for (const card of parsed.cards) {
     const style = styleMap[card.index - 1]
+
+    const designDecisions = [
+      card.marketing_angle ? `Marketing angle: ${card.marketing_angle}.` : '',
+      card.layout ? `Layout: ${card.layout}.` : '',
+      card.product_position ? `Product position: ${card.product_position}.` : '',
+      card.background ? `Background: ${card.background}.` : '',
+      Array.isArray(card.visual_effects) && card.visual_effects.length > 0
+        ? `Visual effects: ${card.visual_effects.join(', ')}.` : '',
+    ].filter(Boolean).join(' ')
+
+    const textInstruction = card.text_overlay_az.length > 0
+      ? `Render this text on the image: ${card.text_overlay_az.join(' — ')}.`
+      : ''
+
     card.prompt_en = [
       BASE_PROMPT,
-      `STYLE: ${style.name}.`,
-      style.prompt_prefix,
+      designDecisions,
+      `STYLE: ${style.name}. ${style.prompt_prefix}`,
       `Composition: ${style.composition}. Lighting: ${style.lighting}.`,
-      'TAPLA MARKETPLACE product card. 1:1 square format.',
+      textInstruction,
       card.prompt_en,
-    ].join(' ')
+    ].filter(Boolean).join(' ')
   }
 
-  return {
-    style_name: `${s1.id}+${s2.id}+${s3.id}`,
-    cards: parsed.cards,
-  }
+  // Убираем design-поля из cards (не нужны дальше)
+  const cleanCards = parsed.cards.map(c => ({
+    index: c.index,
+    purpose: c.purpose,
+    prompt_en: c.prompt_en,
+    text_overlay_az: c.text_overlay_az,
+    needs_model: c.needs_model,
+    composition: c.layout || 'center',
+    reference_weight: c.purpose === 'main_cover' ? 0.8 : c.needs_model ? 0.5 : 0.8,
+  }))
+
+  return { style_name: `${s1.id}+${s2.id}+${s3.id}`, cards: cleanCards }
 }
 
 // ─── Helpers ────────────────────────────────────────────────────────────────

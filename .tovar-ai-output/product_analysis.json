@@ -1,7 +1,7 @@
 {
   "product_type": "massajer",
   "category": "Kosmetika",
-  "subcategory": "Üz baxımı və massaj",
+  "subcategory": "Üz massajeri",
   "brand": null,
   "model": null,
   "logo_visible": false,
@@ -17,7 +17,7 @@
   "dimensions_estimated": "təxminən 15×8×5 sm",
   "construction_features": [
     "erqonomik tutacaq",
-    "LED işıqlandırma paneli"
+    "LED işıq paneli"
   ],
   "controls": [
     "düymə"
@@ -28,35 +28,35 @@
   "ports": [],
   "display": null,
   "indicators": [
-    "bənövşəyi LED işıq"
+    "bənövşəyi LED işığı"
   ],
   "package_contents": [
-    "massajer"
+    "üz massajeri"
   ],
   "accessories": [],
   "possible_functions": [
     "üz massajı",
     "LED terapiyası",
     "qırışların azaldılması",
-    "dəri gərmə"
+    "dəri gərilməsi"
   ],
-  "intended_use": "üz dərisinin baxımı və gərilməsi üçün ev şəraitində istifadə",
+  "intended_use": "üz dərisini massaj etmək və LED terapiyası ilə baxım etmək üçün",
   "needs_human_model": true,
   "needs_lifestyle_scene": true,
   "recommended_scenes": [
     "vanna otağı",
     "yataq otağı",
-    "kosmetika masası"
+    "kosmetologiya salonu"
   ],
   "needs_macro_shots": true,
-  "needs_size_comparison": false,
+  "needs_size_comparison": true,
   "needs_exploded_view": false,
-  "target_audience": "qadınlar 20-55",
+  "target_audience": "qadınlar 18-60",
   "key_selling_points": [
-    "LED işıq terapiyası",
+    "Bənövşəyi LED terapiyası",
     "Erqonomik dizayn",
-    "Asan istifadə (tək düyməli)",
-    "Kompakt ölçü"
+    "Asan tək düyməli idarəetmə",
+    "Kompakt və portativ"
   ],
   "premium_level": "mid"
 }
