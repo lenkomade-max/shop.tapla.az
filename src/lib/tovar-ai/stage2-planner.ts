@@ -16,8 +16,11 @@ interface PhotoStyle {
   needs_model: boolean; needs_environment: boolean
 }
 
-const STYLES_DIR = path.join(__dirname, 'styles')
-const DESIGN_DIR = path.join(__dirname, 'design')
+// __dirname не работает в Next.js (компилируется в /ROOT/).
+// Используем process.cwd() + известный путь от корня проекта.
+const TOLER_AI_DIR = path.join(process.cwd(), 'src/lib/tovar-ai')
+const STYLES_DIR = path.join(TOLER_AI_DIR, 'styles')
+const DESIGN_DIR = path.join(TOLER_AI_DIR, 'design')
 
 function loadAllPhotoStyles(): PhotoStyle[] {
   return fs.readdirSync(STYLES_DIR)
