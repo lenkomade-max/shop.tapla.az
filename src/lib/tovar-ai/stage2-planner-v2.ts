@@ -92,6 +92,7 @@ Only these should vary:
    - Be written in English (Nano Banana works best with English prompts)
    - Be detailed enough that the image generator produces consistent results
    - **CRITICAL: never use words like "minimal", "minimalistic", "clean background", "modern studio", "premium studio" — these tell the image model to strip away typography. Instead describe rich commercial detail: "marketplace infographic card with integrated typography, feature labels, and commercial callouts"**
+   - **EVERY prompt_en MUST explicitly include the hard rules: Azerbaijani Latin text only, no CTA buttons, no logos/brand names, no invented data, single frame, product integrity (shape/color/proportions unchanged). Do not assume the image model knows these rules — repeat them in every prompt.**
 
 5. **text_overlay_az:** Azerbaijani Latin text that should appear on this card.
 
