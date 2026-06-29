@@ -3,7 +3,7 @@
 import React, { useState, useCallback, useRef, DragEvent, useEffect } from 'react'
 import {
   Loader2, CheckCircle2, XCircle, Upload, RefreshCw,
-  Download, X, RotateCcw, Sparkles, ShoppingBag
+  Download, X, RotateCcw, Sparkles, ShoppingBag, ChevronLeft, ChevronRight
 } from 'lucide-react'
 import { createProductFromAI, publishProduct, fetchActiveCategories } from '@/lib/actions'
 import type { ProductDraftData } from '@/lib/tovar-ai'
@@ -105,6 +105,7 @@ export default function TovarAIPage() {
   const [cost, setCost] = useState(0)
   const [elapsed, setElapsed] = useState(0)
   const [regeneratingIndex, setRegeneratingIndex] = useState<number | null>(null)
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
 
   // Фото
   const [photo, setPhoto] = useState<{ base64: string; name: string; size: number } | null>(null)
@@ -244,6 +245,22 @@ export default function TovarAIPage() {
   }, [photo, description, price, mode, supplierUrl, cardCount])
 
   // ─── Регенерация одной карточки ───────────────────────────────────────
+
+  // ─── Lightbox: keyboard navigation ──────────────────────────────────
+  useEffect(() => {
+    if (lightboxIndex === null) return
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') { setLightboxIndex(null); return }
+      if (e.key === 'ArrowLeft') {
+        setLightboxIndex(prev => prev !== null && prev > 0 ? prev - 1 : prev)
+      }
+      if (e.key === 'ArrowRight') {
+        setLightboxIndex(prev => prev !== null && prev < cards.length - 1 ? prev + 1 : prev)
+      }
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [lightboxIndex, cards.length])
 
   const regenerateCard = useCallback(async (index: number) => {
     if (!photo || regeneratingIndex !== null) return
@@ -659,11 +676,16 @@ export default function TovarAIPage() {
                     <div key={card.index} className="relative flex gap-4 rounded-lg border bg-zinc-50 overflow-hidden p-3">
                       {/* Картинка */}
                       <div className="relative w-28 h-28 shrink-0">
-                        <img
-                          src={imgSrc}
-                          alt={`Kart ${card.index}`}
-                          className="w-full h-full rounded-md object-cover border"
-                        />
+                        <button
+                          onClick={() => setLightboxIndex(card.index - 1)}
+                          className="block w-full h-full p-0 border-0 bg-transparent cursor-pointer"
+                        >
+                          <img
+                            src={imgSrc}
+                            alt={`Kart ${card.index}`}
+                            className="w-full h-full rounded-md object-cover border"
+                          />
+                        </button>
                         {isRegenerating && (
                           <div className="absolute inset-0 rounded-md bg-white/70 flex items-center justify-center">
                             <Loader2 className="h-6 w-6 animate-spin text-black" />
@@ -1097,6 +1119,61 @@ export default function TovarAIPage() {
                   )}
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* ════════════════════════════════════════════════════════════════
+              LIGHTBOX — полноэкранный просмотр фото
+             ════════════════════════════════════════════════════════════════ */}
+          {lightboxIndex !== null && cards[lightboxIndex] && (
+            <div
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/90"
+              onClick={() => setLightboxIndex(null)}
+            >
+              {/* Close */}
+              <button
+                onClick={() => setLightboxIndex(null)}
+                className="absolute top-4 right-4 z-10 p-2 text-white/70 hover:text-white"
+              >
+                <X className="h-6 w-6" />
+              </button>
+
+              {/* Counter */}
+              <span className="absolute top-4 left-4 text-sm text-white/50">
+                {lightboxIndex + 1} / {cards.length}
+              </span>
+
+              {/* Prev */}
+              {lightboxIndex > 0 && (
+                <button
+                  onClick={e => { e.stopPropagation(); setLightboxIndex(lightboxIndex - 1) }}
+                  className="absolute left-4 z-10 p-2 text-white/70 hover:text-white"
+                >
+                  <ChevronLeft className="h-8 w-8" />
+                </button>
+              )}
+
+              {/* Image */}
+              <img
+                src={
+                  (imageUrls && imageUrls[lightboxIndex])
+                    ? imageUrls[lightboxIndex]
+                    : `data:image/png;base64,${cards[lightboxIndex].imageBase64}`
+                }
+                alt={`Kart ${lightboxIndex + 1}`}
+                className="max-h-[90vh] max-w-[90vw] rounded-lg object-contain"
+                onClick={e => e.stopPropagation()}
+              />
+
+              {/* Next */}
+              {lightboxIndex < cards.length - 1 && (
+                <button
+                  onClick={e => { e.stopPropagation(); setLightboxIndex(lightboxIndex + 1) }}
+                  className="absolute right-4 z-10 p-2 text-white/70 hover:text-white"
+                >
+                  <ChevronRight className="h-8 w-8" />
+                </button>
+              )}
             </div>
           )}
         </div>
