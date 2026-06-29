@@ -24,17 +24,18 @@ const photoPath = process.argv[2]
 const photoBase64 = fs.readFileSync(photoPath).toString('base64')
 console.log('📸 Photo loaded:', (photoBase64.length / 1024).toFixed(1), 'KB base64')
 
-// Style reference images
-const STYLE_REF_DIR = '/Users/user/Mac-Server/ForAI-Planner'
-function loadStyleRefImages() {
-  if (!fs.existsSync(STYLE_REF_DIR)) return []
-  return fs.readdirSync(STYLE_REF_DIR)
-    .filter(f => /\.(png|jpg|jpeg|webp)$/i.test(f))
-    .sort()
-    .map(f => fs.readFileSync(path.join(STYLE_REF_DIR, f)).toString('base64'))
-}
-const styleRefs = loadStyleRefImages()
-console.log('🎨 Style references:', styleRefs.length, 'images')
+// Style reference images (from R2)
+const STYLE_REF_URLS = [
+  'https://pub-3f6b01f6597249d089c3dbb6fb5a8a8b.r2.dev/tovar-ai/style-refs/Example_of_a_single_product1.webp',
+  'https://pub-3f6b01f6597249d089c3dbb6fb5a8a8b.r2.dev/tovar-ai/style-refs/Example_of_a_single_product2.webp',
+  'https://pub-3f6b01f6597249d089c3dbb6fb5a8a8b.r2.dev/tovar-ai/style-refs/Example_of_a_single_product3.webp',
+  'https://pub-3f6b01f6597249d089c3dbb6fb5a8a8b.r2.dev/tovar-ai/style-refs/Example_of_a_single_product4.webp',
+  'https://pub-3f6b01f6597249d089c3dbb6fb5a8a8b.r2.dev/tovar-ai/style-refs/Example_of_a_single_product5.webp',
+  'https://pub-3f6b01f6597249d089c3dbb6fb5a8a8b.r2.dev/tovar-ai/style-refs/different%20styles1.png',
+  'https://pub-3f6b01f6597249d089c3dbb6fb5a8a8b.r2.dev/tovar-ai/style-refs/different%20styles2.png',
+  'https://pub-3f6b01f6597249d089c3dbb6fb5a8a8b.r2.dev/tovar-ai/style-refs/different%20styles3.png',
+]
+console.log('🎨 Style references:', STYLE_REF_URLS.length, 'images (from R2)')
 
 const { analyzeProductImage } = await import('../src/lib/tovar-ai/stage1-vision.js')
 const { planCardPromptsV2 } = await import('../src/lib/tovar-ai/stage2-planner-v2.js')
@@ -44,6 +45,6 @@ const vision = await analyzeProductImage(photoBase64)
 console.log('Vision result:', JSON.stringify(vision, null, 2))
 
 console.log('\n📝 Stage 2 V2: Planner...')
-const prompts = await planCardPromptsV2(vision, 3, undefined, undefined, styleRefs)
+const prompts = await planCardPromptsV2(vision, 3, undefined, undefined, STYLE_REF_URLS)
 console.log('\n========== PROMPTS OUTPUT ==========')
 console.log(JSON.stringify(prompts, null, 2))
