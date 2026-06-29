@@ -13,6 +13,7 @@ export interface CartItem {
 interface CartContextType {
   cartItems: CartItem[]
   addToCart: (product: Product, shade?: Shade, quantity?: number) => void
+  addToCartSilent: (product: Product, shade?: Shade, quantity?: number) => void
   removeFromCart: (productId: string, shadeName?: string) => void
   updateQuantity: (productId: string, quantity: number, shadeName?: string) => void
   clearCart: () => void
@@ -92,6 +93,22 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setIsCartOpen(true)
   }
 
+  const addToCartSilent = (product: Product, shade?: Shade, quantity: number = 1) => {
+    setCartItems((prevItems) => {
+      const existingIndex = prevItems.findIndex(
+        (item) =>
+          item.product.id === product.id &&
+          (!shade || item.selectedShade?.name === shade.name)
+      )
+      if (existingIndex > -1) {
+        const newItems = [...prevItems]
+        newItems[existingIndex].quantity += quantity
+        return newItems
+      }
+      return [...prevItems, { product, selectedShade: shade, quantity }]
+    })
+  }
+
   const removeFromCart = (productId: string, shadeName?: string) => {
     setCartItems((prevItems) =>
       prevItems.filter(
@@ -128,6 +145,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       value={{
         cartItems,
         addToCart,
+        addToCartSilent,
         removeFromCart,
         updateQuantity,
         clearCart,

@@ -8,10 +8,11 @@ import { ProductCard } from '@/components/cards/ProductCard';
 import { Product, Shade } from '@/types';
 import { Modal } from '@/components/ui/Modal';
 import { useCart } from '@/store/CartContext';
-import { Star, CheckCircle, ShoppingBag, Minimize2, ZoomIn, ChevronRight } from 'lucide-react';
+import { Star, CheckCircle, ShoppingBag, ShoppingCart, Minimize2, ZoomIn, ChevronRight, ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import { clsx } from 'clsx';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface ProductGridProps {
   products: Product[];
@@ -40,7 +41,8 @@ function getProductCategoryValue(product: Product): string {
 }
 
 export function ProductGrid({ products }: ProductGridProps) {
-  const { addToCart } = useCart();
+  const { addToCart, addToCartSilent } = useCart();
+  const router = useRouter();
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
@@ -74,6 +76,14 @@ export function ProductGrid({ products }: ProductGridProps) {
     if (quickViewProduct) {
       addToCart(quickViewProduct, selectedShade, purchaseQuantity);
       setQuickViewProduct(null);
+    }
+  };
+
+  const handleDirectOrderQuick = () => {
+    if (quickViewProduct) {
+      addToCartSilent(quickViewProduct, selectedShade, purchaseQuantity);
+      setQuickViewProduct(null);
+      router.push('/checkout');
     }
   };
 
@@ -390,6 +400,16 @@ export function ProductGrid({ products }: ProductGridProps) {
                     <span>SƏBƏTƏ ƏLAVƏ ET</span>
                   </button>
                 </div>
+
+                {/* Direct checkout from quick view */}
+                <button
+                  onClick={handleDirectOrderQuick}
+                  className="w-full h-11 text-[10px] tracking-widest font-bold uppercase border border-neutral-300 bg-white text-neutral-900 hover:bg-neutral-950 hover:text-white hover:border-neutral-950 transition-all duration-300 flex items-center justify-center space-x-2 cursor-pointer"
+                >
+                  <ShoppingCart className="h-3.5 w-3.5" />
+                  <span>BİRBAŞA SİFARİŞ ET</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </button>
               </div>
             </div>
           )}

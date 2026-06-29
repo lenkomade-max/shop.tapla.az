@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -43,6 +43,9 @@ export default function CheckoutPage() {
   const { cartItems, cartTotal, clearCart } = useCart();
   const { user, profile } = useAuth();
   const [mounted, setMounted] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
+  const submitSentinelRef = useRef<HTMLDivElement>(null);
+  const [showStickySubmit, setShowStickySubmit] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [redirectUrl, setRedirectUrl] = useState('');
@@ -101,6 +104,18 @@ export default function CheckoutPage() {
       });
     }
   }, [mounted, profile]);
+
+  // Sticky submit button detection
+  useEffect(() => {
+    const sentinel = submitSentinelRef.current;
+    if (!sentinel) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setShowStickySubmit(!entry.isIntersecting),
+      { rootMargin: '-1px 0px 0px 0px' }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [mounted]);
 
   if (!mounted) {
     return <div className="min-h-screen bg-[#FAF9F6] pt-32 text-center text-xs uppercase tracking-widest font-mono">Yüklənir...</div>;
@@ -408,7 +423,7 @@ export default function CheckoutPage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
             {/* Left: Input Form details */}
             <div className="lg:col-span-7 bg-white border border-neutral-100 p-6 sm:p-8 space-y-8 shadow-xs rounded-xl">
-              <form onSubmit={handleSubmit} className="space-y-8">
+              <form ref={formRef} onSubmit={handleSubmit} className="space-y-8">
                 {/* Section 1: Customer Details */}
                 <div className="space-y-4">
                   <div className="flex items-center space-x-2 border-b border-neutral-100 pb-2">
@@ -699,6 +714,9 @@ export default function CheckoutPage() {
                   </div>
                 )}
 
+                {/* Sentinel for sticky submit detection */}
+                <div ref={submitSentinelRef} className="h-1" />
+
                 {/* Form Submit Button */}
                 <button
                   type="submit"
@@ -715,6 +733,26 @@ export default function CheckoutPage() {
                   )}
                 </button>
               </form>
+            </div>
+
+            {/* Fixed bottom submit bar */}
+            <div className={`fixed bottom-14 md:bottom-0 left-0 right-0 z-30 bg-white border-t border-neutral-200 p-3 shadow-lg transition-transform duration-300 ${
+              showStickySubmit ? 'translate-y-0' : 'translate-y-full'
+            }`}>
+              <button
+                onClick={() => formRef.current?.requestSubmit()}
+                disabled={isSubmitting}
+                className="w-full bg-neutral-950 text-white text-[10px] tracking-widest font-bold uppercase py-3.5 border border-neutral-950 hover:bg-transparent hover:text-neutral-900 transition-all duration-300 flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50"
+              >
+                {isSubmitting ? (
+                  <span className="flex items-center space-x-2">
+                    <span className="animate-spin h-3.5 w-3.5 border-2 border-white border-t-transparent rounded-full" />
+                    <span>SİFARİŞ GÖNDƏRİLİR...</span>
+                  </span>
+                ) : (
+                  <span>SİFARİŞİ TƏSDİQLƏ VƏ TAMAMLA</span>
+                )}
+              </button>
             </div>
 
             {/* Right: Cart Summary Column */}

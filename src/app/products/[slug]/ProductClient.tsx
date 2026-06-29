@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -33,16 +33,29 @@ interface ProductClientProps {
 }
 
 export function ProductClient({ product, relatedProducts }: ProductClientProps) {
-  const { addToCart } = useCart();
+  const { addToCart, addToCartSilent } = useCart();
   const router = useRouter();
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [scrolled, setScrolled] = useState(false);
+  const [showStickyCta, setShowStickyCta] = useState(false);
+  const ctaSentinelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
     const onScroll = () => setScrolled(window.scrollY > 150);
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  useEffect(() => {
+    const sentinel = ctaSentinelRef.current;
+    if (!sentinel) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setShowStickyCta(!entry.isIntersecting),
+      { rootMargin: '-1px 0px 0px 0px' }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
   }, []);
 
   const handleBack = () => {
@@ -71,6 +84,13 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
     }
     setIsAdded(true);
     setTimeout(() => setIsAdded(false), 2000);
+  };
+
+  const handleDirectOrder = () => {
+    for (let i = 0; i < quantity; i++) {
+      addToCartSilent(product, selectedShade);
+    }
+    router.push('/checkout');
   };
 
   const ledDetails = {
@@ -340,6 +360,40 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
               </div>
             )}
 
+            {/* Sentinel for sticky CTA detection */}
+            <div ref={ctaSentinelRef} className="h-1" />
+
+            {/* Fixed bottom CTA bar (appears when buttons scroll out of view) */}
+            <div className={`fixed bottom-14 md:bottom-0 left-0 right-0 z-30 bg-white border-t border-neutral-200 p-3 shadow-lg transition-transform duration-300 ${
+              showStickyCta ? 'translate-y-0' : 'translate-y-full'
+            }`}>
+              <div className="flex items-center space-x-3 max-w-7xl mx-auto">
+                <div className="flex items-center border border-neutral-300 h-11 bg-white shrink-0">
+                  <button
+                    onClick={() => handleQuantityChange(quantity - 1)}
+                    className="px-3 h-full hover:bg-neutral-50 text-neutral-500 transition-colors cursor-pointer"
+                  >
+                    <Minus className="h-3 w-3" />
+                  </button>
+                  <span className="px-3 text-xs font-mono font-bold text-neutral-800 select-none min-w-[24px] text-center">
+                    {quantity}
+                  </span>
+                  <button
+                    onClick={() => handleQuantityChange(quantity + 1)}
+                    className="px-3 h-full hover:bg-neutral-50 text-neutral-500 transition-colors cursor-pointer"
+                  >
+                    <Plus className="h-3 w-3" />
+                  </button>
+                </div>
+                <button
+                  onClick={handleDirectOrder}
+                  className="flex-1 h-11 text-[10px] tracking-widest font-bold uppercase border border-neutral-950 bg-neutral-950 text-white hover:bg-transparent hover:text-neutral-900 transition-all duration-300 cursor-pointer"
+                >
+                  BİRBAŞA SİFARİŞ ET
+                </button>
+              </div>
+            </div>
+
             {/* Add to Cart Actions */}
             <div className="space-y-4 pt-4 border-t border-neutral-100">
               <div className="flex items-center space-x-4">
@@ -388,14 +442,13 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
               </div>
 
               {/* Direct Checkout Button */}
-              <Link href="/checkout" className="block">
-                <button
-                  className="w-full h-12 text-[10px] tracking-widest font-bold uppercase border border-neutral-300 bg-white text-neutral-900 hover:bg-neutral-950 hover:text-white hover:border-neutral-950 transition-all duration-300 flex items-center justify-center space-x-2 cursor-pointer"
-                >
-                  <span>BİRBAŞA SİFARİŞ ET</span>
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </button>
-              </Link>
+              <button
+                onClick={handleDirectOrder}
+                className="w-full h-12 text-[10px] tracking-widest font-bold uppercase border border-neutral-300 bg-white text-neutral-900 hover:bg-neutral-950 hover:text-white hover:border-neutral-950 transition-all duration-300 flex items-center justify-center space-x-2 cursor-pointer"
+              >
+                <span>BİRBAŞA SİFARİŞ ET</span>
+                <ArrowRight className="h-3.5 w-3.5" />
+              </button>
             </div>
 
             {/* Quick Guarantees Row */}
