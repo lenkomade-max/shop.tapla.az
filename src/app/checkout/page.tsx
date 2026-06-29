@@ -736,8 +736,8 @@ export default function CheckoutPage() {
             </div>
 
             {/* Fixed bottom submit bar */}
-            <div className={`fixed bottom-14 md:bottom-0 left-0 right-0 z-30 bg-white border-t border-neutral-200 p-3 shadow-lg transition-transform duration-300 ${
-              showStickySubmit ? 'translate-y-0' : 'translate-y-full'
+            <div className={`fixed bottom-14 md:bottom-0 left-0 right-0 z-50 bg-white border-t border-neutral-200 p-3 shadow-lg transition-opacity duration-300 ${
+              showStickySubmit ? 'opacity-100' : 'opacity-0 pointer-events-none'
             }`}>
               <button
                 onClick={() => formRef.current?.requestSubmit()}

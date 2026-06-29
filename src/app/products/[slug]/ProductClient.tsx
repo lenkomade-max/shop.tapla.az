@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -364,8 +364,8 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
             <div ref={ctaSentinelRef} className="h-1" />
 
             {/* Fixed bottom CTA bar (appears when buttons scroll out of view) */}
-            <div className={`fixed bottom-14 md:bottom-0 left-0 right-0 z-30 bg-white border-t border-neutral-200 p-3 shadow-lg transition-transform duration-300 ${
-              showStickyCta ? 'translate-y-0' : 'translate-y-full'
+            <div className={`fixed bottom-14 md:bottom-0 left-0 right-0 z-50 bg-white border-t border-neutral-200 p-3 shadow-lg transition-opacity duration-300 ${
+              showStickyCta ? 'opacity-100' : 'opacity-0 pointer-events-none'
             }`}>
               <div className="flex items-center space-x-3 max-w-7xl mx-auto">
                 <div className="flex items-center border border-neutral-300 h-11 bg-white shrink-0">

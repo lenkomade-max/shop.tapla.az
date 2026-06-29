@@ -148,6 +148,8 @@ CRUD товаров: `src/app/admin/products/*` (Server Actions в `lib/actions.
 
 ## Сборка и деплой
 
+Деплоится на **Vercel** (проект `shop-tapla-az`), автоматически с GitHub.
+
 ```bash
 npm run build     # SSG — генерирует все статические страницы
 npm run dev       # dev-сервер :3000
