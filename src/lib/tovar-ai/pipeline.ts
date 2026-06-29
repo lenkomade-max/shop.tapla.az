@@ -22,6 +22,21 @@ import {
   type EnricherOutput,
 } from './types'
 
+const STYLE_REF_URLS: string[] = [
+  'https://pub-3f6b01f6597249d089c3dbb6fb5a8a8b.r2.dev/tovar-ai/style-refs/Example_of_a_single_product1.webp',
+  'https://pub-3f6b01f6597249d089c3dbb6fb5a8a8b.r2.dev/tovar-ai/style-refs/Example_of_a_single_product2.webp',
+  'https://pub-3f6b01f6597249d089c3dbb6fb5a8a8b.r2.dev/tovar-ai/style-refs/Example_of_a_single_product3.webp',
+  'https://pub-3f6b01f6597249d089c3dbb6fb5a8a8b.r2.dev/tovar-ai/style-refs/Example_of_a_single_product4.webp',
+  'https://pub-3f6b01f6597249d089c3dbb6fb5a8a8b.r2.dev/tovar-ai/style-refs/Example_of_a_single_product5.webp',
+  'https://pub-3f6b01f6597249d089c3dbb6fb5a8a8b.r2.dev/tovar-ai/style-refs/different%20styles1.png',
+  'https://pub-3f6b01f6597249d089c3dbb6fb5a8a8b.r2.dev/tovar-ai/style-refs/different%20styles2.png',
+  'https://pub-3f6b01f6597249d089c3dbb6fb5a8a8b.r2.dev/tovar-ai/style-refs/different%20styles3.png',
+]
+
+function loadStyleRefImages(): string[] {
+  return STYLE_REF_URLS
+}
+
 // ════════════════════════════════════════════════════════════════════════════
 // STAGE 2 MODE: 'v1' = старая система с JSON-библиотеками (по умолчанию)
 //              'v2' = новый LLM-driven Creative Director
@@ -112,8 +127,9 @@ export async function runTovarAIPipeline(
         (async () => {
           // ─── STAGE 2: Prompt Planning ──────────────────────────────
           console.log('[Pipeline] Stage 2 — Prompt Planning')
+          const styleRefs = loadStyleRefImages()
           const p = STAGE2_MODE === 'v2'
-            ? await planCardPromptsV2(productAnalysis, cardCount, input.providerDescription, input.priceAz)
+            ? await planCardPromptsV2(productAnalysis, cardCount, input.providerDescription, input.priceAz, styleRefs)
             : await planCardPrompts(productAnalysis, input.providerDescription, input.characteristics, input.priceAz, input.template)
           console.log(
             `[Pipeline] Stage 2 (${STAGE2_MODE}) ✅ — ${p.cards.length} prompts, roles: ${p.roles.join(', ')}, palette: ${JSON.stringify(p.color_palette)}`,
@@ -192,8 +208,9 @@ export async function runTovarAIPipeline(
       callbacks?.onStageChange?.(status, 'Creating prompts...')
       console.log('[Pipeline] Stage 2 — Prompt Planning')
 
+      const styleRefs = loadStyleRefImages()
       prompts = STAGE2_MODE === 'v2'
-        ? await planCardPromptsV2(productAnalysis, cardCount, input.providerDescription, input.priceAz)
+        ? await planCardPromptsV2(productAnalysis, cardCount, input.providerDescription, input.priceAz, styleRefs)
         : await planCardPrompts(productAnalysis, input.providerDescription, input.characteristics, input.priceAz, input.template)
       console.log(
         `[Pipeline] Stage 2 ✅ — ${prompts.cards.length} prompts, roles: ${prompts.roles.join(', ')}, palette: ${JSON.stringify(prompts.color_palette)}`,

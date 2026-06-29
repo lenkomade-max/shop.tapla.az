@@ -15,6 +15,18 @@ export async function generateSingleCard(
 ): Promise<CardResult> {
   const config = TOVAR_AI_CONFIG
 
+  // Жёсткие правила для Nano Banana — всегда в начале промпта
+  const hardRules = `[HARD RULES - MUST FOLLOW]
+- LANGUAGE: ALL visible text in Azerbaijani Latin ONLY. Never English, Russian, or Cyrillic.
+- NO BUTTONS: Never render any CTA buttons ("SƏBƏTƏ AT", "İNDİ AL", etc.).
+- NO LOGOS: Never render any marketplace logo or brand name.
+- NO INVENTED DATA: Use ONLY data from the prompt below. Never invent prices, percentages, or specs.
+- NO REFERENCE COPYING: Do NOT copy logos, brand names, watermarks, barcodes, or packaging text from the reference photo.
+- SINGLE FRAME: One unified image per card — no split-screen, no collages.
+- PRODUCT INTEGRITY: Never alter product shape, color, or proportions. The product must be recognisable from the reference photo.
+- PRICE: Only if explicitly provided, always with "AZN".
+- WARRANTY/DELIVERY: Only if explicitly mentioned. Never invent.`
+
   // Nano Banana 2 использует Gemini chat completions API
   // с image generation модальностью
   const body = {
@@ -25,7 +37,7 @@ export async function generateSingleCard(
         content: [
           {
             type: 'text' as const,
-            text: card.prompt_en,
+            text: `${hardRules}\n\n${card.prompt_en}`,
           },
           {
             type: 'image_url' as const,

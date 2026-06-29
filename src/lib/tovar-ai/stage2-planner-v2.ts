@@ -85,12 +85,14 @@ Only these should vary:
    - Label/badge style (floating text? glass cards? minimal tags? — your choice, but consistent)
    - Overall mood
 
-4. **Write ${cardCount} detailed prompts.** Each prompt_en is a COMPLETE image generation prompt for Nano Banana. It must:
-   - Describe the full scene in detail — composition, product placement, background, lighting, and ALL visible text/typography/labels as design elements
+4. **Write ${cardCount} detailed prompts.** Each prompt_en is a COMPLETE instruction for Nano Banana to RECREATE the product from scratch as a structured marketplace card. It must:
+   - **Command the image model to rebuild the product from the ground up using the reference only for shape/color/proportions** — the output must be a newly composed commercial card, not a photo edit of the reference
+   - Describe the full scene layout in structured order: background → lighting → product placement → typography/overlays → labels/badges
    - Include ALL shared identity elements explicitly (repeat them — don't assume the model remembers)
    - Describe what's DIFFERENT about this specific card
    - Be written in English (Nano Banana works best with English prompts)
-   - Be detailed enough that the image generator produces consistent results
+   - Be at least 300 words — Nano Banana needs rich, detailed instructions to generate a dense infographic card
+   - **Include 6-10 text labels, badges, callouts, or feature pointers per card** — a card with only 2-3 text elements looks empty. Rich products should have more labels. Distribute them across the composition: headlines, feature callouts with pointer lines, spec badges, benefit tags, price/delivery info where available
    - **CRITICAL: never use words like "minimal", "minimalistic", "clean background", "modern studio", "premium studio" — these tell the image model to strip away typography. Instead describe rich commercial detail: "marketplace infographic card with integrated typography, feature labels, and commercial callouts"**
    - **EVERY prompt_en MUST explicitly include the hard rules: Azerbaijani Latin text only, no CTA buttons, no logos/brand names, no invented data, single frame, product integrity (shape/color/proportions unchanged). Do not assume the image model knows these rules — repeat them in every prompt.**
 
@@ -187,6 +189,7 @@ export async function planCardPromptsV2(
   cardCount: number,
   providerDescription?: string,
   priceAz?: string,
+  styleRefImages?: string[],
 ): Promise<PromptsOutput> {
   const config = TOVAR_AI_CONFIG
   const systemPrompt = buildSystemPrompt(cardCount)
@@ -194,17 +197,40 @@ export async function planCardPromptsV2(
 
   console.log(`[Stage 2 V2] LLM-driven Creative Director — ${cardCount} cards`)
   console.log(`[Stage 2 V2] Product: ${analysis.product_type}, category: ${analysis.category}, premium: ${analysis.premium_level}`)
+  if (styleRefImages?.length) {
+    console.log(`[Stage 2 V2] Style references: ${styleRefImages.length} images`)
+  }
 
-  const body = {
+  // User message: text + optional style reference images
+  const userContent: Array<{ type: 'text'; text: string } | { type: 'image_url'; image_url: { url: string } }> = [
+    { type: 'text', text: userPrompt },
+  ]
+
+  if (styleRefImages?.length) {
+    userContent.push({
+      type: 'text',
+      text: `\n\n## STYLE REFERENCE EXAMPLES\nBelow are example marketplace infographic cards. Study their layout, typography, label styles, badge design, and commercial density. Use these as inspiration for the campaign you design — apply the SAME level of commercial richness, structured composition, and infographic polish. These are NOT your product — the product to advertise is described in PRODUCT ANALYSIS above.\n`,
+    })
+    for (const img of styleRefImages) {
+      const url = img.startsWith('http') ? img : `data:image/png;base64,${img}`
+      userContent.push({
+        type: 'image_url',
+        image_url: { url },
+      })
+    }
+  }
+
+  const body: Record<string, unknown> = {
     model: config.PLANNER_MODEL,
     messages: [
       { role: 'system', content: systemPrompt },
-      { role: 'user', content: userPrompt },
+      { role: 'user', content: userContent },
     ],
-    response_format: { type: 'json_object' },
-    temperature: 0.7,
+    temperature: 0.3,
     max_tokens: 8192,
   }
+  // response_format only if model supports it
+  body.response_format = { type: 'json_object' }
 
   const response = await fetch(`${config.OPENROUTER_BASE_URL}/chat/completions`, {
     method: 'POST',

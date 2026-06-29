@@ -259,7 +259,7 @@ export const TOVAR_AI_CONFIG = {
   /** Менять здесь при смене моделей */
   VISION_MODEL: 'google/gemma-4-31b-it' as const,   // Gemini + Vision + текст
   ENRICHER_MODEL: 'google/gemma-4-31b-it' as const,  // Stage 1.5: Data Enricher (та же Gemma)
-  PLANNER_MODEL: 'google/gemini-3.1-flash-lite' as const,
+  PLANNER_MODEL: 'x-ai/grok-4.20' as const,
   IMAGE_MODEL: 'google/gemini-3.1-flash-image-preview' as const, // Nano Banana 2
   QA_MODEL: 'google/gemma-4-31b-it' as const, // Vision-capable, free
 
