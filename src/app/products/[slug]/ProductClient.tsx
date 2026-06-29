@@ -93,8 +93,16 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
           <ArrowLeft className="h-5 w-5" />
         </button>
 
-        {/* Breadcrumbs */}
-        <div className="flex items-center space-x-2 text-[11px] tracking-widest text-neutral-400 uppercase mb-8">          
+        {/* Breadcrumbs + back button (static, always visible) */}
+        <div className="flex items-center space-x-2 text-[11px] tracking-widest text-neutral-400 uppercase mb-8">
+          <button
+            onClick={handleBack}
+            className="flex items-center space-x-1 hover:text-neutral-900 transition-colors cursor-pointer mr-2"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            <span>GERİ</span>
+          </button>
+          <ChevronRight className="h-3 w-3" />
           <Link href="/" className="hover:text-neutral-900 transition-colors">Ana səhifə</Link>
           <ChevronRight className="h-3 w-3" />
           <Link href="/#products" className="hover:text-neutral-900 transition-colors">Məhsullar</Link>

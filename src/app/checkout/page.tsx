@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { 
   ShoppingBag, 
@@ -38,6 +39,7 @@ interface CheckoutForm {
 }
 
 export default function CheckoutPage() {
+  const router = useRouter();
   const { cartItems, cartTotal, clearCart } = useCart();
   const { user, profile } = useAuth();
   const [mounted, setMounted] = useState(false);
@@ -72,6 +74,15 @@ export default function CheckoutPage() {
     return () => clearTimeout(timer);
   }, []);
 
+  // Prevent Chrome autofill from scrolling to first input
+  useEffect(() => {
+    if (mounted) {
+      requestAnimationFrame(() => {
+        window.scrollTo(0, 0);
+      });
+    }
+  }, [mounted]);
+
   // Авто-заполнение из профиля при загрузке (только если поля ещё пустые)
   useEffect(() => {
     if (mounted && profile) {
@@ -83,8 +94,11 @@ export default function CheckoutPage() {
         phone: prev.phone || profile.phone || '',
         email: prev.email || profile.email || '',
         city: prev.city !== 'Bakı' ? prev.city : (profile.city || prev.city),
-        address: prev.address || profile.address || '',
+        address: profile.address || prev.address || '',
       }));
+      requestAnimationFrame(() => {
+        window.scrollTo(0, 0);
+      });
     }
   }, [mounted, profile]);
 
@@ -365,13 +379,13 @@ export default function CheckoutPage() {
     <div className="pt-32 pb-20 bg-[#FAF9F6] text-neutral-900 min-h-screen font-sans">
       <Container>
         {/* Navigation back */}
-        <Link 
-          href="/" 
-          className="inline-flex items-center space-x-2 text-[10px] tracking-widest text-neutral-400 hover:text-neutral-900 uppercase font-bold mb-8 transition-colors"
+        <button
+          onClick={() => router.back()}
+          className="inline-flex items-center space-x-2 text-[10px] tracking-widest text-neutral-400 hover:text-neutral-900 uppercase font-bold mb-8 transition-colors cursor-pointer"
         >
           <ArrowLeft className="h-4.5 w-4.5" />
           <span>ALIŞ-VERİŞƏ DAVAM ET</span>
-        </Link>
+        </button>
 
         <h1 className="text-xl sm:text-2xl font-bold tracking-widest uppercase text-neutral-900 mb-10 text-center sm:text-left">
           SİFARİŞİN TAMAMLANMASI VƏ TƏSDİQLƏNMƏSİ
