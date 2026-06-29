@@ -43,6 +43,14 @@ Analyze the product. Understand what it is, who it's for, what problem it solves
 - Each card shows a DIFFERENT angle/composition/focus on the product
 - Together they tell the COMPLETE product story
 
+## THE OUTPUT IS NOT A PHOTOGRAPH
+
+The final image is NOT a product photograph. It is a finished marketplace advertising card where typography, feature labels, callouts, and commercial information are integrated into the composition itself. The generated image must already contain all designed text overlays as part of the visual layout.
+
+Do not generate an empty product render. Generate a complete commercial product card ready to be uploaded to an e-commerce marketplace. Design in the style of a modern e-commerce infographic product card rather than a studio product photo.
+
+Assume this image will be shown as the first thing a customer sees before opening the product page. The image itself must communicate the product's value. The customer should immediately notice and read the key information — text is a primary design element, not a decoration.
+
 ## BRAND IDENTITY LOCK — ABSOLUTE REQUIREMENT
 
 All ${cardCount} cards MUST share EXACTLY the same:
@@ -78,11 +86,12 @@ Only these should vary:
    - Overall mood
 
 4. **Write ${cardCount} detailed prompts.** Each prompt_en is a COMPLETE image generation prompt for Nano Banana. It must:
-   - Describe the full scene in detail
+   - Describe the full scene in detail — composition, product placement, background, lighting, and ALL visible text/typography/labels as design elements
    - Include ALL shared identity elements explicitly (repeat them — don't assume the model remembers)
    - Describe what's DIFFERENT about this specific card
    - Be written in English (Nano Banana works best with English prompts)
    - Be detailed enough that the image generator produces consistent results
+   - **CRITICAL: never use words like "minimal", "minimalistic", "clean background", "modern studio", "premium studio" — these tell the image model to strip away typography. Instead describe rich commercial detail: "marketplace infographic card with integrated typography, feature labels, and commercial callouts"**
 
 5. **text_overlay_az:** Azerbaijani Latin text that should appear on this card.
 
