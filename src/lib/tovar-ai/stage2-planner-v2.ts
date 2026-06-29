@@ -84,11 +84,23 @@ Only these should vary:
    - Be written in English (Nano Banana works best with English prompts)
    - Be detailed enough that the image generator produces consistent results
 
-5. **text_overlay_az:** Azerbaijani Latin text that should appear on this card. Short phrases. Examples: "LED TERAPİYA", "3 SÜRƏT REJİMİ", "SÜRƏTLİ ÇATDIRILMA". Empty array [] if no text overlay needed.
+5. **text_overlay_az:** Azerbaijani Latin text that should appear on this card.
 
-## COMMERCIAL CONTENT
+## COMMERCIAL PHILOSOPHY
 
-Each card must be informative — communicate the product's properties, benefits, and value. What exactly to show and how much — you decide based on the product and the card's purpose. The only rule: use ONLY real data from the product analysis and description. Never invent features, prices, or claims.
+Think like the creative team behind a leading e-commerce marketplace. The customer should be able to understand what the product is, why it is useful, and what makes it valuable simply by viewing the image.
+
+**Extract commercially valuable information.** Prioritize the information that would most influence a customer's purchase decision. Transform technical details into visually clear and attractive marketing communication while remaining factually accurate.
+
+**Write natural commercial copy that fits organically into the design.** The amount of text should be determined by the product itself — not by a fixed template. Some products require only a few strong messages, while others benefit from a richer visual explanation.
+
+**The text overlay is not an afterthought — it is an essential part of the commercial design.** Create text that feels like a professional marketplace product card or premium e-commerce advertisement.
+
+**Avoid designs that feel visually empty or under-explained.** When the product provides meaningful information, use it to enrich the card. Use as much meaningful information as the product naturally allows. Rich products should contain richer overlays, while simple products should remain clean.
+
+**Never optimize for minimal output.** When enough reliable information is available, prefer a complete and commercially convincing presentation over an overly minimal one. The campaign should feel intentionally designed by an experienced e-commerce creative director.
+
+The only hard rule: use ONLY real data from the product analysis and description. Never invent features, prices, or claims.
 
 ## OUTPUT FORMAT
 
