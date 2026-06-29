@@ -36,9 +36,13 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
   const { addToCart } = useCart();
   const router = useRouter();
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    const onScroll = () => setScrolled(window.scrollY > 150);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   const handleBack = () => {
@@ -79,16 +83,18 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
   return (
     <div className="pt-28 pb-20 bg-[#FAF9F6] text-neutral-900 font-sans min-h-screen">
       <Container>
-        {/* Breadcrumbs + Back button */}
-        <div className="flex items-center space-x-2 text-[11px] tracking-widest text-neutral-400 uppercase mb-8">
-          <button
-            onClick={handleBack}
-            className="flex items-center space-x-1 hover:text-neutral-900 transition-colors cursor-pointer mr-2"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            <span>GERİ</span>
-          </button>
-          <ChevronRight className="h-3 w-3" />
+        {/* Fixed back button when scrolled */}
+        <button
+          onClick={handleBack}
+          className={`fixed top-28 left-4 z-50 flex items-center justify-center w-10 h-10 rounded-full bg-neutral-900 text-white shadow-lg transition-all duration-300 cursor-pointer ${
+            scrolled ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
+          }`}
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </button>
+
+        {/* Breadcrumbs */}
+        <div className="flex items-center space-x-2 text-[11px] tracking-widest text-neutral-400 uppercase mb-8">          
           <Link href="/" className="hover:text-neutral-900 transition-colors">Ana səhifə</Link>
           <ChevronRight className="h-3 w-3" />
           <Link href="/#products" className="hover:text-neutral-900 transition-colors">Məhsullar</Link>

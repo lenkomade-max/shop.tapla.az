@@ -67,27 +67,31 @@ export function ProductCard({ product, onQuickView }: ProductCardProps) {
           />
         </Link>
 
-        {/* Quick view: always visible on mobile, on hover on desktop */}
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            onQuickView?.(product);
-          }}
-          className="md:hidden absolute bottom-3 left-1/2 -translate-x-1/2 z-10 bg-white/95 text-neutral-900 text-[10px] tracking-widest font-semibold uppercase px-3 py-2 rounded-md hover:bg-neutral-950 hover:text-white transition-colors duration-300 cursor-pointer"
-        >
-          SÜRƏTLİ BAXIŞ
-        </button>
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            onQuickView?.(product);
-          }}
-          className="hidden md:block absolute bottom-3 left-1/2 -translate-x-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/95 text-neutral-900 text-[10px] tracking-widest font-semibold uppercase px-4 py-2.5 rounded-md hover:bg-neutral-950 hover:text-white cursor-pointer"
-        >
-          SÜRƏTLİ BAXIŞ
-        </button>
+        {/* Quick view: always visible on mobile, on hover on desktop (no dimming) */}
+        <div className="md:hidden absolute inset-0 z-10 pointer-events-none flex items-end justify-center pb-4">
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onQuickView?.(product);
+            }}
+            className="bg-white/95 text-neutral-900 text-[10px] tracking-widest font-semibold uppercase px-3 py-2 rounded-md hover:bg-neutral-950 hover:text-white transition-colors duration-300 pointer-events-auto cursor-pointer"
+          >
+            SÜRƏTLİ BAXIŞ
+          </button>
+        </div>
+        <div className="hidden md:flex absolute inset-0 z-10 pointer-events-none opacity-0 transition-opacity duration-300 group-hover:opacity-100 items-end justify-center pb-4">
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onQuickView?.(product);
+            }}
+            className="bg-white/95 text-neutral-900 text-[10px] tracking-widest font-semibold uppercase px-4 py-2.5 hover:bg-neutral-950 hover:text-white transition-colors duration-300 pointer-events-auto cursor-pointer"
+          >
+            SÜRƏTLİ BAXIŞ
+          </button>
+        </div>
       </div>
 
       <div className="flex-1 p-3 sm:p-4 flex flex-col justify-between">
