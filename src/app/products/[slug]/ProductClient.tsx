@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -16,7 +16,8 @@ import {
   Check,
   Info,
   HelpCircle,
-  ArrowRight
+  ArrowRight,
+  ArrowLeft
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Product, Shade } from '@/types';
@@ -24,6 +25,7 @@ import { useCart } from '@/store/CartContext';
 import { Container } from '@/components/ui/Container';
 import { Badge } from '@/components/ui/Badge';
 import { ProductCard } from '@/components/cards/ProductCard';
+import { useRouter } from 'next/navigation';
 
 interface ProductClientProps {
   product: Product;
@@ -32,7 +34,16 @@ interface ProductClientProps {
 
 export function ProductClient({ product, relatedProducts }: ProductClientProps) {
   const { addToCart } = useCart();
+  const router = useRouter();
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  const handleBack = () => {
+    router.back();
+  };
   const [selectedShade, setSelectedShade] = useState<Shade | undefined>(
     product.shades && product.shades.length > 0 ? product.shades[0] : undefined
   );
@@ -68,8 +79,16 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
   return (
     <div className="pt-28 pb-20 bg-[#FAF9F6] text-neutral-900 font-sans min-h-screen">
       <Container>
-        {/* Breadcrumbs */}
+        {/* Breadcrumbs + Back button */}
         <div className="flex items-center space-x-2 text-[11px] tracking-widest text-neutral-400 uppercase mb-8">
+          <button
+            onClick={handleBack}
+            className="flex items-center space-x-1 hover:text-neutral-900 transition-colors cursor-pointer mr-2"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            <span>GERİ</span>
+          </button>
+          <ChevronRight className="h-3 w-3" />
           <Link href="/" className="hover:text-neutral-900 transition-colors">Ana səhifə</Link>
           <ChevronRight className="h-3 w-3" />
           <Link href="/#products" className="hover:text-neutral-900 transition-colors">Məhsullar</Link>

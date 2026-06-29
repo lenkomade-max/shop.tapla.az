@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Section } from '@/components/ui/Section';
 import { Container } from '@/components/ui/Container';
 import { Heading } from '@/components/ui/Heading';
@@ -46,6 +46,14 @@ export function ProductGrid({ products }: ProductGridProps) {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [selectedShade, setSelectedShade] = useState<Shade | undefined>(undefined);
   const [purchaseQuantity, setPurchaseQuantity] = useState(1);
+
+  useEffect(() => {
+    const savedScroll = sessionStorage.getItem('tapla_scroll');
+    if (savedScroll) {
+      sessionStorage.removeItem('tapla_scroll');
+      requestAnimationFrame(() => window.scrollTo(0, Number(savedScroll)));
+    }
+  }, []);
 
   const filteredProducts = selectedCategory === 'all'
     ? products
