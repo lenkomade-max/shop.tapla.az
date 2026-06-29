@@ -388,7 +388,7 @@
   "category_matching": {
     "Elektronika": {
       "lighting": ["rim_light", "dramatic_spotlight", "softbox_diffused"],
-      "background_style": ["dark_studio", "abstract_tech", "metal_surface", "glass_surface", "blurred_usage_context"],
+      "background_style": ["dark_studio", "abstract_tech", "metal_surface", "glass_surface"],
       "mood": ["tech_innovation", "modern_sleek", "minimal_luxury"],
       "materials": ["brushed_chrome", "carbon_fiber", "polished_aluminum", "matte_glass", "liquid_metal"],
       "spatial_depth": ["neon_glow_depth", "floating_geometric", "volumetric_light", "acrylic_light_halos"],
@@ -397,7 +397,7 @@
     },
     "Kosmetika": {
       "lighting": ["soft_studio", "golden_hour", "softbox_diffused"],
-      "background_style": ["premium_gradient", "marble_surface", "editorial_backdrop", "glass_surface", "blurred_lifestyle", "blurred_lifestyle_holding"],
+      "background_style": ["premium_gradient", "marble_surface", "editorial_backdrop", "glass_surface"],
       "mood": ["editorial_vogue", "minimal_luxury", "classic_luxury", "warm_cozy"],
       "materials": ["satin_fabric", "glossy_lacquer", "clear_acrylic", "ceramic", "matte_glass"],
       "spatial_depth": ["liquid_abstract_forms", "soft_mist_layers", "acrylic_light_halos", "multi_layer_glass"],
@@ -406,7 +406,7 @@
     },
     "Məişət texnikası": {
       "lighting": ["soft_studio", "softbox_diffused", "natural_daylight"],
-      "background_style": ["pure_white", "environmental", "wood_surface", "marble_surface", "blurred_usage_context"],
+      "background_style": ["pure_white", "environmental", "wood_surface", "marble_surface"],
       "mood": ["clean_clinical", "warm_cozy", "scandinavian", "modern_sleek"],
       "materials": ["polished_aluminum", "ceramic", "walnut_wood", "natural_stone"],
       "spatial_depth": ["reflection_infinity", "soft_mist_layers", "multi_layer_glass", "acrylic_light_halos"],
@@ -415,7 +415,7 @@
     },
     "Mətbəx": {
       "lighting": ["natural_daylight", "soft_studio", "golden_hour"],
-      "background_style": ["wood_surface", "marble_surface", "environmental", "natural_stone", "blurred_usage_context", "blurred_lifestyle"],
+      "background_style": ["wood_surface", "marble_surface", "environmental", "natural_stone"],
       "mood": ["warm_cozy", "scandinavian", "industrial_premium", "classic_luxury"],
       "materials": ["walnut_wood", "natural_stone", "ceramic", "polished_aluminum"],
       "spatial_depth": ["soft_mist_layers", "particle_atmosphere", "floating_geometric"],
@@ -424,7 +424,7 @@
     },
     "İdman": {
       "lighting": ["high_contrast", "dramatic_spotlight", "rim_light"],
-      "background_style": ["dark_studio", "abstract_tech", "metal_surface", "blurred_usage_context"],
+      "background_style": ["dark_studio", "abstract_tech", "metal_surface"],
       "mood": ["dynamic_action", "industrial_premium", "tech_innovation", "modern_sleek"],
       "materials": ["carbon_fiber", "liquid_metal", "soft_rubber", "brushed_chrome"],
       "spatial_depth": ["volumetric_light", "floating_geometric", "particle_atmosphere", "neon_glow_depth"],
@@ -433,7 +433,7 @@
     },
     "Uşaq malları": {
       "lighting": ["soft_studio", "natural_daylight", "softbox_diffused"],
-      "background_style": ["premium_gradient", "environmental", "editorial_backdrop", "blurred_lifestyle", "blurred_usage_context"],
+      "background_style": ["premium_gradient", "environmental", "editorial_backdrop"],
       "mood": ["warm_cozy", "scandinavian", "modern_sleek"],
       "materials": ["soft_rubber", "satin_fabric", "clear_acrylic", "glossy_lacquer"],
       "spatial_depth": ["floating_geometric", "particle_atmosphere", "acrylic_light_halos", "soft_mist_layers"],
@@ -442,7 +442,7 @@
     },
     "Ofis malları": {
       "lighting": ["softbox_diffused", "soft_studio", "natural_daylight"],
-      "background_style": ["pure_white", "wood_surface", "metal_surface", "glass_surface", "blurred_usage_context"],
+      "background_style": ["pure_white", "wood_surface", "metal_surface", "glass_surface"],
       "mood": ["clean_clinical", "modern_sleek", "scandinavian", "minimal_luxury"],
       "materials": ["polished_aluminum", "matte_glass", "walnut_wood", "clear_acrylic"],
       "spatial_depth": ["multi_layer_glass", "reflection_infinity", "acrylic_light_halos"],
@@ -451,7 +451,7 @@
     },
     "Aksesuarlar": {
       "lighting": ["soft_studio", "golden_hour", "softbox_diffused"],
-      "background_style": ["premium_gradient", "editorial_backdrop", "marble_surface", "glass_surface", "blurred_lifestyle"],
+      "background_style": ["premium_gradient", "editorial_backdrop", "marble_surface", "glass_surface"],
       "mood": ["minimal_luxury", "editorial_vogue", "modern_sleek", "classic_luxury"],
       "materials": ["clear_acrylic", "satin_fabric", "matte_glass", "glossy_lacquer", "brushed_chrome"],
       "spatial_depth": ["acrylic_light_halos", "reflection_infinity", "floating_geometric", "multi_layer_glass"],
@@ -460,7 +460,7 @@
     },
     "Avto": {
       "lighting": ["high_contrast", "dramatic_spotlight", "rim_light"],
-      "background_style": ["dark_studio", "metal_surface", "abstract_tech", "blurred_usage_context"],
+      "background_style": ["dark_studio", "metal_surface", "abstract_tech"],
       "mood": ["dynamic_action", "industrial_premium", "tech_innovation", "modern_sleek"],
       "materials": ["carbon_fiber", "brushed_chrome", "liquid_metal", "polished_aluminum"],
       "spatial_depth": ["volumetric_light", "neon_glow_depth", "particle_atmosphere", "floating_geometric"],

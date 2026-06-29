@@ -5,6 +5,7 @@
 import { analyzeProductImage } from './stage1-vision'
 import { enrichProductData } from './stage1.5-enricher'
 import { planCardPrompts } from './stage2-planner'
+import { planCardPromptsV2 } from './stage2-planner-v2'
 import { generateAllCards } from './stage3-generate'
 import { checkCardQuality } from './stage4-qa'
 import { visionToProductData } from './vision-to-product'
@@ -20,6 +21,12 @@ import {
   type QAResult,
   type EnricherOutput,
 } from './types'
+
+// ════════════════════════════════════════════════════════════════════════════
+// STAGE 2 MODE: 'v1' = старая система с JSON-библиотеками (по умолчанию)
+//              'v2' = новый LLM-driven Creative Director
+// ════════════════════════════════════════════════════════════════════════════
+const STAGE2_MODE: 'v1' | 'v2' = 'v1'
 
 interface PipelineCallbacks {
   onStageChange?: (stage: GenerationStatus, message: string) => void
@@ -105,15 +112,11 @@ export async function runTovarAIPipeline(
         (async () => {
           // ─── STAGE 2: Prompt Planning ──────────────────────────────
           console.log('[Pipeline] Stage 2 — Prompt Planning')
-          const p = await planCardPrompts(
-            productAnalysis,
-            input.providerDescription,
-            input.characteristics,
-            input.priceAz,
-            input.template,
-          )
+          const p = STAGE2_MODE === 'v2'
+            ? await planCardPromptsV2(productAnalysis, cardCount, input.providerDescription, input.priceAz)
+            : await planCardPrompts(productAnalysis, input.providerDescription, input.characteristics, input.priceAz, input.template)
           console.log(
-            `[Pipeline] Stage 2 ✅ — ${p.cards.length} prompts, roles: ${p.roles.join(', ')}, palette: ${JSON.stringify(p.color_palette)}`,
+            `[Pipeline] Stage 2 (${STAGE2_MODE}) ✅ — ${p.cards.length} prompts, roles: ${p.roles.join(', ')}, palette: ${JSON.stringify(p.color_palette)}`,
           )
 
           // ─── STAGE 3: Parallel Image Generation ────────────────────
@@ -189,13 +192,9 @@ export async function runTovarAIPipeline(
       callbacks?.onStageChange?.(status, 'Creating prompts...')
       console.log('[Pipeline] Stage 2 — Prompt Planning')
 
-      prompts = await planCardPrompts(
-        productAnalysis,
-        input.providerDescription,
-        input.characteristics,
-        input.priceAz,
-        input.template,
-      )
+      prompts = STAGE2_MODE === 'v2'
+        ? await planCardPromptsV2(productAnalysis, cardCount, input.providerDescription, input.priceAz)
+        : await planCardPrompts(productAnalysis, input.providerDescription, input.characteristics, input.priceAz, input.template)
       console.log(
         `[Pipeline] Stage 2 ✅ — ${prompts.cards.length} prompts, roles: ${prompts.roles.join(', ')}, palette: ${JSON.stringify(prompts.color_palette)}`,
       )

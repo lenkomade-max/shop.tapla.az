@@ -184,10 +184,10 @@ const ROLE_MARKETING_STYLES: Record<CardRole, string[]> = {
 const ROLE_VISUAL_THEMES: Record<CardRole, Pick<VisualTheme, 'lighting' | 'background_style' | 'mood'>> = {
   hero:         { lighting: 'soft_studio', background_style: 'premium_gradient', mood: 'minimal_luxury' },
   problem:      { lighting: 'dark_moody', background_style: 'environmental', mood: 'industrial_premium' },
-  solution:     { lighting: 'golden_hour', background_style: 'blurred_lifestyle', mood: 'warm_cozy' },
+  solution:     { lighting: 'golden_hour', background_style: 'environmental', mood: 'warm_cozy' },
   benefits:     { lighting: 'softbox_diffused', background_style: 'dark_studio', mood: 'tech_innovation' },
-  usage:        { lighting: 'natural_daylight', background_style: 'blurred_usage_context', mood: 'warm_cozy' },
-  lifestyle:    { lighting: 'golden_hour', background_style: 'blurred_lifestyle', mood: 'editorial_vogue' },
+  usage:        { lighting: 'natural_daylight', background_style: 'environmental', mood: 'warm_cozy' },
+  lifestyle:    { lighting: 'golden_hour', background_style: 'environmental', mood: 'editorial_vogue' },
   offer:        { lighting: 'high_contrast', background_style: 'premium_gradient', mood: 'dynamic_action' },
   bundle:       { lighting: 'soft_studio', background_style: 'pure_white', mood: 'clean_clinical' },
   delivery:     { lighting: 'soft_studio', background_style: 'pure_white', mood: 'clean_clinical' },
@@ -478,7 +478,7 @@ Product images on TAPLA.AZ must:
 - Ultra-thin pointer lines (1px) with dot endpoints connecting product to badges
 - Asymmetric, dynamic compositions
 - Zero dead zones — every area contains product or informative badges
-- LAYER DISCIPLINE: when using blurred real backgrounds, strict 3-layer order — blurred bg → sharp product → sharp badges
+- LAYER DISCIPLINE: when using blurred real backgrounds, strict 3-layer order — blurred bg → sharp product → sharp floating labels with pointer lines
 
 ## CAMPAIGN BRIEF — DO THIS FIRST
 Before designing individual cards, establish the CAMPAIGN-LEVEL shared identity:
@@ -1099,7 +1099,7 @@ export async function planCardPrompts(
     const isBlurredBg = sharedVt.background_style.startsWith('blurred_')
 
     const blurredBgInstruction = isBlurredBg
-      ? `BLURRED BACKGROUND TECHNIQUE: The background is a REAL interior/environment scene with a person, HEAVILY BLURRED (bokeh f/1.4). STRICT 3-LAYER COMPOSITION: Layer 1 (back) = blurred real scene with person, atmospheric and emotional. Layer 2 (mid) = SHARP product on clean surface, 65-70% of frame — the ONLY sharp photographic element. Layer 3 (front) = SHARP glassmorphism badges and pointer lines floating above. The product must be SHARP. The background must be BLURRED. No exceptions. The person in the background must never distract from the product.`
+      ? `BLURRED BACKGROUND TECHNIQUE: The background is a REAL interior/environment scene with a person, HEAVILY BLURRED (bokeh f/1.4). STRICT 3-LAYER COMPOSITION: Layer 1 (back) = blurred real scene with person, atmospheric and emotional. Layer 2 (mid) = SHARP product on clean surface, 65-70% of frame — the ONLY sharp photographic element. Layer 3 (front) = SHARP floating labels (icon + text directly on background, NO boxes/panels/containers) with thin pointer lines. The product must be SHARP. The background must be BLURRED. No exceptions. The person in the background must never distract from the product. ALL label rendering rules from the main prompt apply — text directly on background, no glassmorphism containers.`
       : ''
 
     const designDecisions = [
