@@ -31,6 +31,7 @@ interface CheckoutForm {
   city: string;
   address: string;
   paymentMethod: 'cash_delivery' | 'card_delivery' | 'online_card';
+  depositMethod: 'pasha_bank' | 'whatsapp';
   cardNumber: string;
   cardExpiry: string;
   cardCvv: string;
@@ -46,6 +47,7 @@ export default function CheckoutPage() {
   const [orderConfirmed, setOrderConfirmed] = useState(false);
   const [generatedOrderNumber, setGeneratedOrderNumber] = useState('');
   const [orderError, setOrderError] = useState('');
+  const [orderItems, setOrderItems] = useState<Array<{ name: string; price: number; quantity: number; shade?: string }>>([]);
 
   // Local form state
   const [form, setForm] = useState<CheckoutForm>({
@@ -55,6 +57,7 @@ export default function CheckoutPage() {
     city: 'Bakı',
     address: '',
     paymentMethod: 'online_card',
+    depositMethod: 'whatsapp',
     cardNumber: '',
     cardExpiry: '',
     cardCvv: '',
@@ -150,6 +153,7 @@ export default function CheckoutPage() {
       city: form.city,
       address: form.address,
       paymentMethod: form.paymentMethod,
+      depositMethod: form.paymentMethod === 'cash_delivery' ? form.depositMethod : undefined,
       items: cartItems.map(item => ({
         productId: item.product.id,
         name: item.product.name,
@@ -166,8 +170,27 @@ export default function CheckoutPage() {
       return;
     }
 
-    // If online_card, show secure transition animation then redirect
+    // Сохраняем данные заказа для WhatsApp на экране успеха
+    const orderItemData = cartItems.map(item => ({
+      name: item.product.name,
+      price: item.product.price,
+      quantity: item.quantity,
+      shade: item.selectedShade?.name,
+    }));
+    setOrderItems(orderItemData);
+
+    // For online_card or cash_delivery+pasha_bank: redirect to Pasha Bank
     if (result.redirectUrl) {
+      localStorage.setItem('tapla_last_order', JSON.stringify({
+        orderNumber: result.orderNumber,
+        items: orderItemData,
+        fullName: form.fullName,
+        phone: form.phone,
+        city: form.city,
+        address: form.address,
+        total: cartTotal,
+        depositMethod: form.paymentMethod === 'cash_delivery' ? form.depositMethod : undefined,
+      }));
       setRedirectUrl(result.redirectUrl);
       setIsRedirecting(true);
       window.scrollTo({ top: document.querySelector('form')?.offsetTop || 300, behavior: 'smooth' });
@@ -232,8 +255,9 @@ export default function CheckoutPage() {
 
               <div className="flex justify-between border-b border-neutral-200/60 pb-3">
                 <span className="text-neutral-400 uppercase tracking-wider font-semibold">Ödəniş üsulu:</span>
-                <span className="font-bold text-neutral-900 uppercase">
-                  {form.paymentMethod === 'cash_delivery' && 'Nağd ödəniş (Qapıda)'}
+                <span className="font-bold text-neutral-900 uppercase text-[9px] text-right">
+                  {form.paymentMethod === 'cash_delivery' && form.depositMethod === 'pasha_bank' && 'Nağd (Qapıda) — Beh: PASHA Bank'}
+                  {form.paymentMethod === 'cash_delivery' && form.depositMethod === 'whatsapp' && 'Nağd (Qapıda) — Beh: WhatsApp'}
                   {form.paymentMethod === 'card_delivery' && 'Kartla ödəniş (Qapıda)'}
                   {form.paymentMethod === 'online_card' && 'Onlayn ödəniş (Uğurlu)'}
                 </span>
@@ -256,6 +280,51 @@ export default function CheckoutPage() {
                 <span className="font-mono">{cartTotal.toFixed(2)} ₼</span>
               </div>
             </div>
+
+            {/* WhatsApp deposit info for cash_delivery */}
+            {form.depositMethod === 'whatsapp' && (
+              <div className="border border-amber-200/40 bg-amber-50/30 p-6 space-y-4 rounded-xl text-left">
+                <p className="text-[10px] font-bold tracking-widest uppercase text-amber-800">
+                  ⚠️ 5 AZN BEH (REZERVASİYA) HAQQINDA
+                </p>
+                <p className="text-xs text-neutral-600 leading-relaxed font-sans">
+                  Sifarişinizin rezerv edilməsi üçün <strong>5 AZN beh</strong> tələb olunur. Menecerimiz WhatsApp vasitəsilə sizinlə əlaqə saxlayacaq və ödəniş üçün kart nömrəsi təqdim edəcək. Bu məbləğ ümumi sifariş məbləğindən çıxılacaq.
+                </p>
+                <p className="text-[10px] text-neutral-500 font-sans">
+                  Behi ödədikdən sonra sifariş təsdiqlənəcək və kuryer çatdırılma üçün yola düşəcək.
+                </p>
+                <a
+                  href={buildWhatsAppUrl({
+                    orderNumber: generatedOrderNumber,
+                    items: orderItems,
+                    fullName: form.fullName,
+                    phone: form.phone,
+                    city: form.city,
+                    address: form.address,
+                    total: cartTotal,
+                    depositMethod: 'whatsapp',
+                  })}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center space-x-2 bg-[#25D366] text-white w-full px-5 py-3.5 text-[9px] font-bold uppercase tracking-widest hover:bg-[#20ba56] transition-colors rounded-xl"
+                >
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.513 2.262 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.713-1.455L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.42 9.864-9.864.002-2.637-1.023-5.115-2.887-6.979C16.58 1.898 14.1 1.842 11.983 1.842c-5.441 0-9.866 4.423-9.87 9.867 0 1.724.462 3.411 1.338 4.907L2.453 20.35l3.993-1.047c-.001-.001-.001-.001 0 0z"/></svg>
+                  <span>MENECERLƏ WHATSAPP-DA ƏLAQƏ</span>
+                </a>
+              </div>
+            )}
+
+            {/* Deposit paid via Pasha Bank — show WhatsApp too */}
+            {form.paymentMethod === 'cash_delivery' && form.depositMethod === 'pasha_bank' && (
+              <div className="border border-emerald-200/40 bg-emerald-50/30 p-6 space-y-4 rounded-xl text-left">
+                <p className="text-[10px] font-bold tracking-widest uppercase text-emerald-800">
+                  ✅ 5 AZN BEH ÖDƏNİLDİ!
+                </p>
+                <p className="text-xs text-neutral-600 leading-relaxed font-sans">
+                  Beh uğurla ödənildi. Qalan məbləği kuryerə çatdırılma zamanı nağd şəkildə ödəyəcəksiniz.
+                </p>
+              </div>
+            )}
 
             <div className="space-y-4">
               <p className="text-[11px] text-neutral-400 leading-relaxed font-sans max-w-sm mx-auto">
@@ -495,9 +564,11 @@ export default function CheckoutPage() {
                       )}
                     </label>
 
-                    {/* COD Cash */}
-                    <label className={`border p-5 flex flex-col justify-between space-y-3 cursor-pointer transition-all duration-300 relative rounded-xl ${
-                      form.paymentMethod === 'cash_delivery' ? 'border-neutral-950 bg-neutral-50/50 shadow-xs' : 'border-neutral-200 hover:border-neutral-400'
+                    {/* COD Cash — QAPIDA NAĞD */}
+                    <label className={`border p-5 flex flex-col space-y-3 cursor-pointer transition-all duration-300 relative rounded-xl ${
+                      form.paymentMethod === 'cash_delivery'
+                        ? 'border-neutral-950 bg-neutral-50/50 shadow-xs sm:col-span-2'
+                        : 'border-neutral-200 hover:border-neutral-400'
                     }`}>
                       <input
                         type="radio"
@@ -528,41 +599,83 @@ export default function CheckoutPage() {
                         </div>
                         <span className="text-[8px] text-neutral-400 font-sans tracking-wide">Rezervasiya tələb olunur</span>
                       </div>
+
+                      {/* Sub-options when cash_delivery selected */}
+                      {form.paymentMethod === 'cash_delivery' && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          className="pt-3 border-t border-neutral-200/60 space-y-2"
+                        >
+                          <p className="text-[9px] font-bold uppercase tracking-wider text-neutral-500 mb-2">BEH ÖDƏNİŞ ÜSULUNU SEÇİN:</p>
+
+                          {/* Pasha Bank deposit option */}
+                          <label onClick={e => e.stopPropagation()} className={`flex items-center gap-3 p-3 border cursor-pointer transition-all rounded-xl ${
+                            form.depositMethod === 'pasha_bank'
+                              ? 'border-emerald-400 bg-emerald-50/30'
+                              : 'border-neutral-200 hover:border-neutral-400'
+                          }`}>
+                            <input
+                              type="radio"
+                              name="depositMethod"
+                              value="pasha_bank"
+                              checked={form.depositMethod === 'pasha_bank'}
+                              onChange={handleInputChange}
+                              className="sr-only"
+                            />
+                            <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                              form.depositMethod === 'pasha_bank' ? 'border-emerald-600' : 'border-neutral-300'
+                            }`}>
+                              {form.depositMethod === 'pasha_bank' && <div className="w-2 h-2 rounded-full bg-emerald-600" />}
+                            </div>
+                            <div className="flex-1">
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-900 block">PASHA Bank — 5 AZN</span>
+                              <span className="text-[9px] text-neutral-500 font-sans">Behi onlayn kartla ödəyin, qalanı qapıda nağd</span>
+                            </div>
+                            <Image src="/images/pashabank-logo.svg" alt="PASHA Bank" width={55} height={14} className="h-3 w-auto opacity-60" />
+                          </label>
+
+                          {/* WhatsApp deposit option */}
+                          <label onClick={e => e.stopPropagation()} className={`flex items-center gap-3 p-3 border cursor-pointer transition-all rounded-xl ${
+                            form.depositMethod === 'whatsapp'
+                              ? 'border-emerald-400 bg-emerald-50/30'
+                              : 'border-neutral-200 hover:border-neutral-400'
+                          }`}>
+                            <input
+                              type="radio"
+                              name="depositMethod"
+                              value="whatsapp"
+                              checked={form.depositMethod === 'whatsapp'}
+                              onChange={handleInputChange}
+                              className="sr-only"
+                            />
+                            <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                              form.depositMethod === 'whatsapp' ? 'border-emerald-600' : 'border-neutral-300'
+                            }`}>
+                              {form.depositMethod === 'whatsapp' && <div className="w-2 h-2 rounded-full bg-emerald-600" />}
+                            </div>
+                            <div className="flex-1">
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-900 block">WhatsApp — Menecer kart-karta</span>
+                              <span className="text-[9px] text-neutral-500 font-sans">Sifariş yaradılsın, menecer WhatsApp-da əlaqə saxlasın</span>
+                            </div>
+                            <svg className="w-5 h-5 text-[#25D366]" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.513 2.262 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.713-1.455L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.42 9.864-9.864.002-2.637-1.023-5.115-2.887-6.979C16.58 1.898 14.1 1.842 11.983 1.842c-5.441 0-9.866 4.423-9.87 9.867 0 1.724.462 3.411 1.338 4.907L2.453 20.35l3.993-1.047c-.001-.001-.001-.001 0 0z"/></svg>
+                          </label>
+
+                          {/* Info block based on selection */}
+                          {form.depositMethod === 'pasha_bank' && (
+                            <div className="bg-white border border-emerald-100/70 p-3 text-[10px] text-neutral-600 leading-relaxed font-sans rounded-xl">
+                              <strong className="text-emerald-700">5 AZN</strong> beh PASHA Bank ilə onlayn ödəniləcək. Qalan məbləği ({cartTotal >= 5 ? (cartTotal - 5).toFixed(2) : '0.00'} ₼) kuryerə çatdırılma zamanı nağd ödəyəcəksiniz.
+                            </div>
+                          )}
+                          {form.depositMethod === 'whatsapp' && (
+                            <div className="bg-white border border-amber-100/70 p-3 text-[10px] text-neutral-600 leading-relaxed font-sans rounded-xl">
+                              Sifariş yaradıldıqdan sonra menecerimiz <strong>WhatsApp</strong> vasitəsilə sizinlə əlaqə saxlayacaq və 5 AZN beh üçün kart nömrəsi təqdim edəcək.
+                            </div>
+                          )}
+                        </motion.div>
+                      )}
                     </label>
                   </div>
-
-                  {/* Cash Delivery Beh Info Block */}
-                  {form.paymentMethod === 'cash_delivery' && (
-                    <div className="bg-amber-50/30 border border-amber-200/40 p-5 space-y-3.5 transition-all duration-300 animate-fadeIn rounded-xl">
-                      <p className="text-[10px] font-bold tracking-widest uppercase text-amber-800 flex items-center space-x-1.5">
-                        <span className="bg-amber-100 px-1.5 py-0.5 rounded-sm">⚠️</span>
-                        <span>SİFARİŞİN REZERVASİYASI (5 AZN BEH) SİSTEMİ</span>
-                      </p>
-                      <p className="text-xs text-neutral-600 leading-relaxed font-sans">
-                        Qapıda nağd ödəniş seçimində kuryerin ünvanınıza rezerv edilməsi üçün <strong>5 AZN beh</strong> (öncədən ödəniş) ödənilməlidir. Bu ödəniş ümumi məbləğdən çıxılacaqdır və qalan məbləği qapıda ödəyəcəksiniz.
-                      </p>
-                      <div className="bg-white p-3.5 border border-amber-100/70 space-y-2 text-[11px] text-neutral-700">
-                        <p className="font-semibold text-neutral-800">Rezervasiya ödənişini necə edə bilərsiniz?</p>
-                        <ul className="list-disc list-inside space-y-1.5 font-sans text-xs text-neutral-600">
-                          <li>Sifarişi tamamladıqdan sonra menecerimiz <strong>WhatsApp</strong> vasitəsilə əlaqə saxlayaraq sizə beh üçün kart nömrəsi təqdim edəcək.</li>
-                          <li>Və ya dərhal <strong>&quot;KARTLA ONLAYN&quot;</strong> seçimini edərək ümumi məbləği tam təhlükəsiz şəkildə onlayn ödəyə bilərsiniz.</li>
-                        </ul>
-                      </div>
-                      <div className="pt-1 flex flex-col sm:flex-row gap-3">
-                        <a
-                          href="https://wa.me/994503003030?text=Salam,%20TAPLA-dan%20na%C4%9Fd%20sifari%C5%9Fi%20%C3%BC%C3%A7%C3%BCn%205%20AZN%20beh%20%C3%B6d%C9%99m%C9%99k%20ist%C9%99yir%C9%99m"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center justify-center space-x-2 bg-[#25D366] text-white px-5 py-3 text-[9px] font-bold uppercase tracking-widest hover:bg-[#20ba56] transition-colors"
-                        >
-                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.513 2.262 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.713-1.455L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.42 9.864-9.864.002-2.637-1.023-5.115-2.887-6.979C16.58 1.898 14.1 1.842 11.983 1.842c-5.441 0-9.866 4.423-9.87 9.867 0 1.724.462 3.411 1.338 4.907L2.453 20.35l3.993-1.047c-.001-.001-.001-.001 0 0z" />
-                          </svg>
-                          <span>WHATSAPP MENECERLƏ ƏLAQƏ</span>
-                        </a>
-                      </div>
-                    </div>
-                  )}
 
                 </div>
 
@@ -673,4 +786,39 @@ export default function CheckoutPage() {
       </Container>
     </div>
   );
+}
+
+// ——— Helpers ———
+
+function buildWhatsAppUrl(opts: {
+  orderNumber: string;
+  items: Array<{ name: string; price: number; quantity: number; shade?: string }>;
+  fullName: string;
+  phone: string;
+  city: string;
+  address: string;
+  total: number;
+  depositMethod?: string;
+}) {
+  const lines = [
+    `Salam! Mən TAPLA-dan sifariş etdim.`,
+    `Sifariş nömrəm: ${opts.orderNumber}`,
+    ``,
+    `Məhsullar:`,
+    ...opts.items.map(i => {
+      const shade = i.shade ? ` (${i.shade})` : '';
+      return `  • ${i.name}${shade} x${i.quantity} = ${(i.price * i.quantity).toFixed(2)} AZN`;
+    }),
+    `Cəmi: ${opts.total.toFixed(2)} AZN`,
+    ``,
+    `Ad: ${opts.fullName}`,
+    `Tel: ${opts.phone}`,
+    `Ünvan: ${opts.city}, ${opts.address}`,
+  ];
+  if (opts.depositMethod === 'whatsapp') {
+    lines.push(``, `Beh ödənişi: WhatsApp (menecer)`);
+  } else if (opts.depositMethod === 'pasha_bank') {
+    lines.push(``, `Beh ödənişi: PASHA Bank (5 AZN)`);
+  }
+  return `https://wa.me/994503003030?text=${encodeURIComponent(lines.join('\n'))}`;
 }

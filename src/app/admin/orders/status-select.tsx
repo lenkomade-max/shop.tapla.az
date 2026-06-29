@@ -1,6 +1,6 @@
 'use client';
 
-import { updateOrderStatus, updatePaymentStatus } from '@/lib/actions';
+import { updateOrderStatus, updatePaymentStatus, updateDepositStatus } from '@/lib/actions';
 
 const STATUSES = ['new', 'paid', 'confirmed', 'shipped', 'delivered', 'cancelled'] as const;
 
@@ -51,6 +51,40 @@ export function OrderStatusSelect({ id, currentStatus }: { id: string; currentSt
         {STATUSES.map(s => (
           <option key={s} value={s}>
             {STATUS_LABELS[s]}
+          </option>
+        ))}
+      </select>
+    </form>
+  );
+}
+
+const DEPOSIT_STATUSES = ['pending', 'paid', 'refunded'] as const;
+
+const DEPOSIT_LABELS: Record<string, string> = {
+  pending: '⏳ Beh gözlənir',
+  paid: '✓ Beh ödənildi',
+  refunded: '↩ Beh qaytarıldı',
+};
+
+const DEPOSIT_CLASSES: Record<string, string> = {
+  pending: 'bg-yellow-100 text-yellow-700',
+  paid: 'bg-emerald-100 text-emerald-700',
+  refunded: 'bg-zinc-100 text-zinc-500',
+};
+
+export function DepositStatusSelect({ id, currentStatus }: { id: string; currentStatus: string | null }) {
+  return (
+    <form action={updateDepositStatus}>
+      <input type="hidden" name="id" value={id} />
+      <select
+        name="deposit_status"
+        defaultValue={currentStatus || 'pending'}
+        onChange={e => { e.target.form?.requestSubmit(); }}
+        className={`cursor-pointer rounded-full px-2 py-0.5 text-xs font-medium outline-none ${DEPOSIT_CLASSES[currentStatus || 'pending'] || ''}`}
+      >
+        {DEPOSIT_STATUSES.map(s => (
+          <option key={s} value={s}>
+            {DEPOSIT_LABELS[s]}
           </option>
         ))}
       </select>

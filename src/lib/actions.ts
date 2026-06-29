@@ -65,6 +65,28 @@ export async function updatePaymentStatus(formData: FormData) {
   revalidatePath('/admin/orders');
 }
 
+export async function updateDepositStatus(formData: FormData) {
+  if (!(await checkAuth())) return;
+  const id = formData.get('id') as string;
+  const deposit_status = formData.get('deposit_status') as string;
+  if (!id || !deposit_status) return;
+
+  const { data: old } = await supabaseAdmin.from('orders').select('deposit_status').eq('id', id).single();
+  const oldDepositStatus = (old as Record<string, unknown> | null)?.deposit_status as string | undefined;
+
+  await supabaseAdmin.from('orders').update({ deposit_status, updated_at: new Date().toISOString() }).eq('id', id);
+
+  await supabaseAdmin.from('order_activity_log').insert({
+    order_id: id,
+    field: 'deposit_status',
+    old_value: oldDepositStatus || null,
+    new_value: deposit_status,
+    changed_by: 'admin',
+  });
+
+  revalidatePath('/admin/orders');
+}
+
 export async function deleteProduct(formData: FormData) {
   if (!(await checkAuth())) return;
   const id = formData.get('id') as string;
@@ -338,6 +360,7 @@ export interface CheckoutFormData {
   city: string
   address: string
   paymentMethod: string
+  depositMethod?: 'pasha_bank' | 'whatsapp'
   items: Array<{ productId: string; name: string; price: number; quantity: number; shade?: string }>
   total: number
 }
@@ -365,6 +388,8 @@ export async function submitOrder(formData: CheckoutFormData) {
     profileId = newProfile.id
   }
 
+  const depositMethod = formData.paymentMethod === 'cash_delivery' ? (formData.depositMethod || 'whatsapp') : null
+
   const { data: order, error } = await supabaseAdmin.from('orders').insert({
     profile_id: profileId,
     product_id: formData.items[0]?.productId || null,
@@ -374,6 +399,9 @@ export async function submitOrder(formData: CheckoutFormData) {
     city: formData.city,
     address: formData.address,
     payment_method: formData.paymentMethod,
+    deposit_method: depositMethod,
+    deposit_status: depositMethod ? 'pending' : null,
+    items: formData.items,
     total: formData.total,
     status: 'new',
     payment_status: 'pending',
@@ -398,7 +426,7 @@ export async function submitOrder(formData: CheckoutFormData) {
   revalidatePath('/admin/orders')
   const o = order as Record<string, unknown>
 
-  // For online_card payment, create transaction via tapla.az gateway
+  // Online_card: full payment via Pasha Bank (unchanged)
   if (formData.paymentMethod === 'online_card') {
     const gatewayUrl = process.env.GATEWAY_BASE_URL || 'https://tapla.az'
     const apiKey = process.env.GATEWAY_API_KEY || ''
@@ -441,10 +469,53 @@ export async function submitOrder(formData: CheckoutFormData) {
     }
   }
 
+  // Cash_delivery + Pasha Bank deposit (5 AZN)
+  if (formData.paymentMethod === 'cash_delivery' && depositMethod === 'pasha_bank') {
+    const gatewayUrl = process.env.GATEWAY_BASE_URL || 'https://tapla.az'
+    const apiKey = process.env.GATEWAY_API_KEY || ''
+
+    try {
+      const gwResponse = await fetch(`${gatewayUrl}/api/payments/pasha/create`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+        },
+        body: JSON.stringify({
+          orderId: o.id,
+          profileId,
+          amount: 5,
+          items: [{ name: `${formData.fullName} — Depozit (beh)`, price: 5, quantity: 1 }],
+        }),
+      })
+
+      if (!gwResponse.ok) {
+        return { success: false, error: 'Depozit ödənişi yaradılması xətası' }
+      }
+
+      const gwData = await gwResponse.json()
+      return {
+        success: true as const,
+        orderId: o.id as string,
+        orderNumber: `TPL-${String(o.id).slice(0, 6).toUpperCase()}`,
+        depositMethod: 'pasha_bank' as const,
+        items: formData.items,
+        isGuest: !session?.user,
+        redirectUrl: (gwData as any).redirectUrl as string,
+      }
+    } catch (err) {
+      console.error('Gateway error:', err)
+      return { success: false, error: `Depozit ödənişi xətası: ${err instanceof Error ? err.message : 'Naməlum xəta'}` }
+    }
+  }
+
+  // Cash_delivery + WhatsApp: order saved, no payment redirect
   return {
     success: true as const,
     orderId: o.id as string,
     orderNumber: `TPL-${String(o.id).slice(0, 6).toUpperCase()}`,
+    depositMethod: 'whatsapp' as const,
+    items: formData.items,
     isGuest: !session?.user,
   }
 }

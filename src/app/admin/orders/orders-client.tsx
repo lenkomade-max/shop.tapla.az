@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { OrderStatusSelect, PaymentStatusSelect } from './status-select';
+import { OrderStatusSelect, PaymentStatusSelect, DepositStatusSelect } from './status-select';
 import {
   ShoppingBag,
   Clock,
@@ -31,7 +31,10 @@ interface Order {
   city: string | null;
   address: string | null;
   payment_method: string | null;
+  deposit_method: string | null;
+  deposit_status: string | null;
   product_id: string | null;
+  items: Array<{ name: string; price: number; quantity: number; shade?: string }>;
   quantity: number;
   total: number;
   status: string;
@@ -55,6 +58,17 @@ const PAYMENT_METHOD_LABELS: Record<string, string> = {
   cash_delivery: 'Наличные',
   card_delivery: 'Карта курьеру',
   online_card: 'Pasha Bank',
+};
+
+const DEPOSIT_METHOD_LABELS: Record<string, string> = {
+  pasha_bank: 'Pasha Bank (5 AZN)',
+  whatsapp: 'WhatsApp (менеджер)',
+};
+
+const DEPOSIT_STATUS_LABELS: Record<string, string> = {
+  pending: 'Ожидает',
+  paid: 'Оплачен',
+  refunded: 'Возврат',
 };
 
 const PAYMENT_STATUS_ICON: Record<string, { icon: React.ReactNode; cls: string }> = {
@@ -336,12 +350,50 @@ export default function OrdersClient({ orders, productMap, productImages, activi
                       <span className="text-zinc-500">Оплата:</span>
                       <span className="font-medium">{o.payment_method ? (PAYMENT_METHOD_LABELS[o.payment_method] || o.payment_method) : '—'}</span>
                     </div>
+                    {o.deposit_method && (
+                      <div className="flex items-center gap-2 text-xs">
+                        <CreditCard className="h-3.5 w-3.5 text-zinc-400 flex-shrink-0" />
+                        <span className="text-zinc-500">Депозит (5 AZN):</span>
+                        <span className="font-medium">{DEPOSIT_METHOD_LABELS[o.deposit_method] || o.deposit_method}</span>
+                      </div>
+                    )}
                     <div className="flex items-center gap-2 text-xs">
                       <Hash className="h-3.5 w-3.5 text-zinc-400 flex-shrink-0" />
                       <span className="text-zinc-500">Заказ:</span>
                       <span className="font-mono text-[10px]">TPL-{o.id.slice(0, 6).toUpperCase()}</span>
                     </div>
                   </div>
+
+                  {/* Items list */}
+                  {o.items && o.items.length > 0 && (
+                    <div className="border-t border-zinc-100 pt-3">
+                      <div className="flex items-center gap-1.5 mb-2">
+                        <ShoppingBag className="h-3.5 w-3.5 text-zinc-400" />
+                        <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">Товары в заказе</span>
+                      </div>
+                      <div className="space-y-1.5">
+                        {o.items.map((item, idx) => (
+                          <div key={idx} className="flex items-center justify-between text-xs bg-white p-2 rounded-lg border border-zinc-100">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <span className="font-medium text-zinc-800 truncate">{item.name}</span>
+                              {item.shade && <span className="text-[9px] text-zinc-400 bg-zinc-50 px-1.5 py-0.5 rounded-full">{item.shade}</span>}
+                            </div>
+                            <span className="text-zinc-500 font-mono text-[10px] flex-shrink-0 ml-2">{item.quantity} × {Number(item.price).toFixed(2)} ₼</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Deposit status select */}
+                  {o.deposit_method && (
+                    <div className="border-t border-zinc-100 pt-3 flex items-center justify-between">
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">Статус депозита (5 AZN):</span>
+                      <div onClick={e => e.stopPropagation()}>
+                        <DepositStatusSelect id={o.id} currentStatus={o.deposit_status} />
+                      </div>
+                    </div>
+                  )}
 
                   {/* Activity log */}
                   {logs.length > 0 && (

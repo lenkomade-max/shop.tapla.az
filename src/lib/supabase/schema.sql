@@ -212,7 +212,7 @@ CREATE INDEX IF NOT EXISTS idx_orders_payment_status ON orders(payment_status);
 CREATE TABLE IF NOT EXISTS order_activity_log (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   order_id UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
-  field TEXT NOT NULL CHECK (field IN ('status', 'payment_status')),
+  field TEXT NOT NULL CHECK (field IN ('status', 'payment_status', 'deposit_status')),
   old_value TEXT,
   new_value TEXT NOT NULL,
   changed_by TEXT NOT NULL DEFAULT 'admin',
@@ -499,3 +499,18 @@ CREATE TRIGGER categories_updated_at BEFORE UPDATE ON categories
 DROP TRIGGER IF EXISTS orders_updated_at ON orders;
 CREATE TRIGGER orders_updated_at BEFORE UPDATE ON orders
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+-- ============================================================================
+-- Миграция 2026-06-29: items JSONB + deposit_fields
+-- ============================================================================
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS items JSONB DEFAULT '[]'::jsonb;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS deposit_method TEXT;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS deposit_status TEXT DEFAULT 'pending';
+ALTER TABLE orders DROP CONSTRAINT IF EXISTS orders_deposit_method_check;
+ALTER TABLE orders ADD CONSTRAINT orders_deposit_method_check CHECK (deposit_method IN ('pasha_bank', 'whatsapp'));
+ALTER TABLE orders DROP CONSTRAINT IF EXISTS orders_deposit_status_check;
+ALTER TABLE orders ADD CONSTRAINT orders_deposit_status_check CHECK (deposit_status IN ('pending', 'paid', 'refunded'));
+
+-- Расширяем CHECK для order_activity_log.field
+ALTER TABLE order_activity_log DROP CONSTRAINT IF EXISTS order_activity_log_field_check;
+ALTER TABLE order_activity_log ADD CONSTRAINT order_activity_log_field_check CHECK (field IN ('status', 'payment_status', 'deposit_status'));
