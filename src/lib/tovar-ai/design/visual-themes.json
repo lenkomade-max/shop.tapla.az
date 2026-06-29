@@ -111,6 +111,24 @@
       "name": "Editorial Backdrop",
       "description": "Textured photography backdrop. Magazine quality. Fashion and lifestyle.",
       "prompt_fragment": "Textured premium photography backdrop. Canvas or subtle fabric texture. Magazine editorial quality. Fashion and lifestyle product photography standard."
+    },
+    {
+      "id": "blurred_lifestyle",
+      "name": "Blurred Lifestyle",
+      "description": "Real interior scene with a person naturally present (not interacting with product). Heavily blurred bokeh. Product is the only sharp element.",
+      "prompt_fragment": "Background is a real modern interior (home, office, cafe, or store) with a person naturally present in the scene — not holding or using the product, just part of the environment. The ENTIRE background is heavily blurred with shallow depth of field (bokeh, f/1.4). The person and environment are soft, atmospheric, and do NOT compete with the product. The product in the foreground is the ONLY sharp element. The blurred person adds life and context without distraction."
+    },
+    {
+      "id": "blurred_usage_context",
+      "name": "Blurred Usage Context",
+      "description": "Real environment where a person is actively USING the product. Heavily blurred. Product in foreground is sharp and separate.",
+      "prompt_fragment": "Background shows the natural usage environment where a person is actively using or applying THIS exact product type — e.g. someone blow-drying hair (for a hair dryer), someone cooking (for kitchenware), someone exercising (for fitness gear). The person and environment are HEAVILY BLURRED (bokeh, f/1.4). The product in the foreground is sharp, isolated, and treated as the infographic hero — it is the SAME product as the one being used in the blurred background. The blurred usage scene provides emotional context and proof of real-world value."
+    },
+    {
+      "id": "blurred_lifestyle_holding",
+      "name": "Blurred Lifestyle Holding",
+      "description": "Real scene where a person is holding or directly interacting with THIS product. Heavily blurred. Foreground product is sharp and separate.",
+      "prompt_fragment": "Background shows a person naturally holding, touching, or directly interacting with THIS product — the exact same product that appears sharp in the foreground. Depending on the product type: for handheld items (fan, phone, tool) the person holds it; for wearable items (headphones, watch) the person wears it; for cosmetic items the person applies it; for desktop items the person's hands are near it. The person and their interaction are HEAVILY BLURRED (bokeh, f/1.4). The foreground product is the SAME product — sharp, detailed, and treated as the infographic hero. The blurred interaction shows the product 'in real life' while the sharp foreground shows it in full commercial detail."
     }
   ],
   "mood": [
@@ -370,7 +388,7 @@
   "category_matching": {
     "Elektronika": {
       "lighting": ["rim_light", "dramatic_spotlight", "softbox_diffused"],
-      "background_style": ["dark_studio", "abstract_tech", "metal_surface", "glass_surface"],
+      "background_style": ["dark_studio", "abstract_tech", "metal_surface", "glass_surface", "blurred_usage_context"],
       "mood": ["tech_innovation", "modern_sleek", "minimal_luxury"],
       "materials": ["brushed_chrome", "carbon_fiber", "polished_aluminum", "matte_glass", "liquid_metal"],
       "spatial_depth": ["neon_glow_depth", "floating_geometric", "volumetric_light", "acrylic_light_halos"],
@@ -379,7 +397,7 @@
     },
     "Kosmetika": {
       "lighting": ["soft_studio", "golden_hour", "softbox_diffused"],
-      "background_style": ["premium_gradient", "marble_surface", "editorial_backdrop", "glass_surface"],
+      "background_style": ["premium_gradient", "marble_surface", "editorial_backdrop", "glass_surface", "blurred_lifestyle", "blurred_lifestyle_holding"],
       "mood": ["editorial_vogue", "minimal_luxury", "classic_luxury", "warm_cozy"],
       "materials": ["satin_fabric", "glossy_lacquer", "clear_acrylic", "ceramic", "matte_glass"],
       "spatial_depth": ["liquid_abstract_forms", "soft_mist_layers", "acrylic_light_halos", "multi_layer_glass"],
@@ -388,7 +406,7 @@
     },
     "Məişət texnikası": {
       "lighting": ["soft_studio", "softbox_diffused", "natural_daylight"],
-      "background_style": ["pure_white", "environmental", "wood_surface", "marble_surface"],
+      "background_style": ["pure_white", "environmental", "wood_surface", "marble_surface", "blurred_usage_context"],
       "mood": ["clean_clinical", "warm_cozy", "scandinavian", "modern_sleek"],
       "materials": ["polished_aluminum", "ceramic", "walnut_wood", "natural_stone"],
       "spatial_depth": ["reflection_infinity", "soft_mist_layers", "multi_layer_glass", "acrylic_light_halos"],
@@ -397,7 +415,7 @@
     },
     "Mətbəx": {
       "lighting": ["natural_daylight", "soft_studio", "golden_hour"],
-      "background_style": ["wood_surface", "marble_surface", "environmental", "natural_stone"],
+      "background_style": ["wood_surface", "marble_surface", "environmental", "natural_stone", "blurred_usage_context", "blurred_lifestyle"],
       "mood": ["warm_cozy", "scandinavian", "industrial_premium", "classic_luxury"],
       "materials": ["walnut_wood", "natural_stone", "ceramic", "polished_aluminum"],
       "spatial_depth": ["soft_mist_layers", "particle_atmosphere", "floating_geometric"],
@@ -406,7 +424,7 @@
     },
     "İdman": {
       "lighting": ["high_contrast", "dramatic_spotlight", "rim_light"],
-      "background_style": ["dark_studio", "abstract_tech", "metal_surface"],
+      "background_style": ["dark_studio", "abstract_tech", "metal_surface", "blurred_usage_context"],
       "mood": ["dynamic_action", "industrial_premium", "tech_innovation", "modern_sleek"],
       "materials": ["carbon_fiber", "liquid_metal", "soft_rubber", "brushed_chrome"],
       "spatial_depth": ["volumetric_light", "floating_geometric", "particle_atmosphere", "neon_glow_depth"],
@@ -415,7 +433,7 @@
     },
     "Uşaq malları": {
       "lighting": ["soft_studio", "natural_daylight", "softbox_diffused"],
-      "background_style": ["premium_gradient", "environmental", "editorial_backdrop"],
+      "background_style": ["premium_gradient", "environmental", "editorial_backdrop", "blurred_lifestyle", "blurred_usage_context"],
       "mood": ["warm_cozy", "scandinavian", "modern_sleek"],
       "materials": ["soft_rubber", "satin_fabric", "clear_acrylic", "glossy_lacquer"],
       "spatial_depth": ["floating_geometric", "particle_atmosphere", "acrylic_light_halos", "soft_mist_layers"],
@@ -424,7 +442,7 @@
     },
     "Ofis malları": {
       "lighting": ["softbox_diffused", "soft_studio", "natural_daylight"],
-      "background_style": ["pure_white", "wood_surface", "metal_surface", "glass_surface"],
+      "background_style": ["pure_white", "wood_surface", "metal_surface", "glass_surface", "blurred_usage_context"],
       "mood": ["clean_clinical", "modern_sleek", "scandinavian", "minimal_luxury"],
       "materials": ["polished_aluminum", "matte_glass", "walnut_wood", "clear_acrylic"],
       "spatial_depth": ["multi_layer_glass", "reflection_infinity", "acrylic_light_halos"],
@@ -433,7 +451,7 @@
     },
     "Aksesuarlar": {
       "lighting": ["soft_studio", "golden_hour", "softbox_diffused"],
-      "background_style": ["premium_gradient", "editorial_backdrop", "marble_surface", "glass_surface"],
+      "background_style": ["premium_gradient", "editorial_backdrop", "marble_surface", "glass_surface", "blurred_lifestyle"],
       "mood": ["minimal_luxury", "editorial_vogue", "modern_sleek", "classic_luxury"],
       "materials": ["clear_acrylic", "satin_fabric", "matte_glass", "glossy_lacquer", "brushed_chrome"],
       "spatial_depth": ["acrylic_light_halos", "reflection_infinity", "floating_geometric", "multi_layer_glass"],
@@ -442,7 +460,7 @@
     },
     "Avto": {
       "lighting": ["high_contrast", "dramatic_spotlight", "rim_light"],
-      "background_style": ["dark_studio", "metal_surface", "abstract_tech"],
+      "background_style": ["dark_studio", "metal_surface", "abstract_tech", "blurred_usage_context"],
       "mood": ["dynamic_action", "industrial_premium", "tech_innovation", "modern_sleek"],
       "materials": ["carbon_fiber", "brushed_chrome", "liquid_metal", "polished_aluminum"],
       "spatial_depth": ["volumetric_light", "neon_glow_depth", "particle_atmosphere", "floating_geometric"],

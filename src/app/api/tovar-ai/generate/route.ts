@@ -8,7 +8,7 @@ import { runTovarAIPipeline, TOVAR_AI_CONFIG } from '@/lib/tovar-ai'
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { photoUrl, providerDescription, characteristics, photoBase64, priceAz, mode, supplierUrl, cardCount } = body
+    const { photoUrl, providerDescription, characteristics, photoBase64, priceAz, mode, supplierUrl, cardCount, template } = body
 
     if (!photoUrl && !photoBase64) {
       return NextResponse.json({ error: 'photoUrl or photoBase64 required' }, { status: 400 })
@@ -23,6 +23,7 @@ export async function POST(request: Request) {
       mode: mode || 'test',
       supplierUrl: supplierUrl || undefined,
       cardCount: typeof cardCount === 'number' ? cardCount : undefined,
+      template: template || undefined,
     })
 
     // Возвращаем также cardPrompts — данные промптов для каждой карточки,

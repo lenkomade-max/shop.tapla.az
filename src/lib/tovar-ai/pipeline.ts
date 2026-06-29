@@ -110,6 +110,7 @@ export async function runTovarAIPipeline(
             input.providerDescription,
             input.characteristics,
             input.priceAz,
+            input.template,
           )
           console.log(
             `[Pipeline] Stage 2 ✅ — ${p.cards.length} prompts, roles: ${p.roles.join(', ')}, palette: ${JSON.stringify(p.color_palette)}`,
@@ -193,6 +194,7 @@ export async function runTovarAIPipeline(
         input.providerDescription,
         input.characteristics,
         input.priceAz,
+        input.template,
       )
       console.log(
         `[Pipeline] Stage 2 ✅ — ${prompts.cards.length} prompts, roles: ${prompts.roles.join(', ')}, palette: ${JSON.stringify(prompts.color_palette)}`,

@@ -147,6 +147,11 @@ export interface PipelineInput {
   mode?: PipelineMode // 'test' (по умолч.) | 'product'
   supplierUrl?: string // URL поставщика (только в product mode)
   cardCount?: number // сколько карточек генерить (1-10, по умолч. 3)
+  /** Шаблон генерации:
+   * - 'auto' (по умолч.) — AI сам выбирает стиль на основе анализа товара
+   * - 'default' — случайный выбор из всех триад
+   * - 'benefit_solution' — форсирует problem_solution / relief_solution триаду */
+  template?: 'auto' | 'default' | 'benefit_solution'
 }
 
 export interface GenerationRecord {

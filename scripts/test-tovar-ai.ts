@@ -33,13 +33,20 @@ loadEnv()
 async function main() {
   const args = process.argv.slice(2)
   if (args.length < 1) {
-    console.log('Использование: npx tsx scripts/test-tovar-ai.ts <путь-к-фото> [описание]')
+    console.log('Использование: npx tsx scripts/test-tovar-ai.ts <путь-к-фото> [описание] [--template=auto|default|benefit_solution]')
     console.log('Пример: npx tsx scripts/test-tovar-ai.ts ./test-photo.jpg "Профессиональный фен 2000W"')
+    console.log('Пример: npx tsx scripts/test-tovar-ai.ts ./test-photo.jpg "Вентилятор" --template=benefit_solution')
     process.exit(1)
   }
 
   const photoPath = args[0]
-  const description = args[1] || undefined
+  const description = args[1] && !args[1].startsWith('--') ? args[1] : undefined
+
+  // Парсим --template=... из любого аргумента
+  const templateArg = args.find(a => a.startsWith('--template='))
+  const template = templateArg
+    ? templateArg.split('=')[1] as 'auto' | 'default' | 'benefit_solution'
+    : undefined
 
   if (!fs.existsSync(photoPath)) {
     console.error('❌ Файл не найден:', photoPath)
@@ -67,6 +74,7 @@ async function main() {
   console.log(`   Planner: ${TOVAR_AI_CONFIG.PLANNER_MODEL}`)
   console.log(`   Image: ${TOVAR_AI_CONFIG.IMAGE_MODEL}`)
   console.log(`   QA: ${TOVAR_AI_CONFIG.QA_MODEL}`)
+  console.log(`   Template: ${template || 'auto'}`)
   console.log(`   Разрешение: ${TOVAR_AI_CONFIG.IMAGE_SIZE}\n`)
 
   const startTime = Date.now()
@@ -76,6 +84,7 @@ async function main() {
       photoUrl: `file://${photoPath}`,
       photoBase64,
       providerDescription: description,
+      template,
     },
     {
       onStageChange(stage, message) {

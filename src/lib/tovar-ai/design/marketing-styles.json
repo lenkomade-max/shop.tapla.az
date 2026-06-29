@@ -241,6 +241,14 @@
       "tone": "action",
       "best_for": ["main_cover"],
       "prompt_fragment": "Call to action message. The entire composition naturally guides the eye toward the action button. Buy Now, Order Today, Shop Now — the CTA is clear and natural, never aggressive. The image communicates 'take the next step — it's easy and obvious'."
+    },
+    {
+      "id": "ms31",
+      "name": "Problem Solver",
+      "description": "This product solves your specific problem. Relief and transformation. Life is better with this product. Confident and reassuring tone.",
+      "tone": "confident",
+      "best_for": ["solution", "hero", "problem"],
+      "prompt_fragment": "Problem-solver message. The visual communication says: 'this product fixes the exact problem you have — here is the proof of transformation.' The tone is confident, reassuring, and emotionally resonant. Before vs After energy. Relief and visible improvement are the core messages. The viewer should feel: 'this is exactly what I need to solve my problem.'"
     }
   ]
 }

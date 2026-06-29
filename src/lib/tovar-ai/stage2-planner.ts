@@ -89,6 +89,11 @@ const ROLE_TRIADS: RoleTriad[] = [
     logic: 'Card 1 HERO: the product as answer. Card 2: problem visualization (before). Card 3: aspirational result (after). Problem-solution story.',
     roles: ['hero', 'problem', 'solution'],
   },
+  {
+    name: 'relief_solution',
+    logic: 'Card 1 HERO: the product as the relief-bringer — stunning first impression with emotional "solution" energy. Card 2: pain point visualization (before state) — the problem the customer faces. Card 3: relief and transformation (after state) — life improved, problem solved. Emotional problem-solution story with blurred real-life backgrounds.',
+    roles: ['hero', 'problem', 'solution'],
+  },
 ]
 
 // ─── ЦВЕТОВЫЕ ПАЛИТРЫ (по premium_level) ────────────────────────────────────
@@ -120,9 +125,9 @@ const COLOR_PALETTES: Record<string, Array<{ name: string; colors: string[]; atm
 // ─── РОЛЬ → CREATIVE STYLES ─────────────────────────────────────────────────
 
 const ROLE_CREATIVE_STYLES: Record<CardRole, string[]> = {
-  hero:         ['cs01', 'cs12', 'cs25', 'cs37', 'cs27'],
+  hero:         ['cs01', 'cs12', 'cs25', 'cs37', 'cs27', 'cs41'],
   problem:      ['cs09'],
-  solution:     ['cs09', 'cs01'],
+  solution:     ['cs09', 'cs01', 'cs41'],
   benefits:     ['cs04', 'cs05', 'cs22'],
   usage:        ['cs06', 'cs07'],
   lifestyle:    ['cs08', 'cs11', 'cs29', 'cs34'],
@@ -149,8 +154,8 @@ const ROLE_CREATIVE_STYLES: Record<CardRole, string[]> = {
 
 const ROLE_MARKETING_STYLES: Record<CardRole, string[]> = {
   hero:         ['ms27', 'ms04', 'ms06'],
-  problem:      ['ms21'],
-  solution:     ['ms21', 'ms22'],
+  problem:      ['ms21', 'ms31'],
+  solution:     ['ms21', 'ms22', 'ms31'],
   benefits:     ['ms03', 'ms04', 'ms05'],
   usage:        ['ms09', 'ms20', 'ms11'],
   lifestyle:    ['ms20', 'ms11'],
@@ -179,10 +184,10 @@ const ROLE_MARKETING_STYLES: Record<CardRole, string[]> = {
 const ROLE_VISUAL_THEMES: Record<CardRole, Pick<VisualTheme, 'lighting' | 'background_style' | 'mood'>> = {
   hero:         { lighting: 'soft_studio', background_style: 'premium_gradient', mood: 'minimal_luxury' },
   problem:      { lighting: 'dark_moody', background_style: 'environmental', mood: 'industrial_premium' },
-  solution:     { lighting: 'golden_hour', background_style: 'environmental', mood: 'warm_cozy' },
+  solution:     { lighting: 'golden_hour', background_style: 'blurred_lifestyle', mood: 'warm_cozy' },
   benefits:     { lighting: 'softbox_diffused', background_style: 'dark_studio', mood: 'tech_innovation' },
-  usage:        { lighting: 'natural_daylight', background_style: 'environmental', mood: 'warm_cozy' },
-  lifestyle:    { lighting: 'golden_hour', background_style: 'environmental', mood: 'editorial_vogue' },
+  usage:        { lighting: 'natural_daylight', background_style: 'blurred_usage_context', mood: 'warm_cozy' },
+  lifestyle:    { lighting: 'golden_hour', background_style: 'blurred_lifestyle', mood: 'editorial_vogue' },
   offer:        { lighting: 'high_contrast', background_style: 'premium_gradient', mood: 'dynamic_action' },
   bundle:       { lighting: 'soft_studio', background_style: 'pure_white', mood: 'clean_clinical' },
   delivery:     { lighting: 'soft_studio', background_style: 'pure_white', mood: 'clean_clinical' },
@@ -341,6 +346,12 @@ const COMPOSITION_VARIATIONS: CompositionVariation[] = [
     description: 'Продукт в центре, от него расходятся линии к карточкам как техническая схема.',
     prompt_fragment: 'Exploded technical composition: product centered with thin glowing connection lines radiating outward to 4-6 specification cards. Like an engineering diagram but premium and commercial. Each line connects a product feature to its explanatory card. Technical authority style.',
   },
+  {
+    id: 'blurred_after_background',
+    name: 'Размытый After-фон',
+    description: 'Продукт в резком фокусе на переднем плане. Позади — размытая (bokeh) реальная сцена, показывающая улучшенное состояние после использования товара.',
+    prompt_fragment: 'Bokeh background composition: product sharp in foreground occupying 65-70% of the frame on a clean surface. Behind it, a heavily blurred (f/1.4 bokeh, shallow depth of field) real-life scene showing the improved "after" state — the problem solved, the environment transformed, life visibly better. The blurred background tells the emotional transformation story. The product is the ONLY sharp element in the entire image. Glassmorphism badges and pointer lines float in the sharp foreground layer. This is a 3-layer composition: 1) Blurred real background (atmospheric, emotional), 2) Sharp product on surface (midground hero), 3) Sharp glassmorphism badges with pointer lines (foreground infographic layer).',
+  },
 ]
 
 // ─── ЗАГРУЗКА БИБЛИОТЕК ─────────────────────────────────────────────────────
@@ -403,7 +414,16 @@ This is the Apple product page / tech infographic style — labels float cleanly
 
 Deep rich gradient COMPLEMENTARY to the product color. If product is white/light: deep blue, purple, or charcoal gradient. Never same color as the product.
 
-Multi-layer depth: gradient background → product on surface with soft shadow or mirror reflection → floating labels in foreground.
+**ALTERNATIVE — Blurred Lifestyle Background (for solution/usage/lifestyle cards):**
+When the card uses a real environment background instead of gradient:
+- Background = real interior/context scene with a person naturally present, HEAVILY BLURRED (bokeh, f/1.4 equivalent shallow depth of field).
+- The person in the background is soft, atmospheric, and NEVER competes with the product for attention.
+- The product in the foreground is the ONLY sharp element in the image.
+- If the person interacts with the product in the background, it must be the SAME product as the foreground hero — showing it "in real life" while the foreground shows it in commercial detail.
+- STRICT LAYER ORDER (back to front): 1) Blurred real background (atmospheric, emotional context) → 2) Sharp product on clean surface (midground hero, 65-70% frame) → 3) Sharp glassmorphism badges with pointer lines (foreground infographic layer).
+- The blurred background tells the "after" story without distracting from the commercial message.
+
+Multi-layer depth: gradient OR blurred real background → product on surface with soft shadow or mirror reflection → floating labels in foreground.
 
 ## TYPOGRAPHY
 
@@ -453,11 +473,12 @@ Apply color palette, lighting, mood, premium badge styling, pointer lines. Desig
 ## PREMIUM MARKETPLACE INFOGRAPHIC STYLE
 Product images on TAPLA.AZ must:
 - Contain 3-7 glassmorphism feature badges with pointer lines
-- Deep complementary gradient backgrounds (never same color as product)
+- Deep complementary gradient backgrounds (never same color as product) — OR for solution/usage/lifestyle cards: real interior scenes heavily blurred (bokeh) with a person naturally present
 - Frosted glass badges: semi-transparent, thin 1px border, soft shadow, outline icon + bold text
 - Ultra-thin pointer lines (1px) with dot endpoints connecting product to badges
 - Asymmetric, dynamic compositions
 - Zero dead zones — every area contains product or informative badges
+- LAYER DISCIPLINE: when using blurred real backgrounds, strict 3-layer order — blurred bg → sharp product → sharp badges
 
 ## CAMPAIGN BRIEF — DO THIS FIRST
 Before designing individual cards, establish the CAMPAIGN-LEVEL shared identity:
@@ -772,17 +793,67 @@ function buildUserPrompt(
 
 // ─── ВЫБОР ТРИАДЫ ───────────────────────────────────────────────────────────
 
-function selectTriad(vision: VisionOutput): RoleTriad {
-  // Фильтруем триады, требующие модель, если товар без неё
-  const availableTriads = ROLE_TRIADS.filter(triad => {
-    const hasUsageRole = triad.roles.some(r => r === 'usage')
-    if (!vision.needs_human_model && hasUsageRole) {
-      // usage-триады всё ещё доступны — просто будет использован другой creative style
-    }
-    return true
-  })
+/**
+ * Определяет, является ли товар «решателем проблем» —
+ * на основе key_selling_points, possible_functions и intended_use.
+ */
+function isProblemSolver(vision: VisionOutput): boolean {
+  const problemKeywords = [
+    'problem', 'problem', 'pain', 'discomfort', 'heat', 'cold', 'noise',
+    'clutter', 'mess', 'stress', 'fatigue', 'tired', 'ache', 'dry',
+    'oily', 'frizz', 'damage', 'wrinkle', 'acne', 'sweat', 'odor',
+    'dark', 'dim', 'heavy', 'bulky', 'slow', 'complicated', 'difficult',
+    'relief', 'relieve', 'solve', 'solution', 'fix', 'eliminate',
+    'reduce', 'prevent', 'protect', 'organize', 'clean', 'smooth',
+    'cooling', 'heating', 'calming', 'soothing', 'comfort',
+    'ağrı', 'problem', 'narahat', 'istidən', 'soyuqdan', 'səs-küy',
+    'qarışıqlıq', 'stress', 'yorğunluq', 'zədə', 'quru', 'yağlı',
+    'tökülmə', 'qırış', 'sızanaq', 'tər', 'qoxu', 'qaranlıq',
+    'ağır', 'yavaş', 'mürəkkəb', 'çətin', 'rahatlıq', 'həll',
+    'aradan qaldırmaq', 'azaltmaq', 'qarşısını almaq', 'təşkil',
+    'təmiz', 'hamar', 'sərin', 'istilik', 'sakitləşdirici',
+  ]
 
-  return availableTriads[Math.floor(Math.random() * availableTriads.length)]
+  const textToCheck = [
+    ...vision.key_selling_points,
+    ...vision.possible_functions,
+    vision.intended_use,
+    ...(vision.recommended_scenes || []),
+  ].join(' ').toLowerCase()
+
+  return problemKeywords.some(kw => textToCheck.includes(kw.toLowerCase()))
+}
+
+function selectTriad(vision: VisionOutput, template?: string): RoleTriad {
+  // Если явно запрошен benefit_solution — гарантированно выбираем problem_solution или relief_solution
+  if (template === 'benefit_solution') {
+    const solutionTriads = ROLE_TRIADS.filter(
+      t => t.name === 'problem_solution' || t.name === 'relief_solution'
+    )
+    return solutionTriads[Math.floor(Math.random() * solutionTriads.length)]
+  }
+
+  // Если template === 'default' — случайный выбор из всех (стандартное поведение)
+  if (template === 'default') {
+    return ROLE_TRIADS[Math.floor(Math.random() * ROLE_TRIADS.length)]
+  }
+
+  // Авто-режим: если товар явно решает проблему — повышаем вероятность problem/relief триад
+  const isSolver = isProblemSolver(vision)
+
+  if (isSolver) {
+    // 60% шанс problem_solution/relief_solution, 40% случайная из остальных
+    const solutionTriads = ROLE_TRIADS.filter(
+      t => t.name === 'problem_solution' || t.name === 'relief_solution'
+    )
+    const otherTriads = ROLE_TRIADS.filter(
+      t => t.name !== 'problem_solution' && t.name !== 'relief_solution'
+    )
+    const pool = Math.random() < 0.6 ? solutionTriads : otherTriads
+    return pool[Math.floor(Math.random() * pool.length)]
+  }
+
+  return ROLE_TRIADS[Math.floor(Math.random() * ROLE_TRIADS.length)]
 }
 
 // ─── ВЫБОР ЦВЕТОВОЙ ПАЛИТРЫ ─────────────────────────────────────────────────
@@ -884,14 +955,15 @@ export async function planCardPrompts(
   providerDescription?: string,
   characteristics?: Record<string, string>,
   priceAz?: string,
+  template?: string,
 ): Promise<PromptsOutput> {
   const config = TOVAR_AI_CONFIG
   const creativeStyles = loadCreativeStyles()
   const marketingStyles = loadMarketingStyles()
   const visualThemes = loadVisualThemes()
 
-  // 1. Выбор триады (комплементарные роли)
-  const triad = selectTriad(analysis)
+  // 1. Выбор триады (комплементарные роли) — с учётом template
+  const triad = selectTriad(analysis, template)
 
   // 2. Выбор ОБЩЕЙ цветовой палитры (одна на все карточки) — с учётом категории
   const colorPalette = selectColorPalette(analysis.premium_level, analysis.category)
@@ -1023,10 +1095,18 @@ export async function planCardPrompts(
     const depthItem = visualThemes.spatial_depth.find(d => d.id === sharedVt.spatial_depth[0])
     const motionItem = visualThemes.motion.find(m => m.id === sharedVt.motion)
 
+    // Флаг: используется ли размытый лайфстайл-фон
+    const isBlurredBg = sharedVt.background_style.startsWith('blurred_')
+
+    const blurredBgInstruction = isBlurredBg
+      ? `BLURRED BACKGROUND TECHNIQUE: The background is a REAL interior/environment scene with a person, HEAVILY BLURRED (bokeh f/1.4). STRICT 3-LAYER COMPOSITION: Layer 1 (back) = blurred real scene with person, atmospheric and emotional. Layer 2 (mid) = SHARP product on clean surface, 65-70% of frame — the ONLY sharp photographic element. Layer 3 (front) = SHARP glassmorphism badges and pointer lines floating above. The product must be SHARP. The background must be BLURRED. No exceptions. The person in the background must never distract from the product.`
+      : ''
+
     const designDecisions = [
       colorInstruction,
       `CAMPAIGN SHARED IDENTITY — Lighting: ${lightingItem?.prompt_fragment || sharedVt.lighting}.`,
       `CAMPAIGN SHARED IDENTITY — Background: ${bgItem?.prompt_fragment || sharedVt.background_style}.`,
+      blurredBgInstruction,
       `CAMPAIGN SHARED IDENTITY — Mood: ${moodItem?.prompt_fragment || sharedVt.mood}.`,
       `Scene Materials: ${materialsItem?.prompt_fragment || sharedVt.materials.join(', ')}.`,
       `Spatial Depth: ${depthItem?.prompt_fragment || sharedVt.spatial_depth.join(', ')}.`,

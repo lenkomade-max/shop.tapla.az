@@ -361,6 +361,15 @@
       "use_for": ["main_cover", "features_detail", "usage_demo"],
       "needs_model": false,
       "needs_environment": false
+    },
+    {
+      "id": "cs41",
+      "name": "Solution Relief",
+      "description": "Product as the hero that solves a problem. Blurred 'After' background showing improved state. 4 clean pointer lines to minimalist solution icons. Relief headline at top. Clean bright professional colors.",
+      "prompt_fragment": "Product centered in sharp focus (65% of frame). Behind it, a heavily blurred (bokeh f/1.4) real-life background showing the improved 'After' state — the problem is solved, life is better. 4 clean white thin pointer lines (1px) extend from the product to small minimalist outline icons, each paired with short bold solution-oriented text. Large relief/solution headline at the top in clean  premium white font. The visual story is: 'this product fixed the problem — here is the proof.' Clean, bright, professional colors. Marketplace infographic style but with emotional relief messaging. The background tells the transformation story while the product remains the sharp hero.",
+      "use_for": ["main_cover", "features_detail"],
+      "needs_model": false,
+      "needs_environment": true
     }
   ]
 }
