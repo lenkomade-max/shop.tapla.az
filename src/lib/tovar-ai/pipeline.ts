@@ -26,7 +26,7 @@ import {
 // STAGE 2 MODE: 'v1' = старая система с JSON-библиотеками (по умолчанию)
 //              'v2' = новый LLM-driven Creative Director
 // ════════════════════════════════════════════════════════════════════════════
-const STAGE2_MODE: 'v1' | 'v2' = 'v1'
+const STAGE2_MODE: 'v1' | 'v2' = 'v2'
 
 interface PipelineCallbacks {
   onStageChange?: (stage: GenerationStatus, message: string) => void
