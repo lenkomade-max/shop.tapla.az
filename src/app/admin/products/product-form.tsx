@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { saveProduct } from '@/lib/actions';
 import { fetchActiveCategories } from '@/lib/actions';
 import { Upload, Loader2, X } from 'lucide-react';
+import { PriceCalculator } from '@/components/PriceCalculator';
 
 interface Props {
   product?: Record<string, unknown>;
@@ -302,6 +303,12 @@ export function ProductForm({ product, error: initialError }: Props) {
           </div>
         </div>
       </section>
+
+      {/* Калькулятор цены */}
+      <PriceCalculator
+        currentPrice={price}
+        onApply={(val) => setPrice(String(val))}
+      />
 
       {/* Изображения */}
       <section className="rounded-xl border bg-white p-6 shadow-sm">
