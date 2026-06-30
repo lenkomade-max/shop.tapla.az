@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { MessageSquareCode, Gift, Flame, ShoppingCart, User } from 'lucide-react';
+import { Home, Grid3X3, ShoppingCart, User } from 'lucide-react';
 import { useCart } from '@/store/CartContext';
 import { useAuth } from '@/components/auth/AuthContext';
 
@@ -17,24 +17,16 @@ export function StickyMobileBar() {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleSupportClick = () => {
-    alert('TAPLA MARKETPLACE Müştəri Xidmətləri: WhatsApp (+994702453060) və ya Onlayn Çat vasitəsilə 24/7 xidmətinizdəyik!');
-  };
-
-  const handleDiscountClick = () => {
-    alert('TAPLA MARKETPLACE-ə xoş gəldiniz! İlk sifarişinizə xüsusi endirim kodu mövcuddur.');
-  };
-
   return (
     <div className="md:hidden fixed bottom-0 left-0 right-0 z-20 bg-black text-white border-t border-neutral-900 grid grid-cols-4 h-14 text-[9px] tracking-widest font-semibold uppercase font-sans">
 
-      <button
-        onClick={handleSupportClick}
-        className="flex flex-col items-center justify-center space-y-1.5 border-r border-neutral-900 active:bg-neutral-900 transition-colors cursor-pointer"
+      <a
+        href="/"
+        className="flex flex-col items-center justify-center space-y-1.5 border-r border-neutral-900 active:bg-neutral-900 transition-colors"
       >
-        <MessageSquareCode className="h-4 w-4 text-neutral-300" />
-        <span>YAZIN BİZƏ</span>
-      </button>
+        <Home className="h-4 w-4 text-neutral-300" />
+        <span>ANA SƏHİFƏ</span>
+      </a>
 
       <button
         onClick={() => user ? window.location.href = '/profile' : openLogin()}
@@ -45,11 +37,11 @@ export function StickyMobileBar() {
       </button>
 
       <a
-        href="#products"
+        href="/products"
         className="flex flex-col items-center justify-center space-y-1.5 border-r border-neutral-900 active:bg-neutral-900 transition-colors"
       >
-        <Flame className="h-4 w-4 text-red-400" />
-        <span>KAMPANİYALAR</span>
+        <Grid3X3 className="h-4 w-4 text-neutral-300" />
+        <span>KATEQORİYALAR</span>
       </a>
 
       <button

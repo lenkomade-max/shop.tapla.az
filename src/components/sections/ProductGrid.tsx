@@ -88,7 +88,7 @@ export function ProductGrid({ products }: ProductGridProps) {
   };
 
   return (
-    <Section id="products" variant="neutral" py="lg">
+    <Section id="products" variant="neutral" py="sm">
       <Container className="!px-1 sm:!px-1">
         {/* Header */}
         <div className="max-w-3xl mx-auto text-center space-y-3 mb-12">
