@@ -152,10 +152,20 @@ export default function CheckoutPage() {
     if (!form.fullName.trim()) errors.fullName = 'Ad və soyadınızı daxil edin';
     if (!form.phone.trim()) errors.phone = 'Əlaqə nömrənizi daxil edin';
     if (!form.address.trim()) errors.address = 'Çatdırılma ünvanını daxil edin';
-    
+
     // online_card: card is entered on Pasha Bank's secure page — no client-side validation needed
 
     setFormErrors(errors);
+
+    // Скроллим к первому полю с ошибкой
+    const firstKey = Object.keys(errors)[0];
+    if (firstKey) {
+      const el = document.querySelector(`[name="${firstKey}"]`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
     return Object.keys(errors).length === 0;
   };
 
