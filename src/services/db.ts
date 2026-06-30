@@ -20,6 +20,7 @@ function mapProduct(row: Record<string, unknown>): Product {
     reviewsCount: Number(row.reviews_count) || 0,
     images: Array.isArray(row.images) ? row.images as string[] : [],
     category: (row.category as string) || '',
+    categoryId: (row.category_id as string | null) || null,
     benefits: Array.isArray(row.benefits) ? row.benefits as string[] : [],
     howToUse: (row.how_to_use as string) || '',
     ingredients: row.ingredients as string | undefined,

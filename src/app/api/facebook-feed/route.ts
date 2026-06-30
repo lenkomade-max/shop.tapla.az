@@ -1,10 +1,15 @@
 import { NextResponse } from 'next/server'
 import { dbService } from '@/services/db'
+import type { Category } from '@/types'
 
 const BASE_URL = 'https://shop.tapla.az'
 
-function googleCategory(category: string): string {
-  const cat = (category || '').toLowerCase().replace(/ı/g, 'i').replace(/i̇/g, 'i')
+function normalize(s: string): string {
+  return s.toLowerCase().replace(/ı/g, 'i').replace(/i̇/g, 'i').trim()
+}
+
+function googleCategory(leafName: string): string {
+  const cat = normalize(leafName)
   if (cat.includes('notebook') || cat.includes('ultrabook') || cat.includes('noutbuk')) return 'Electronics > Computers > Notebooks'
   if (cat.includes('smartfon') || cat.includes('telefon') || cat.includes('phone')) return 'Electronics > Communications > Smartphones'
   if (cat.includes('planset') || cat.includes('tablet') || cat.includes('ipad')) return 'Electronics > Computers > Tablet Computers'
@@ -20,7 +25,29 @@ function googleCategory(category: string): string {
   return 'Electronics'
 }
 
+// Builds full path from leaf category up to root, e.g. "Elektronika > Qulaqlıq > Simsiz Qulaqlıq"
+function buildCategoryPath(catId: string | null | undefined, catMap: Map<string, Category>): string[] {
+  const parts: string[] = []
+  let current = catId
+  while (current && catMap.has(current)) {
+    const cat = catMap.get(current)!
+    parts.unshift(cat.title)
+    current = cat.parentId || null
+  }
+  return parts
+}
+
 export async function GET() {
+  let categories: Category[] = []
+  try {
+    categories = await dbService.getCategories()
+  } catch { /* ignore — fallback to empty */ }
+
+  const catMap = new Map<string, Category>()
+  for (const c of categories) {
+    catMap.set(c.id, c)
+  }
+
   const products = await dbService.getProducts()
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || BASE_URL
 
@@ -48,6 +75,12 @@ export async function GET() {
       ? p.tags.map((tag) => `      <g:custom_label_0>${escapeXml(tag)}</g:custom_label_0>`).join('\n')
       : ''
 
+    // Resolve full category path from category_id
+    const catPath = buildCategoryPath(p.categoryId, catMap)
+    const fullPath = catPath.length > 0 ? catPath.join(' > ') : p.category || ''
+    // Use the leaf (deepest subcategory) for Google Shopping category matching
+    const leafCategory = catPath.length > 0 ? catPath[catPath.length - 1] : p.category || ''
+
     return `
     <item>
       <g:id>${escapeXml(p.id)}</g:id>
@@ -61,8 +94,8 @@ export async function GET() {
       <g:availability>in_stock</g:availability>
       <g:brand>TAPLA MARKETPLACE</g:brand>
       <g:condition>new</g:condition>
-      <g:google_product_category>${escapeXml(googleCategory(p.category))}</g:google_product_category>
-      <g:product_type>${escapeXml(p.category || '')}</g:product_type>
+      <g:google_product_category>${escapeXml(googleCategory(leafCategory))}</g:google_product_category>
+      <g:product_type>${escapeXml(fullPath || p.category || '')}</g:product_type>
       ${tags}
       ${color}
       ${itemGroupId}

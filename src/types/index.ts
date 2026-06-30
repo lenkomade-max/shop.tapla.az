@@ -93,6 +93,7 @@ export interface Product {
   reviewsCount: number;
   images: string[];
   category: string;
+  categoryId?: string | null;
   benefits: string[];
   howToUse: string;
   ingredients?: string;
