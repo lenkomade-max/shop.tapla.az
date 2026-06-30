@@ -45,8 +45,6 @@ export default function CheckoutPage() {
   const { user, profile } = useAuth();
   const [mounted, setMounted] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
-  const submitSentinelRef = useRef<HTMLDivElement>(null);
-  const [showStickySubmit, setShowStickySubmit] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [redirectUrl, setRedirectUrl] = useState('');
@@ -119,18 +117,6 @@ export default function CheckoutPage() {
       });
     }
   }, [mounted, profile]);
-
-  // Sticky submit button detection
-  useEffect(() => {
-    const sentinel = submitSentinelRef.current;
-    if (!sentinel) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => setShowStickySubmit(!entry.isIntersecting),
-      { rootMargin: '-1px 0px 0px 0px' }
-    );
-    observer.observe(sentinel);
-    return () => observer.disconnect();
-  }, [mounted]);
 
   useEffect(() => {
     if (orderConfirmed) {
@@ -750,14 +736,11 @@ export default function CheckoutPage() {
                   </div>
                 )}
 
-                {/* Sentinel for sticky submit detection */}
-                <div ref={submitSentinelRef} className="h-1" />
-
-                {/* Form Submit Button */}
+                {/* Form Submit Button — статичный, всегда на месте */}
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-neutral-950 text-white text-[10px] tracking-widest font-bold uppercase py-4 border border-neutral-950 hover:bg-transparent hover:text-neutral-900 transition-all duration-300 flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50"
+                  className="w-full bg-emerald-600 text-white text-[10px] tracking-widest font-bold uppercase py-4 border border-emerald-600 hover:bg-emerald-700 hover:border-emerald-700 transition-all duration-300 flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50 rounded-xl"
                 >
                   {isSubmitting ? (
                     <span className="flex items-center space-x-2">
@@ -772,13 +755,11 @@ export default function CheckoutPage() {
             </div>
 
             {/* Fixed bottom submit bar */}
-            <div className={`fixed bottom-14 md:bottom-0 left-0 right-0 z-50 bg-white border-t border-neutral-200 p-3 shadow-lg transition-opacity duration-300 ${
-              showStickySubmit ? 'opacity-100' : 'opacity-0 pointer-events-none'
-            }`}>
+            <div className="fixed bottom-14 md:bottom-0 left-0 right-0 z-50 bg-white border-t border-neutral-200 p-3 shadow-lg">
               <button
                 onClick={() => formRef.current?.requestSubmit()}
                 disabled={isSubmitting}
-                className="w-full bg-neutral-950 text-white text-[10px] tracking-widest font-bold uppercase py-3.5 border border-neutral-950 hover:bg-transparent hover:text-neutral-900 transition-all duration-300 flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50"
+                className="w-full bg-emerald-600 text-white text-[10px] tracking-widest font-bold uppercase py-3.5 border border-emerald-600 hover:bg-emerald-700 hover:border-emerald-700 transition-all duration-300 flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50 rounded-xl"
               >
                 {isSubmitting ? (
                   <span className="flex items-center space-x-2">
