@@ -78,6 +78,16 @@ export default function CheckoutPage() {
     return () => clearTimeout(timer);
   }, []);
 
+  useEffect(() => {
+    if (!mounted || cartItems.length === 0) return
+    pixel.event('InitiateCheckout', {
+      value: cartTotal,
+      currency: 'AZN',
+      content_ids: cartItems.map(i => i.product.id),
+      content_type: 'product',
+    })
+  }, [mounted])
+
   // Prevent Chrome autofill from scrolling to first input
   useEffect(() => {
     if (mounted) {
