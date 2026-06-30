@@ -118,20 +118,20 @@ export function ProductGrid({ products }: ProductGridProps) {
                     ? 'text-neutral-950 after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-neutral-950'
                     : 'text-neutral-400 hover:text-neutral-950'),
                   cat.value === 'qulaqliq-ve-audio' && (isActive
-                    ? 'text-emerald-600 after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-emerald-600'
-                    : 'text-neutral-400 hover:text-emerald-600'),
+                    ? 'text-emerald-600 font-bold after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-emerald-600'
+                    : 'text-emerald-600'),
                   cat.value === 'telefonlar-ve-plansetler' && (isActive
-                    ? 'text-blue-600 after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-blue-600'
-                    : 'text-neutral-400 hover:text-blue-600'),
+                    ? 'text-blue-600 font-bold after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-blue-600'
+                    : 'text-blue-600'),
                   cat.value === 'kicik-meiset-texnikasi' && (isActive
-                    ? 'text-amber-600 after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-amber-500'
-                    : 'text-neutral-400 hover:text-amber-600'),
+                    ? 'text-amber-600 font-bold after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-amber-500'
+                    : 'text-amber-600'),
                   cat.value === 'aqilli-saat-ve-gadget' && (isActive
-                    ? 'text-violet-600 after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-violet-600'
-                    : 'text-neutral-400 hover:text-violet-600'),
+                    ? 'text-violet-600 font-bold after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-violet-600'
+                    : 'text-violet-600'),
                   cat.value === 'elektronika' && (isActive
-                    ? 'text-rose-600 after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-rose-600'
-                    : 'text-neutral-400 hover:text-rose-600'),
+                    ? 'text-rose-600 font-bold after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-rose-600'
+                    : 'text-rose-600'),
                 )}
               >
                 {cat.label}
