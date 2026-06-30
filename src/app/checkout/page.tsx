@@ -755,7 +755,7 @@ export default function CheckoutPage() {
             </div>
 
             {/* Fixed bottom submit bar */}
-            <div className="fixed bottom-14 md:bottom-0 left-0 right-0 z-50 bg-white border-t border-neutral-200 p-3 shadow-lg">
+            <div className="fixed bottom-14 md:bottom-0 left-0 right-0 z-50 p-3">
               <button
                 onClick={() => formRef.current?.requestSubmit()}
                 disabled={isSubmitting}
