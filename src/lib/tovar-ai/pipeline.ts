@@ -371,12 +371,14 @@ function mergeEnrichedData(
     images: [],
     supplier_url: supplierUrl,
     is_new: true,
-    // Shades: из AI-Enricher, иначе из Vision (primary + secondary colors)
+    // Shades: из AI-Enricher (объекты {name, colorHex, isHot}),
+    // иначе fallback из Vision primary/secondary colors
     shades: enriched.shades?.length
       ? enriched.shades
-      : [analysis.primary_color, ...analysis.secondary_colors].filter(Boolean),
+      : [analysis.primary_color, ...analysis.secondary_colors]
+          .filter(Boolean)
+          .map(name => ({ name, colorHex: colorNameToHex(name) })),
     try_on_enabled: enriched.try_on_enabled ?? (
-      // Авто: включаем если товар имеет оттенки или это косметика/очки
       (enriched.shades?.length || 0) > 1 || analysis.category === 'Kosmetika'
     ),
     features: enriched.features_az?.length ? enriched.features_az : undefined,
@@ -394,6 +396,30 @@ function mergeEnrichedData(
 function capitalizeFirst(s: string): string {
   if (!s) return ''
   return s.charAt(0).toUpperCase() + s.slice(1)
+}
+
+/** Маппинг названий цветов → hex (fallback когда AI не вернул shades) */
+function colorNameToHex(name: string): string {
+  const lower = name.toLowerCase().trim()
+  const map: Record<string, string> = {
+    'black': '#1A1A1A', 'qara': '#1A1A1A',
+    'white': '#FAFAFA', 'ağ': '#FAFAFA', 'ag': '#FAFAFA',
+    'red': '#DC2626', 'qırmızı': '#DC2626', 'qirmizi': '#DC2626',
+    'blue': '#2563EB', 'mavi': '#2563EB', 'göy': '#2563EB', 'goy': '#2563EB',
+    'green': '#16A34A', 'yaşıl': '#16A34A', 'yasil': '#16A34A',
+    'yellow': '#EAB308', 'sarı': '#EAB308', 'sari': '#EAB308',
+    'pink': '#EC4899', 'çəhrayı': '#EC4899', 'cehrayi': '#EC4899',
+    'purple': '#9333EA', 'bənövşəyi': '#9333EA', 'benovseyi': '#9333EA',
+    'grey': '#6B7280', 'gray': '#6B7280', 'boz': '#6B7280',
+    'brown': '#92400E', 'qəhvəyi': '#92400E', 'qehveyi': '#92400E',
+    'orange': '#EA580C', 'narıncı': '#EA580C', 'narinci': '#EA580C',
+    'silver': '#C0C0C0', 'gümüşü': '#C0C0C0', 'gumusu': '#C0C0C0',
+    'gold': '#DAA520', 'qızılı': '#DAA520', 'qizili': '#DAA520',
+    'beige': '#F5F0E8', 'bej': '#F5F0E8',
+    'navy': '#1E3A5F', 'tünd göy': '#1E3A5F',
+    'rose gold': '#E0A899', 'çəhrayı qızıl': '#E0A899',
+  }
+  return map[lower] || '#888888'
 }
 
 function buildDescription(analysis: VisionOutput): string {

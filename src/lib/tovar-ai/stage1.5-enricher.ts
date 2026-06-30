@@ -101,6 +101,15 @@ Examples: "hair dryer", "blow dryer", "professional hair dryer", "ionic hair dry
 ### slug (string or null)
 SEO-friendly URL. Only override if the auto-generated slug would be poor. Short, readable. Max 60 chars. ə→e, ç→c, ş→s, ğ→g, ü→u, ö→o, ı→i. Lowercase, hyphens.
 
+### shades (array of objects)
+Product color variants. Each shade MUST have:
+- name: Color name in Azerbaijani (e.g. "Qara", "Ağ", "Qırmızı", "Mavi", "Yaşıl", "Çəhrayı", "Bənövşəyi", "Boz", "Qəhvəyi", "Narıncı", "Sarı", "Gümüşü", "Qızılı")
+- colorHex: Exact hex color code (e.g. "#000000", "#FFFFFF", "#FF0000", "#0000FF")
+- isHot: true for the most popular/default color (only ONE should be true)
+If product has only one color — return array with that single color. Max 8 shades.
+If product color is not in the list — use the closest match and write actual color as name.
+Examples: [{"name": "Qara", "colorHex": "#1A1A1A", "isHot": true}, {"name": "Ağ", "colorHex": "#FAFAFA"}]
+
 ## OUTPUT SCHEMA
 
 Respond with ONLY valid JSON. No markdown, no code fences, no extra text.
@@ -122,7 +131,7 @@ Respond with ONLY valid JSON. No markdown, no code fences, no extra text.
   "tags_az": ["string", ...],
   "search_keywords_az": ["string", ...],
   "slug": "string | null",
-  "shades": ["string", ...],
+  "shades": [{"name": "string", "colorHex": "#hex", "isHot": false}, ...],
   "try_on_enabled": false
 }`
 
@@ -319,7 +328,12 @@ function validateEnricherOutput(obj: EnricherOutput): void {
   if (!Array.isArray(obj.use_cases_az)) obj.use_cases_az = []
   if (!Array.isArray(obj.tags_az)) obj.tags_az = obj.tags_az || [obj.name_az]
   if (!Array.isArray(obj.search_keywords_az)) obj.search_keywords_az = obj.search_keywords_az || [obj.name_az]
-  if (!Array.isArray(obj.shades)) obj.shades = []
+  if (!Array.isArray(obj.shades)) { obj.shades = [] }
+  else {
+    obj.shades = obj.shades
+      .filter((s: unknown) => s && typeof s === 'object' && typeof (s as Record<string,unknown>).name === 'string' && typeof (s as Record<string,unknown>).colorHex === 'string')
+      .map((s: Record<string,unknown>) => ({ name: s.name as string, colorHex: s.colorHex as string, isHot: s.isHot === true }))
+  }
 
   // ─── FAQ ────────────────────────────────────────────────────────
   if (!Array.isArray(obj.faq_az)) {

@@ -232,7 +232,7 @@ export async function createProductFromAI(
     images: string[]
     supplier_url?: string
     is_new?: boolean
-    shades?: string[]
+    shades?: Array<{ name: string; colorHex: string; isHot?: boolean; label?: string }>
     try_on_enabled?: boolean
     features?: string[]
     ideal_for?: string | null

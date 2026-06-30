@@ -192,7 +192,7 @@ export interface ProductDraftData {
   supplier_url?: string
   // Stage 1.5 enrichment
   is_new?: boolean
-  shades?: string[]
+  shades?: Array<{ name: string; colorHex: string; isHot?: boolean; label?: string }>
   try_on_enabled?: boolean
   features?: string[]             // 8-20 ключевых особенностей
   ideal_for?: string              // для кого подходит
@@ -236,7 +236,7 @@ export interface EnricherOutput {
   slug: string | null             // SEO-URL; null = стандартная генерация
 
   // ─── Визуальные варианты ──────────────────────────────────────────
-  shades: string[]                // цвета/оттенки с фото
+  shades: Array<{ name: string; colorHex: string; isHot?: boolean }>  // цвета/оттенки
   try_on_enabled: boolean         // true для косметики/очков
 }
 
