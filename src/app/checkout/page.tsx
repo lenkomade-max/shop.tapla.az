@@ -117,6 +117,19 @@ export default function CheckoutPage() {
     return () => observer.disconnect();
   }, [mounted]);
 
+  useEffect(() => {
+    if (orderConfirmed) {
+      if (typeof window !== 'undefined' && 'fbq' in window) {
+        ;(window as any).fbq('track', 'Purchase', {
+          value: cartTotal,
+          currency: 'AZN',
+          content_ids: cartItems.map(i => i.product.id),
+          content_type: 'product',
+        });
+      }
+    }
+  }, [orderConfirmed]);
+
   if (!mounted) {
     return <div className="min-h-screen bg-[#FAF9F6] pt-32 text-center text-xs uppercase tracking-widest font-mono">Yüklənir...</div>;
   }
@@ -237,19 +250,6 @@ export default function CheckoutPage() {
     // Redirect to home
     window.location.href = '/';
   };
-
-  useEffect(() => {
-    if (orderConfirmed) {
-      if (typeof window !== 'undefined' && 'fbq' in window) {
-        ;(window as any).fbq('track', 'Purchase', {
-          value: cartTotal,
-          currency: 'AZN',
-          content_ids: cartItems.map(i => i.product.id),
-          content_type: 'product',
-        });
-      }
-    }
-  }, [orderConfirmed]);
 
   // If order is successfully confirmed
   if (orderConfirmed) {
