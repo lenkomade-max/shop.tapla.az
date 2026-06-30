@@ -396,7 +396,7 @@ export default function TovarAIPage() {
         <h2 className="text-xl font-bold">Tovar.AI</h2>
         <p className="text-sm text-zinc-500 mt-0.5">
           {mode === 'test'
-            ? 'Bir foto → 3 professional kart şəkli'
+            ? `Bir foto → ${cardCount} professional kart şəkli`
             : 'Foto + AI → hazır məhsul kartı'}
         </p>
 
@@ -586,7 +586,7 @@ export default function TovarAIPage() {
               stage === 'planning' ? 'Promtlar hazırlanır...' :
               'Şəkillər yaradılır...'
             ) : stage === 'done' ? 'Yenidən yarat' : (
-              mode === 'product' ? 'Məhsul yarat' : '3 kart şəkli yarat'
+              mode === 'product' ? 'Məhsul yarat' : `${cardCount} kart şəkli yarat`
             )}
           </button>
         </div>
@@ -605,7 +605,7 @@ export default function TovarAIPage() {
                 {[
                   { key: 'analyzing', label: 'Foto analizi (Vision)', stage: 'analyzing' as Stage },
                   { key: 'planning', label: 'Promtların hazırlanması', stage: 'planning' as Stage },
-                  { key: 'generating', label: '3 şəkil generasiyası (paralel)', stage: 'generating' as Stage },
+                  { key: 'generating', label: `${cardCount} şəkil generasiyası (paralel)`, stage: 'generating' as Stage },
                 ].map(s => {
                   const done = stage !== s.stage && (
                     (stage === 'generating' && (s.stage === 'analyzing' || s.stage === 'planning')) ||
