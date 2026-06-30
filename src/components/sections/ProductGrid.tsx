@@ -91,7 +91,7 @@ export function ProductGrid({ products }: ProductGridProps) {
     <Section id="products" variant="neutral" py="sm">
       <Container className="!px-1 sm:!px-1">
         {/* Header */}
-        <div className="max-w-3xl mx-auto text-center space-y-3 mb-12">
+        <div className="max-w-3xl mx-auto text-center space-y-3 mb-4">
           <span className="text-[10px] tracking-[0.25em] font-bold text-neutral-400 uppercase">
             TAPLA MARKETPLACE
           </span>
@@ -103,22 +103,41 @@ export function ProductGrid({ products }: ProductGridProps) {
           </p>
         </div>
 
-        {/* Category Filter Tabs */}
+        {/* Category Filter Tabs — premium rəngli */}
         <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 mb-8 sm:mb-12 border-b border-neutral-100 pb-4">
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat.value}
-              onClick={() => setSelectedCategory(cat.value)}
-              className={clsx(
-                'text-[10px] sm:text-xs tracking-widest font-semibold uppercase relative py-2 transition-colors cursor-pointer',
-                selectedCategory === cat.value
-                  ? 'text-neutral-950 font-bold after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-neutral-950'
-                  : 'text-neutral-400 hover:text-neutral-950'
-              )}
-            >
-              {cat.label}
-            </button>
-          ))}
+          {CATEGORIES.map((cat) => {
+            const isActive = selectedCategory === cat.value;
+            return (
+              <button
+                key={cat.value}
+                onClick={() => setSelectedCategory(cat.value)}
+                className={clsx(
+                  'text-[10px] sm:text-xs tracking-widest font-semibold uppercase relative py-2 transition-all duration-300 cursor-pointer',
+                  isActive && 'font-bold',
+                  cat.value === 'all' && (isActive
+                    ? 'text-neutral-950 after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-neutral-950'
+                    : 'text-neutral-400 hover:text-neutral-950'),
+                  cat.value === 'qulaqliq-ve-audio' && (isActive
+                    ? 'text-emerald-600 after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-emerald-600'
+                    : 'text-neutral-400 hover:text-emerald-600'),
+                  cat.value === 'telefonlar-ve-plansetler' && (isActive
+                    ? 'text-blue-600 after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-blue-600'
+                    : 'text-neutral-400 hover:text-blue-600'),
+                  cat.value === 'kicik-meiset-texnikasi' && (isActive
+                    ? 'text-amber-600 after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-amber-500'
+                    : 'text-neutral-400 hover:text-amber-600'),
+                  cat.value === 'aqilli-saat-ve-gadget' && (isActive
+                    ? 'text-violet-600 after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-violet-600'
+                    : 'text-neutral-400 hover:text-violet-600'),
+                  cat.value === 'elektronika' && (isActive
+                    ? 'text-rose-600 after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-rose-600'
+                    : 'text-neutral-400 hover:text-rose-600'),
+                )}
+              >
+                {cat.label}
+              </button>
+            );
+          })}
         </div>
 
         {/* Link to all category pages */}
