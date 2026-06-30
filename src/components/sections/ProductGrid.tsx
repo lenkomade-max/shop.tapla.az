@@ -30,6 +30,21 @@ const TAB_COLORS = [
   { active: 'text-lime-600 after:bg-lime-600', inactive: 'text-lime-600' },
 ];
 
+// Legacy-маппинг: старые product.category → новые category.slug (для статических товаров)
+const LEGACY_CATEGORY_MAP: Record<string, string> = {
+  'Notebook / Ultrabook': 'elektronika',
+  'Smartfon / Planşet': 'telefonlar-ve-plansetler',
+  'Aksesuar / Qadjet': 'aqilli-saat-ve-gadget',
+  'Planşet': 'telefonlar-ve-plansetler',
+  'Qulaqlıq & Audio': 'qulaqliq-ve-audio',
+  'Kiçik Məişət Texnikası': 'kicik-meiset-texnikasi',
+  'Sağlamlıq & İdman': 'saglamliq-ve-idman',
+  'Ağıllı Saat & Gadget': 'aqilli-saat-ve-gadget',
+  'Telefonlar & Planşetlər': 'telefonlar-ve-plansetler',
+  'Elektronika': 'elektronika',
+  'TV / Audio': 'elektronika',
+};
+
 interface CategoryTab {
   label: string;
   value: string;
@@ -94,11 +109,17 @@ export function ProductGrid({ products }: ProductGridProps) {
   }, []);
 
   const getProductCategorySlug = (product: Product): string => {
+    // 1. По categoryId (FK в БД)
     if (product.categoryId && slugById.has(product.categoryId)) {
       return slugById.get(product.categoryId)!;
     }
+    // 2. По category.title (динамическое совпадение)
     if (product.category && slugByName.has(product.category.toLowerCase())) {
       return slugByName.get(product.category.toLowerCase())!;
+    }
+    // 3. Legacy-маппинг (статические товары)
+    if (product.category && LEGACY_CATEGORY_MAP[product.category]) {
+      return LEGACY_CATEGORY_MAP[product.category];
     }
     return '';
   };
