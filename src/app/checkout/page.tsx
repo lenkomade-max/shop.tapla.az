@@ -238,6 +238,19 @@ export default function CheckoutPage() {
     window.location.href = '/';
   };
 
+  useEffect(() => {
+    if (orderConfirmed) {
+      if (typeof window !== 'undefined' && 'fbq' in window) {
+        ;(window as any).fbq('track', 'Purchase', {
+          value: cartTotal,
+          currency: 'AZN',
+          content_ids: cartItems.map(i => i.product.id),
+          content_type: 'product',
+        });
+      }
+    }
+  }, [orderConfirmed]);
+
   // If order is successfully confirmed
   if (orderConfirmed) {
     return (
