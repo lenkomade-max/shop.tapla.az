@@ -427,29 +427,55 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
             <div className={`fixed bottom-14 md:bottom-0 left-0 right-0 z-50 bg-white border-t border-neutral-200 p-3 shadow-lg transition-opacity duration-300 ${
               showStickyCta ? 'opacity-100' : 'opacity-0 pointer-events-none'
             }`}>
-              <div className="flex items-center space-x-3 max-w-7xl mx-auto">
-                <div className="flex items-center border border-neutral-300 h-11 bg-white shrink-0">
+              <div className="flex items-center gap-2 max-w-7xl mx-auto">
+                {/* Quantity */}
+                <div className="flex items-center border border-neutral-300 h-10 bg-white shrink-0 rounded-lg overflow-hidden">
                   <button
                     onClick={() => handleQuantityChange(quantity - 1)}
-                    className="px-3 h-full hover:bg-neutral-50 text-neutral-500 transition-colors cursor-pointer"
+                    className="px-2.5 h-full hover:bg-neutral-50 text-neutral-500 transition-colors cursor-pointer"
                   >
                     <Minus className="h-3 w-3" />
                   </button>
-                  <span className="px-3 text-xs font-mono font-bold text-neutral-800 select-none min-w-[24px] text-center">
+                  <span className="px-2 text-xs font-mono font-bold text-neutral-800 select-none min-w-[22px] text-center">
                     {quantity}
                   </span>
                   <button
                     onClick={() => handleQuantityChange(quantity + 1)}
-                    className="px-3 h-full hover:bg-neutral-50 text-neutral-500 transition-colors cursor-pointer"
+                    className="px-2.5 h-full hover:bg-neutral-50 text-neutral-500 transition-colors cursor-pointer"
                   >
                     <Plus className="h-3 w-3" />
                   </button>
                 </div>
+                {/* Add to Cart */}
+                <button
+                  onClick={handleAddToCart}
+                  className={`flex-1 h-10 text-[9px] tracking-widest font-bold uppercase border transition-all duration-300 cursor-pointer rounded-lg whitespace-nowrap ${
+                    isAdded
+                      ? 'bg-emerald-600 text-white border-emerald-600'
+                      : 'bg-white text-neutral-900 border-neutral-300 hover:border-neutral-950 hover:bg-neutral-50'
+                  }`}
+                >
+                  {isAdded ? (
+                    <span className="flex items-center justify-center gap-1">
+                      <Check className="h-3.5 w-3.5" />
+                      <span>ƏLAVƏ EDİLDİ</span>
+                    </span>
+                  ) : (
+                    <span className="flex items-center justify-center gap-1">
+                      <ShoppingBag className="h-3.5 w-3.5" />
+                      <span>SƏBƏTƏ AT</span>
+                    </span>
+                  )}
+                </button>
+                {/* Direct Order */}
                 <button
                   onClick={handleDirectOrder}
-                  className="flex-1 h-11 text-[10px] tracking-widest font-bold uppercase border border-neutral-950 bg-neutral-950 text-white hover:bg-transparent hover:text-neutral-900 transition-all duration-300 cursor-pointer"
+                  className="flex-1 h-10 text-[9px] tracking-widest font-bold uppercase border border-neutral-950 bg-neutral-950 text-white hover:bg-neutral-800 transition-all duration-300 cursor-pointer rounded-lg whitespace-nowrap"
                 >
-                  BİRBAŞA SİFARİŞ ET
+                  <span className="flex items-center justify-center gap-1">
+                    <ArrowRight className="h-3.5 w-3.5" />
+                    <span>SİFARİŞ ET</span>
+                  </span>
                 </button>
               </div>
             </div>
@@ -520,8 +546,8 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
                     onClick={() => setActiveTab(tab)}
                     className={`pb-2.5 text-[10px] font-bold tracking-widest uppercase mr-6 border-b-2 transition-all cursor-pointer ${
                       activeTab === tab
-                        ? 'border-neutral-950 text-neutral-950'
-                        : 'border-transparent text-[#b52525] hover:text-neutral-700'
+                        ? 'border-blue-600 text-blue-600'
+                        : 'border-transparent text-blue-500 hover:text-blue-600'
                     }`}
                   >
                     {tab === 'benefits' && 'FAYDALARI'}
@@ -609,8 +635,8 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
         </div>
 
         {/* Dynamic Reviews Segment for current product */}
-        <div className="mt-24 border-t border-neutral-100 pt-16">
-          <div className="mb-10 text-center max-w-lg mx-auto">
+        <div className="mt-12 border-t border-neutral-100 pt-8">
+          <div className="mb-6 text-center max-w-lg mx-auto">
             <h2 className="text-lg font-bold tracking-widest uppercase text-neutral-950 mb-3">MÜŞTƏRİ RƏYLƏRİ</h2>
             <p className="text-xs text-neutral-400 font-sans">Məhsulumuz haqqında real müştərilərimizdən gələn rəylərlə tanış olun.</p>
           </div>
@@ -644,8 +670,8 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
 
         {/* Related Products Showcase */}
         {relatedProducts.length > 0 && (
-          <div className="mt-24 border-t border-neutral-100 pt-16">
-            <div className="flex items-center justify-between mb-10">
+          <div className="mt-12 border-t border-neutral-100 pt-8">
+            <div className="flex items-center justify-between mb-6">
               <h2 className="text-sm sm:text-base font-bold tracking-widest uppercase text-neutral-950">
                 SİZİN ÜÇÜN SEÇDİKLƏRİMİZ
               </h2>
