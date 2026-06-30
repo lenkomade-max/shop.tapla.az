@@ -272,6 +272,10 @@ export const TOVAR_AI_CONFIG = {
   // OpenRouter
   OPENROUTER_BASE_URL: 'https://openrouter.ai/api/v1',
 
+  // Kei Proxy (n1leads.tapla.az) — Stage 3 image generation
+  KEI_PROXY_URL: process.env.KEI_PROXY_URL || 'https://n1leads.tapla.az',
+  PROXY_SECRET: process.env.PROXY_SECRET || '',
+
   /** Единственное что берётся из .env */
   get API_KEY() {
     return process.env.OPENROUTER_API_KEY || ''

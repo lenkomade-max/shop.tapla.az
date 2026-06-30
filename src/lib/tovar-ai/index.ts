@@ -5,7 +5,7 @@
 export { analyzeProductImage } from './stage1-vision'
 export { enrichProductData } from './stage1.5-enricher'
 export { planCardPrompts } from './stage2-planner'
-export { generateSingleCard, generateAllCards } from './stage3-generate'
+export { generateSingleCard, generateAllCards } from './stage3-generate-kei'
 export { checkCardQuality } from './stage4-qa'
 export { runTovarAIPipeline } from './pipeline'
 export { visionToProductData } from './vision-to-product'
