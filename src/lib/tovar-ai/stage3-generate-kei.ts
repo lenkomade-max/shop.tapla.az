@@ -39,8 +39,8 @@ export async function generateSingleCard(
 
   const hardRules = `[HARD RULES - MUST FOLLOW]
 - LANGUAGE: ALL visible text in Azerbaijani Latin ONLY. Never English, Russian, or Cyrillic.
-- NO BUTTONS: Never render any CTA buttons ("SƏBƏTƏ AT", "İNDİ AL", etc.).
-- NO MARKETPLACE LOGOS: Never render any marketplace logo, shop logo, or brand watermark (TAPLA, shop.tapla.az, etc.).
+- NO BUTTONS: Never render any CTA buttons ("SƏBƏTƏ AT", etc.).
+- NO MARKETPLACE LOGOS: Never render any marketplace logo, shop logo, or brand watermark (tap.az, magazam az, etc.).
 - KEEP PRODUCT LOGO: The product's own manufacturer logo (if physically on the product) MUST stay visible and accurate — it's part of the product identity.
 - REMOVE OVERLAYS: Strip any text overlays, watermarks, or stickers that are NOT physically printed on the product itself.
 - NO INVENTED DATA: Use ONLY data from the prompt below. Never invent prices, percentages, or specs.

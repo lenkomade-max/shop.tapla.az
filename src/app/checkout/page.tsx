@@ -88,13 +88,17 @@ export default function CheckoutPage() {
     })
   }, [mounted])
 
-  // Prevent Chrome autofill from scrolling to first input
+  // Страница ВСЕГДА открывается сверху — запрещаем браузеру восстанавливать скролл
   useEffect(() => {
-    if (mounted) {
-      requestAnimationFrame(() => {
-        window.scrollTo(0, 0);
-      });
-    }
+    if (!mounted) return;
+    // «manual» отключает встроенное восстановление скролла браузером
+    // Страница открывается на самом верху, а не там где был пользователь
+    history.scrollRestoration = 'manual';
+    window.scrollTo(0, 0);
+    // Возвращаем 'auto' при уходе со страницы, чтобы не ломать другие страницы
+    return () => {
+      history.scrollRestoration = 'auto';
+    };
   }, [mounted]);
 
   // Авто-заполнение из профиля при загрузке (только если поля ещё пустые)
