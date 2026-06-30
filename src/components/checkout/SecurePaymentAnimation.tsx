@@ -167,8 +167,8 @@ export default function SecurePaymentAnimation({
                 )}
               </AnimatePresence>
             </motion.div>
-            <span className="text-[9px] sm:text-[10px] font-bold text-slate-700 mt-1 sm:mt-2">Mobil Tətbiq</span>
-            <span className="text-[7px] sm:text-[9px] text-rose-500 font-bold font-mono">TƏSDİQ</span>
+            <span className="text-[9px] sm:text-[10px] font-bold text-slate-700 mt-1 sm:mt-2">Bank Tətbiqi</span>
+            <span className="text-[7px] sm:text-[9px] text-rose-500 font-bold font-mono">TƏSDİQ ET</span>
           </div>
 
           {/* Flow paths */}
