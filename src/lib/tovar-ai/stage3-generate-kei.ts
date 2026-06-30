@@ -1,7 +1,7 @@
 // ============================================================================
 // Stage 3: Image Generation via Kei Proxy (n1leads.tapla.az)
 // Nano Banana 2 через Kei Proxy. Promise.all для параллельной генерации.
-// Асинхронный протокол: createTask → polling → download.
+// Асинхронный протокол: upload photo → createTask → polling → download.
 // ============================================================================
 
 import { TOVAR_AI_CONFIG, type CardPrompt, type CardResult } from './types'
@@ -10,16 +10,26 @@ import { createSignedHeaders } from './proxy-security'
 /**
  * Генерация одного изображения через Kei Proxy (Nano Banana 2).
  * Асинхронный протокол: createTask → polling → download image → base64.
+ *
+ * @param referenceUrl — URL уже загруженного reference фото (если есть).
+ *   Если не передан — фото НЕ будет загружено; предполагается что вызыватель
+ *   предварительно загрузил фото через uploadReferencePhoto().
  */
 export async function generateSingleCard(
   card: CardPrompt,
   photoBase64: string,
   attempt: number = 1,
+  referenceUrl?: string,
 ): Promise<CardResult> {
   const config = TOVAR_AI_CONFIG
 
   if (!config.PROXY_SECRET) {
     throw new Error('PROXY_SECRET is not set in .env.local')
+  }
+
+  // ─── 0. Upload reference photo если URL не передан ──────────────────────
+  if (!referenceUrl) {
+    referenceUrl = await uploadReferencePhoto(photoBase64)
   }
 
   // Жёсткие правила для Nano Banana — всегда в начале промпта
@@ -42,7 +52,7 @@ export async function generateSingleCard(
       aspect_ratio: config.ASPECT_RATIO,
       resolution: config.IMAGE_SIZE,
       output_format: 'png',
-      image_input: [`data:image/jpeg;base64,${photoBase64}`],
+      image_input: [referenceUrl],
     },
   })
 
@@ -56,11 +66,10 @@ export async function generateSingleCard(
   })
 
   if (!createResponse.ok) {
-    // 5xx — retryable
     if (createResponse.status >= 500 && attempt <= config.MAX_RETRIES) {
       console.warn(`[Stage 3 Kei] Server error ${createResponse.status}, retrying (${attempt}/${config.MAX_RETRIES})`)
       await sleep(1000 * attempt)
-      return generateSingleCard(card, photoBase64, attempt + 1)
+      return generateSingleCard(card, photoBase64, attempt + 1, referenceUrl)
     }
     const errText = await createResponse.text()
     throw new Error(`Kei Proxy createTask error ${createResponse.status}: ${errText.slice(0, 500)}`)
@@ -69,11 +78,10 @@ export async function generateSingleCard(
   const createData = await createResponse.json()
 
   if (createData.code !== 200 || !createData.data?.taskId) {
-    // Retryable?
     if (attempt <= config.MAX_RETRIES) {
       console.warn(`[Stage 3 Kei] createTask failed (code=${createData.code}), retrying (${attempt}/${config.MAX_RETRIES})`)
       await sleep(2000 * attempt)
-      return generateSingleCard(card, photoBase64, attempt + 1)
+      return generateSingleCard(card, photoBase64, attempt + 1, referenceUrl)
     }
     throw new Error(`Kei Proxy createTask failed: ${createData.msg || JSON.stringify(createData).slice(0, 300)}`)
   }
@@ -91,11 +99,10 @@ export async function generateSingleCard(
     const msg = pollErr instanceof Error ? pollErr.message : String(pollErr)
     console.error(`[Stage 3 Kei] Card ${card.index} — polling failed: ${msg}`)
 
-    // Retry если таймаут или сетевая ошибка
     if (attempt <= config.MAX_RETRIES) {
       console.warn(`[Stage 3 Kei] Retrying card ${card.index} (${attempt}/${config.MAX_RETRIES})`)
       await sleep(2000 * attempt)
-      return generateSingleCard(card, photoBase64, attempt + 1)
+      return generateSingleCard(card, photoBase64, attempt + 1, referenceUrl)
     }
     throw pollErr
   }
@@ -104,7 +111,7 @@ export async function generateSingleCard(
     if (attempt <= config.MAX_RETRIES) {
       console.warn(`[Stage 3 Kei] Card ${card.index} — empty resultUrls, retrying (${attempt}/${config.MAX_RETRIES})`)
       await sleep(2000 * attempt)
-      return generateSingleCard(card, photoBase64, attempt + 1)
+      return generateSingleCard(card, photoBase64, attempt + 1, referenceUrl)
     }
     throw new Error(`Kei Proxy returned no images for card ${card.index}`)
   }
@@ -127,7 +134,7 @@ export async function generateSingleCard(
     if (attempt <= config.MAX_RETRIES) {
       console.warn(`[Stage 3 Kei] Retrying card ${card.index} (${attempt}/${config.MAX_RETRIES})`)
       await sleep(1000 * attempt)
-      return generateSingleCard(card, photoBase64, attempt + 1)
+      return generateSingleCard(card, photoBase64, attempt + 1, referenceUrl)
     }
     throw new Error(`Failed to download image for card ${card.index}: ${msg}`)
   }
@@ -135,9 +142,8 @@ export async function generateSingleCard(
 
 /**
  * Параллельная генерация всех карточек через Kei Proxy.
- * Все запросы уходят ОДНОВРЕМЕННО через Promise.allSettled.
+ * Reference фото загружается ОДИН раз, затем все карточки используют тот же URL.
  * generateSingleCard САМ делает ретраи (MAX_RETRIES=2).
- * Здесь ретраев НЕТ — чтобы не было каскадных повторов.
  */
 export async function generateAllCards(
   cards: CardPrompt[],
@@ -145,8 +151,19 @@ export async function generateAllCards(
 ): Promise<CardResult[]> {
   console.log(`[Stage 3 Kei] Generating ${cards.length} cards in parallel via Kei Proxy...`)
 
+  // ─── Upload reference photo ONCE ────────────────────────────────────────
+  let referenceUrl: string
+  try {
+    referenceUrl = await uploadReferencePhoto(photoBase64)
+    console.log(`[Stage 3 Kei] Reference photo uploaded: ${referenceUrl}`)
+  } catch (uploadErr) {
+    console.error(`[Stage 3 Kei] Upload failed:`, uploadErr instanceof Error ? uploadErr.message : String(uploadErr))
+    return []
+  }
+
+  // ─── Parallel generation ────────────────────────────────────────────────
   const results = await Promise.allSettled(
-    cards.map(card => generateSingleCard(card, photoBase64)),
+    cards.map(card => generateSingleCard(card, photoBase64, 1, referenceUrl)),
   )
 
   const finalResults: CardResult[] = []
@@ -166,6 +183,56 @@ export async function generateAllCards(
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
+
+/**
+ * Загружает reference фото в kei-proxy и возвращает публичный URL.
+ * POST /api/upload  { image: "data:image/...;base64,..." }
+ */
+async function uploadReferencePhoto(photoBase64: string): Promise<string> {
+  const config = TOVAR_AI_CONFIG
+  const mimeType = detectMimeType(photoBase64)
+  const dataUrl = `data:${mimeType};base64,${photoBase64}`
+
+  const body = JSON.stringify({ image: dataUrl })
+  const path = '/api/upload'
+  const headers = createSignedHeaders(path, 'POST', body)
+
+  const response = await fetch(`${config.KEI_PROXY_URL}${path}`, {
+    method: 'POST',
+    headers,
+    body,
+  })
+
+  if (!response.ok) {
+    const errText = await response.text()
+    throw new Error(`Upload failed: HTTP ${response.status} — ${errText.slice(0, 300)}`)
+  }
+
+  const data = await response.json()
+
+  if (!data.success || !data.url) {
+    throw new Error(`Upload failed: ${data.error || 'no url returned'}`)
+  }
+
+  return data.url as string
+}
+
+/**
+ * Определяет MIME-тип изображения по первым байтам base64-строки.
+ */
+function detectMimeType(base64: string): string {
+  const head = Buffer.from(base64.slice(0, 16), 'base64')
+  // JPEG: FF D8 FF
+  if (head[0] === 0xff && head[1] === 0xd8) return 'image/jpeg'
+  // PNG: 89 50 4E 47
+  if (head[0] === 0x89 && head[1] === 0x50 && head[2] === 0x4e && head[3] === 0x47) return 'image/png'
+  // WebP: 52 49 46 46 ... 57 45 42 50
+  if (head[0] === 0x52 && head[1] === 0x49 && head[2] === 0x46 && head[3] === 0x46) return 'image/webp'
+  // GIF: 47 49 46 38
+  if (head[0] === 0x47 && head[1] === 0x49 && head[2] === 0x46) return 'image/gif'
+  // fallback
+  return 'image/jpeg'
+}
 
 /**
  * Polling статуса задачи с exponential backoff.
