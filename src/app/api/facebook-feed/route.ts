@@ -8,21 +8,48 @@ function normalize(s: string): string {
   return s.toLowerCase().replace(/ı/g, 'i').replace(/i̇/g, 'i').trim()
 }
 
-function googleCategory(leafName: string): string {
+function googleCategory(leafName: string, tags?: string[]): string {
   const cat = normalize(leafName)
+
+  // Try tags as fallback for better granularity
+  const tryTags = (arr: string[]): string | null => {
+    for (const t of arr) {
+      const n = normalize(t)
+      const r = matchGoogleCategory(n)
+      if (r) return r
+    }
+    return null
+  }
+
+  const r = matchGoogleCategory(cat)
+  if (r) return r
+  if (tags && tags.length > 0) {
+    const fromTags = tryTags(tags)
+    if (fromTags) return fromTags
+  }
+  return 'Electronics'
+}
+
+function matchGoogleCategory(cat: string): string | null {
   if (cat.includes('notebook') || cat.includes('ultrabook') || cat.includes('noutbuk')) return 'Electronics > Computers > Notebooks'
   if (cat.includes('smartfon') || cat.includes('telefon') || cat.includes('phone')) return 'Electronics > Communications > Smartphones'
   if (cat.includes('planset') || cat.includes('tablet') || cat.includes('ipad')) return 'Electronics > Computers > Tablet Computers'
   if (cat.includes('qulaqliq') || cat.includes('audio') || cat.includes('qulaqüstü')) return 'Electronics > Audio > Headphones'
-  if (cat.includes('saat') || cat.includes('watch') || cat.includes('gadget')) return 'Electronics > Wearables'
-  if (cat.includes('powerbank') || cat.includes('enerji')) return 'Electronics > Computers > Computer Accessories'
-  if (cat.includes('aksesuar') || cat.includes('accessory') || cat.includes('kabel')) return 'Electronics > Accessories'
-  if (cat.includes('fen') || cat.includes('serinkes') || cat.includes('saç')) return 'Home & Garden > Household Appliances > Hair Care Appliances'
-  if (cat.includes('temizlik') || cat.includes('tozsoran') || cat.includes('vacuum')) return 'Home & Garden > Household Appliances > Vacuums'
-  if (cat.includes('metbex') || cat.includes('mətbəx') || cat.includes('kitchen')) return 'Home & Garden > Household Appliances > Kitchen Appliances'
+  if (cat.includes('saat') || cat.includes('watch') || cat.includes('gadget') || cat.includes('aqilli')) return 'Electronics > Wearables'
+  if (cat.includes('powerbank') || cat.includes('enerji') || cat.includes('batareya')) return 'Electronics > Computers > Computer Accessories'
+  if (cat.includes('aksesuar') || cat.includes('accessory') || cat.includes('kabel') || cat.includes('qoruyucu')) return 'Electronics > Accessories'
+  if (cat.includes('fen') || cat.includes('serinkes') || cat.includes('saç') || cat.includes('düzəldən')) return 'Home & Garden > Household Appliances > Hair Care Appliances'
+  if (cat.includes('temizlik') || cat.includes('tozsoran') || cat.includes('vacuum') || cat.includes('robot')) return 'Home & Garden > Household Appliances > Vacuums'
+  if (cat.includes('metbex') || cat.includes('mətbəx') || cat.includes('kitchen') || cat.includes('məişət')) return 'Home & Garden > Household Appliances > Kitchen Appliances'
   if (cat.includes('kamera') || cat.includes('dji') || cat.includes('drone')) return 'Electronics > Camera & Optics'
-  if (cat.includes('idman') || cat.includes('saglamliq') || cat.includes('masaj') || cat.includes('fitness')) return 'Health & Beauty > Exercise & Fitness'
-  return 'Electronics'
+  if (cat.includes('idman') || cat.includes('saglamliq') || cat.includes('masaj') || cat.includes('fitness') || cat.includes('sağlamlıq')) return 'Health & Beauty > Exercise & Fitness'
+  if (cat.includes('utü') || cat.includes('ütü') || cat.includes('buxar')) return 'Home & Garden > Household Appliances > Kitchen Appliances'
+  if (cat.includes('oyun') || cat.includes('game') || cat.includes('gaming')) return 'Electronics > Video Game Consoles & Accessories'
+  if (cat.includes('musiqi') || cat.includes('kolonka') || cat.includes('speaker')) return 'Electronics > Audio > Speakers'
+  if (cat.includes('monitor') || cat.includes('ekran')) return 'Electronics > Computers > Monitors'
+  if (cat.includes('printer') || cat.includes('mfp')) return 'Electronics > Computers > Printers & Scanners'
+  if (cat.includes('elektronika')) return 'Electronics'
+  return null
 }
 
 // Builds full path from leaf category up to root, e.g. "Elektronika > Qulaqlıq > Simsiz Qulaqlıq"
@@ -94,7 +121,7 @@ export async function GET() {
       <g:availability>in_stock</g:availability>
       <g:brand>TAPLA MARKETPLACE</g:brand>
       <g:condition>new</g:condition>
-      <g:google_product_category>${escapeXml(googleCategory(leafCategory))}</g:google_product_category>
+      <g:google_product_category>${escapeXml(googleCategory(leafCategory, p.tags || []))}</g:google_product_category>
       <g:product_type>${escapeXml(fullPath || p.category || '')}</g:product_type>
       ${tags}
       ${color}
