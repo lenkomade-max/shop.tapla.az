@@ -1,66 +1,54 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { ProductCard } from '@/components/cards/ProductCard';
 import { Container } from '@/components/ui/Container';
 import { clsx } from 'clsx';
-import { Product, Category } from '@/types';
+import { Product } from '@/types';
 
-// Цвета для табов (циклично)
-const TAB_COLORS = [
-  { active: 'text-emerald-600 after:bg-emerald-600', inactive: 'text-emerald-600' },
-  { active: 'text-blue-600 after:bg-blue-600', inactive: 'text-blue-600' },
-  { active: 'text-amber-600 after:bg-amber-500', inactive: 'text-amber-600' },
-  { active: 'text-violet-600 after:bg-violet-600', inactive: 'text-violet-600' },
-  { active: 'text-rose-600 after:bg-rose-600', inactive: 'text-rose-600' },
-  { active: 'text-cyan-600 after:bg-cyan-600', inactive: 'text-cyan-600' },
-  { active: 'text-orange-600 after:bg-orange-600', inactive: 'text-orange-600' },
-  { active: 'text-lime-600 after:bg-lime-600', inactive: 'text-lime-600' },
-];
-
-// Legacy-маппинг: старые product.category → новые category.slug
-const LEGACY_CATEGORY_MAP: Record<string, string> = {
+// Карта: старые category names → новые root slugs (для демо-товаров)
+const CATEGORY_NAME_MAP: Record<string, string> = {
   'Notebook / Ultrabook': 'elektronika',
   'Smartfon / Planşet': 'telefonlar-ve-plansetler',
   'Aksesuar / Qadjet': 'aqilli-saat-ve-gadget',
   'Planşet': 'telefonlar-ve-plansetler',
-  'Qulaqlıq & Audio': 'qulaqliq-ve-audio',
-  'Kiçik Məişət Texnikası': 'kicik-meiset-texnikasi',
-  'Sağlamlıq & İdman': 'saglamliq-ve-idman',
-  'Ağıllı Saat & Gadget': 'aqilli-saat-ve-gadget',
-  'Telefonlar & Planşetlər': 'telefonlar-ve-plansetler',
-  'Elektronika': 'elektronika',
-  'TV / Audio': 'elektronika',
 };
 
-interface CategoryTab {
-  label: string;
-  value: string;
-  colorIndex: number;
-}
+const CATEGORIES = [
+  { label: 'HAMSINI GÖSTƏR', value: 'all' },
+  { label: 'QULAQLIQ & AUDIO', value: 'qulaqliq-ve-audio' },
+  { label: 'TELEFON & PLANŞET', value: 'telefonlar-ve-plansetler' },
+  { label: 'MƏİŞƏT TEXNİKASI', value: 'kicik-meiset-texnikasi' },
+  { label: 'SAAT & GADGET', value: 'aqilli-saat-ve-gadget' },
+  { label: 'ELEKTRONIKA', value: 'elektronika' },
+];
 
-function buildTabsAndMaps(cats: Category[]): {
-  tabs: CategoryTab[];
-  slugById: Map<string, string>;
-  slugByName: Map<string, string>;
-} {
-  const tabs: CategoryTab[] = [{ label: 'HAMSINI GÖSTƏR', value: 'all', colorIndex: -1 }];
-  const slugById = new Map<string, string>();
-  const slugByName = new Map<string, string>();
-  let colorIdx = 0;
+const TAB_COLOR_CLASSES: Record<string, { active: string; inactive: string }> = {
+  'qulaqliq-ve-audio': {
+    active: 'text-emerald-600 font-bold after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-emerald-600',
+    inactive: 'text-emerald-600',
+  },
+  'telefonlar-ve-plansetler': {
+    active: 'text-blue-600 font-bold after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-blue-600',
+    inactive: 'text-blue-600',
+  },
+  'kicik-meiset-texnikasi': {
+    active: 'text-amber-600 font-bold after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-amber-500',
+    inactive: 'text-amber-600',
+  },
+  'aqilli-saat-ve-gadget': {
+    active: 'text-violet-600 font-bold after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-violet-600',
+    inactive: 'text-violet-600',
+  },
+  'elektronika': {
+    active: 'text-rose-600 font-bold after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-rose-600',
+    inactive: 'text-rose-600',
+  },
+};
 
-  function walk(list: Category[]) {
-    for (const cat of list) {
-      slugById.set(cat.id, cat.slug);
-      slugByName.set(cat.title.toLowerCase(), cat.slug);
-      if (!cat.parentId) {
-        tabs.push({ label: cat.title.toUpperCase(), value: cat.slug, colorIndex: colorIdx++ });
-      }
-      if (cat.children) walk(cat.children);
-    }
-  }
-  walk(cats);
-  return { tabs, slugById, slugByName };
+function getProductCategoryValue(product: Product): string {
+  const mapped = CATEGORY_NAME_MAP[product.category];
+  return mapped || '';
 }
 
 interface ProductsClientProps {
@@ -70,41 +58,9 @@ interface ProductsClientProps {
 export function ProductsClient({ products }: ProductsClientProps) {
   const [selectedCategory, setSelectedCategory] = useState('all');
 
-  // Динамическая загрузка категорий из БД
-  const [tabs, setTabs] = useState<CategoryTab[]>([]);
-  const [slugById, setSlugById] = useState<Map<string, string>>(new Map());
-  const [slugByName, setSlugByName] = useState<Map<string, string>>(new Map());
-
-  useEffect(() => {
-    import('@/services/db').then(({ dbService }) => {
-      dbService.getCategoryTree().then((cats) => {
-        const { tabs: loaded, slugById: byId, slugByName: byName } = buildTabsAndMaps(cats);
-        setTabs(loaded);
-        setSlugById(byId);
-        setSlugByName(byName);
-      });
-    });
-  }, []);
-
-  const getProductCategorySlug = (product: Product): string => {
-    // 1. По categoryId (FK в БД)
-    if (product.categoryId && slugById.has(product.categoryId)) {
-      return slugById.get(product.categoryId)!;
-    }
-    // 2. По category.title (динамическое совпадение)
-    if (product.category && slugByName.has(product.category.toLowerCase())) {
-      return slugByName.get(product.category.toLowerCase())!;
-    }
-    // 3. Legacy-маппинг (статические товары)
-    if (product.category && LEGACY_CATEGORY_MAP[product.category]) {
-      return LEGACY_CATEGORY_MAP[product.category];
-    }
-    return '';
-  };
-
   const filteredProducts = selectedCategory === 'all'
     ? products
-    : products.filter(p => getProductCategorySlug(p) === selectedCategory);
+    : products.filter(p => getProductCategoryValue(p) === selectedCategory);
 
   return (
     <div className="min-h-screen bg-neutral-50">
@@ -122,31 +78,25 @@ export function ProductsClient({ products }: ProductsClientProps) {
           </p>
         </div>
 
-        {/* Category Filter Tabs — динамические из БД, premium rəngli */}
+        {/* Category Filter Tabs — premium rəngli */}
         <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 mb-8 border-b border-neutral-100 pb-4">
-          {tabs.map((tab) => {
-            const isActive = selectedCategory === tab.value;
-            const isAll = tab.value === 'all';
-            const color = TAB_COLORS[tab.colorIndex % TAB_COLORS.length];
-
-            const activeClass = isAll
-              ? 'text-neutral-950 font-bold after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-neutral-950'
-              : `font-bold ${color.active} after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full`;
-
-            const inactiveClass = isAll
-              ? 'text-neutral-400 hover:text-neutral-950'
-              : color.inactive;
-
+          {CATEGORIES.map((cat) => {
+            const isActive = selectedCategory === cat.value;
+            const colors = TAB_COLOR_CLASSES[cat.value];
             return (
               <button
-                key={tab.value}
-                onClick={() => setSelectedCategory(tab.value)}
+                key={cat.value}
+                onClick={() => setSelectedCategory(cat.value)}
                 className={clsx(
-                  'text-[10px] sm:text-xs tracking-widest font-semibold uppercase relative py-2 transition-all duration-300 cursor-pointer',
-                  isActive ? activeClass : inactiveClass,
+                  'text-[10px] sm:text-xs tracking-widest font-semibold uppercase relative py-2 transition-colors cursor-pointer',
+                  cat.value === 'all'
+                    ? (isActive
+                        ? 'text-neutral-950 font-bold after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-neutral-950'
+                        : 'text-neutral-400 hover:text-neutral-950')
+                    : (isActive ? colors.active : colors.inactive),
                 )}
               >
-                {tab.label}
+                {cat.label}
               </button>
             );
           })}
