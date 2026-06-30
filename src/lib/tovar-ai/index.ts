@@ -6,7 +6,9 @@ export { analyzeProductImage } from './stage1-vision'
 export { enrichProductData } from './stage1.5-enricher'
 export { planCardPrompts } from './stage2-planner'
 export { generateSingleCard, generateAllCards } from './stage3-generate-kei'
-export { checkCardQuality } from './stage4-qa'
+// Stage 4 (Quality Check) — ОТКЛЮЧЕН
+// export { checkCardQuality } from './stage4-qa'
+export { generateCleanProductPhoto } from './stage5-kie-image'
 export { runTovarAIPipeline } from './pipeline'
 export { visionToProductData } from './vision-to-product'
 export type { ProductDraftData } from './vision-to-product'
@@ -24,4 +26,6 @@ export {
   type PipelineResult,
   type GenerationRecord,
   type EnricherOutput,
+  type KieImageToImageInput,
+  type KieImageToImageResult,
 } from './types'

@@ -63,6 +63,8 @@ export async function POST(request: Request) {
       imageUrls: result.imageUrls ?? null,
       // Stage 1.5 — AI-обогащённые данные товара (до мержа)
       enrichedData: result.enrichedData ?? null,
+      // Stage 5 — Kie.ai чистое фото товара (белый фон, без текста/лого)
+      cleanPhoto: result.cleanPhoto ?? null,
     })
   } catch (err) {
     console.error('[TovarAI] API error:', err)

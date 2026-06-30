@@ -6,7 +6,7 @@ import {
   Download, X, RotateCcw, Sparkles, ShoppingBag, ChevronLeft, ChevronRight
 } from 'lucide-react'
 import { createProductFromAI, publishProduct, fetchActiveCategories } from '@/lib/actions'
-import type { ProductDraftData } from '@/lib/tovar-ai'
+import type { ProductDraftData, KieImageToImageResult } from '@/lib/tovar-ai'
 
 type Stage = 'idle' | 'uploading' | 'analyzing' | 'planning' | 'generating' | 'done' | 'error'
 type Mode = 'test' | 'product'
@@ -120,6 +120,7 @@ export default function TovarAIPage() {
   // ─── Product mode — данные товара ─────────────────────────────────────
   const [productData, setProductData] = useState<ProductDraftData | null>(null)
   const [imageUrls, setImageUrls] = useState<string[] | null>(null)
+  const [cleanPhoto, setCleanPhoto] = useState<KieImageToImageResult | null>(null)
   const [savedProductId, setSavedProductId] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [categories, setCategories] = useState<Array<{ id: string; slug: string; title: string; parent_id: string | null }>>([])
@@ -199,6 +200,7 @@ export default function TovarAIPage() {
     setError('')
     setCards([])
     setCardPrompts([])
+    setCleanPhoto(null)
     setProductData(null)
     setImageUrls(null)
     setSavedProductId(null)
@@ -235,14 +237,22 @@ export default function TovarAIPage() {
       if (data.imageUrls) {
         setImageUrls(data.imageUrls)
       }
+      if (data.cleanPhoto) {
+        setCleanPhoto(data.cleanPhoto)
+      }
 
       setStage(data.success ? 'done' : 'error')
 
       // ─── Product mode: авто-сохранение как черновик ──────────────────
       if (mode === 'product' && data.success && data.productData && data.imageUrls?.length) {
+        // Добавляем cleanPhoto в images если есть
+        const allImages = [...data.imageUrls]
+        if (data.cleanPhoto?.success && data.cleanPhoto.imageUrl) {
+          allImages.unshift(data.cleanPhoto.imageUrl)
+        }
         const finalData = {
           ...data.productData,
-          images: data.imageUrls,
+          images: allImages,
           features: data.productData.features || undefined,
           ideal_for: data.productData.ideal_for || undefined,
           use_cases: data.productData.use_cases || undefined,
@@ -335,9 +345,13 @@ export default function TovarAIPage() {
     setSaving(true)
     setError('')
     try {
+      const allImages = [...(imageUrls || [])]
+      if (cleanPhoto?.success && cleanPhoto.imageUrl) {
+        allImages.unshift(cleanPhoto.imageUrl)
+      }
       const finalData = {
         ...productData,
-        images: imageUrls || [],
+        images: allImages,
         features: productData.features || undefined,
         ideal_for: productData.ideal_for || undefined,
         use_cases: productData.use_cases || undefined,
@@ -357,16 +371,20 @@ export default function TovarAIPage() {
     } finally {
       setSaving(false)
     }
-  }, [productData, imageUrls, saving])
+  }, [productData, imageUrls, cleanPhoto, saving])
 
   const handlePublish = useCallback(async () => {
     if (!productData || saving) return
     setSaving(true)
     setError('')
     try {
+      const allImages = [...(imageUrls || [])]
+      if (cleanPhoto?.success && cleanPhoto.imageUrl) {
+        allImages.unshift(cleanPhoto.imageUrl)
+      }
       const finalData = {
         ...productData,
-        images: imageUrls || [],
+        images: allImages,
         features: productData.features || undefined,
         ideal_for: productData.ideal_for || undefined,
         use_cases: productData.use_cases || undefined,
@@ -386,7 +404,7 @@ export default function TovarAIPage() {
     } finally {
       setSaving(false)
     }
-  }, [productData, imageUrls, saving])
+  }, [productData, imageUrls, cleanPhoto, saving])
 
   // ─── Скачать всё ──────────────────────────────────────────────────────
 
@@ -590,6 +608,11 @@ export default function TovarAIPage() {
               <span className="font-mono text-zinc-700">4:5</span>
               portret format (1080×1350) — məhsul kartı üçün optimal
             </div>
+
+            {/* Clean photo note */}
+            <p className="mt-3 text-xs text-zinc-400">
+              ⚡ Həmişə +1 təmiz məhsul şəkli (ağ fon, logolarsız) — kart sayından asılı deyil.
+            </p>
           </div>
 
           {/* Кнопка генерации */}
@@ -629,7 +652,7 @@ export default function TovarAIPage() {
                 {[
                   { key: 'analyzing', label: 'Foto analizi (Vision)', stage: 'analyzing' as Stage },
                   { key: 'planning', label: 'Promtların hazırlanması', stage: 'planning' as Stage },
-                  { key: 'generating', label: `${cardCount} şəkil generasiyası (paralel)`, stage: 'generating' as Stage },
+                  { key: 'generating', label: `${cardCount} şəkil generasiyası (paralel) + təmiz foto`, stage: 'generating' as Stage },
                 ].map(s => {
                   const done = stage !== s.stage && (
                     (stage === 'generating' && (s.stage === 'analyzing' || s.stage === 'planning')) ||
@@ -671,6 +694,37 @@ export default function TovarAIPage() {
               <a href={`/admin/products/${savedProductId}/edit`} className="underline font-medium">
                 Redaktə et →
               </a>
+            </div>
+          )}
+
+          {/* ════════════════════════════════════════════════════════════════
+              CLEAN PHOTO — Stage 5 чистое фото товара
+             ════════════════════════════════════════════════════════════════ */}
+          {cleanPhoto && cleanPhoto.success && (
+            <div className="rounded-xl border bg-green-50/50 p-6 shadow-sm">
+              <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-zinc-500">
+                Təmiz məhsul şəkli (Stage 5 — Kie.ai)
+              </h3>
+              <p className="mb-3 text-xs text-zinc-500">
+                Ağ fon, logosuz, professional e-commerce foto. Marketplace üçün əsas şəkil kimi istifadə olunur.
+              </p>
+              <img
+                src={cleanPhoto.imageUrl || `data:image/png;base64,${cleanPhoto.imageBase64}`}
+                alt="Təmiz məhsul şəkli"
+                className="w-full rounded-lg border object-cover aspect-square bg-white"
+              />
+              {cleanPhoto.costTime && (
+                <p className="mt-2 text-xs text-zinc-400">
+                  {(cleanPhoto.costTime / 1000).toFixed(1)}s generasiya • taskId: {cleanPhoto.taskId}
+                </p>
+              )}
+            </div>
+          )}
+
+          {cleanPhoto && !cleanPhoto.success && (
+            <div className="rounded-lg bg-amber-50 p-4 text-sm text-amber-600 flex items-start gap-2">
+              <XCircle className="h-4 w-4 shrink-0 mt-0.5" />
+              Təmiz şəkil alınmadı: {cleanPhoto.error || 'naməlum xəta'}. Kartlar hazırdır.
             </div>
           )}
 

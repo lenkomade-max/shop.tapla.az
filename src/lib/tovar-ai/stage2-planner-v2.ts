@@ -20,10 +20,16 @@ import { TOVAR_AI_CONFIG, type VisionOutput, type PromptsOutput, type CardRole, 
 const HARD_RULES = `## HARD RULES — MUST FOLLOW
 
 **LANGUAGE:** ALL visible text in Azerbaijani Latin ONLY. Never English, never Russian, never Cyrillic.
+
+**BRAND & LOGO — CRITICAL DISTINCTION:**
+- PRESERVE manufacturer brand identity: brand name, logo, engraving physically on the product (NARS, Dyson, Apple, NYX, L'Oréal, Samsung, etc.) MUST stay visible and accurate. This is the product's identity — do NOT remove or alter it.
+- REMOVE marketplace/platform logos: tap.az, TAPLA, tapla.az, magazam az, shop.az, or ANY e-commerce platform branding. These are NOT part of the product.
+- REMOVE stickers, price tags, barcodes, QR codes, discount badges, promotional overlays.
+- Rule of thumb: if it's molded into the plastic, printed on the label by the manufacturer, or engraved on the surface = KEEP. If it's a sticker someone added, a marketplace watermark, or a promotional badge = REMOVE.
+
 **NO BUTTONS:** Never render "SƏBƏTƏ AT", "İNDİ AL", "ZƏNG EDİN", "BİZƏ YAZIN", "MAĞAZAYA KEÇ" or any CTA buttons.
-**NO LOGOS:** Never render "tap.az", "TAPLA", "tapla.az", or any marketplace logo or brand name anywhere.
 **NO INVENTED DATA:** Use ONLY data from the product description and analysis. Never invent prices, percentages, warranty terms, or specs that aren't explicitly provided.
-**NO REFERENCE COPYING:** Clean product only — do NOT copy logos, brand names, watermarks, barcodes, or packaging text from the reference photo.
+**NO REFERENCE COPYING:** The output is a NEWLY COMPOSED commercial card, not a photo edit of the reference. Do NOT copy logos, brand names, watermarks, barcodes, or packaging text from the reference photo — EXCEPT the manufacturer's own brand identity physically on the product (see BRAND & LOGO above).
 **SINGLE FRAME:** One unified image per card — no split-screen, no collages, no before/after splits.
 **PRODUCT INTEGRITY:** Never alter product shape, color, or proportions. The product must be recognisable from photo.
 

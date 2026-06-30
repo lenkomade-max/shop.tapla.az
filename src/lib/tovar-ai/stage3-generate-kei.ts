@@ -38,17 +38,29 @@ export async function generateSingleCard(
   }
 
   const hardRules = `[HARD RULES - MUST FOLLOW]
-- LANGUAGE: ALL visible text in Azerbaijani Latin ONLY. Never English, Russian, or Cyrillic.
-- NO BUTTONS: Never render any CTA buttons ("SƏBƏTƏ AT", etc.).
-- NO MARKETPLACE LOGOS: Never render any marketplace logo, shop logo, or brand watermark (tap.az, magazam az, etc.).
-- KEEP PRODUCT LOGO: The product's own manufacturer logo (if physically on the product) MUST stay visible and accurate — it's part of the product identity.
-- REMOVE OVERLAYS: Strip any text overlays, watermarks, or stickers that are NOT physically printed on the product itself.
-- NO INVENTED DATA: Use ONLY data from the prompt below. Never invent prices, percentages, or specs.
-- NO REFERENCE COPYING: Do NOT copy logos, brand names, watermarks, barcodes, or packaging text from the reference photo.
-- SINGLE FRAME: One unified image per card — no split-screen, no collages.
+
+─── LANGUAGE ───
+- ALL visible text in Azerbaijani Latin ONLY. Never English, Russian, or Cyrillic.
+
+─── BRAND & LOGO ───
+- PRESERVE manufacturer brand identity: brand name, logo, engraving physically on the product (NARS, Dyson, Apple, NYX, L'Oréal, Samsung, etc.) MUST stay visible and accurate. This is the product's identity — do NOT remove or alter it.
+- REMOVE marketplace/platform logos: tap.az, TAPLA, tapla.az, magazam az, shop.az, or ANY e-commerce platform branding. These are NOT part of the product.
+- REMOVE stickers, price tags, barcodes, QR codes, discount badges, promotional overlays.
+- REMOVE watermarks and text overlays that are NOT physically printed/engraved/embossed on the product itself.
+- Rule of thumb: if it's molded into the plastic, printed on the label by the manufacturer, or engraved on the surface = KEEP. If it's a sticker someone added, a marketplace watermark, or a promotional badge = REMOVE.
+
+─── NO BUTTONS ───
+- Never render any CTA buttons ("SƏBƏTƏ AT", "İNDİ AL", "ZƏNG EDİN", etc.).
+
+─── NO INVENTED DATA ───
+- Use ONLY data from the prompt below. Never invent prices, percentages, specs, warranty terms, or delivery claims.
+- PRICE: Only if explicitly provided, always with "AZN". Never bare numbers.
+- WARRANTY/DELIVERY: Only if explicitly mentioned. Never invent.
+
+─── IMAGE STRUCTURE ───
+- SINGLE FRAME: One unified image per card — no split-screen, no collages, no before/after splits.
 - PRODUCT INTEGRITY: Never alter product shape, color, or proportions. The product must be recognisable from the reference photo.
-- PRICE: Only if explicitly provided, always with "AZN".
-- WARRANTY/DELIVERY: Only if explicitly mentioned. Never invent.`
+- NO REFERENCE COPYING: Do NOT copy logos, brand names, watermarks, barcodes, or packaging text from the reference photo. The output is a NEWLY COMPOSED commercial card, not a photo edit of the reference.`
 
   // ─── 1. Создать задачу ──────────────────────────────────────────────────
   const createTaskBody = JSON.stringify({

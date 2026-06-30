@@ -1,5 +1,5 @@
 // ============================================================================
-// Tovar.AI Pipeline — оркестратор всех 4 стадий
+// Tovar.AI Pipeline — оркестратор всех стадий
 // ============================================================================
 
 import { analyzeProductImage } from './stage1-vision'
@@ -7,7 +7,9 @@ import { enrichProductData } from './stage1.5-enricher'
 import { planCardPrompts } from './stage2-planner'
 import { planCardPromptsV2 } from './stage2-planner-v2'
 import { generateAllCards } from './stage3-generate-kei'
-import { checkCardQuality } from './stage4-qa'
+// Stage 4 (Quality Check) — ОТКЛЮЧЕН. Код сохранён в stage4-qa.ts, при необходимости включить обратно.
+// import { checkCardQuality } from './stage4-qa'
+import { generateCleanProductPhoto } from './stage5-kie-image'
 import { visionToProductData } from './vision-to-product'
 import type { ProductDraftData } from './vision-to-product'
 import {
@@ -20,6 +22,7 @@ import {
   type CardResult,
   type QAResult,
   type EnricherOutput,
+  type KieImageToImageResult,
 } from './types'
 
 const STYLE_REF_URLS: string[] = [
@@ -51,6 +54,15 @@ interface PipelineCallbacks {
 /**
  * Главная функция — полный пайплайн генерации карточек товара.
  *
+ * Стадии:
+ *   1. Vision Analysis (всегда)
+ *   2. Prompt Planning (всегда)
+ *   3. Image Generation — маркетинговые карточки с текстом (всегда)
+ *   4. Quality Check — ОТКЛЮЧЕН (код в stage4-qa.ts)
+ *   5. Kie.ai Image-to-Image — чистое фото товара, всегда 1 фото (всегда)
+ *
+ * Stage 5 не зависит от cardCount — всегда генерирует 1 чистое фото.
+ *
  * @example
  * ```ts
  * const result = await runTovarAIPipeline({
@@ -58,6 +70,7 @@ interface PipelineCallbacks {
  *   providerDescription: 'Фен профессиональный 2000W',
  * })
  * // result.cards — 3 сгенерированных карточки
+ * // result.cleanPhoto — чистое фото товара (белый фон, без текста)
  * // result.product_analysis — VisionOutput (для автопарсинга)
  * ```
  */
@@ -89,6 +102,7 @@ export async function runTovarAIPipeline(
   let productData: ProductDraftData | undefined
   let imageUrls: string[] | undefined
   let enrichedData: EnricherOutput | undefined
+  let cleanPhoto: KieImageToImageResult | undefined
 
   const isProductMode = input.mode === 'product'
   const cardCount = clampCardCount(input.cardCount ?? config.DEFAULT_CARD_COUNT)
@@ -108,22 +122,25 @@ export async function runTovarAIPipeline(
       `[Pipeline] Stage 1 ✅ — type: ${productAnalysis.product_type}, category: ${productAnalysis.category}`,
     )
 
-    // ─── PRODUCT MODE: Stage 1.5 параллельно с генерацией карточек ──
+    // ─── PRODUCT MODE: Stage 1.5 || Stages 2→3 || Stage 5 (все параллельно) ──
     if (isProductMode) {
       status = 'planning'
-      callbacks?.onStageChange?.(status, 'Enriching data + generating cards...')
-      console.log('[Pipeline] Product mode — parallel: Enricher (1.5) || Stages 2→3→4')
+      callbacks?.onStageChange?.(status, 'Enriching data + generating cards + clean photo...')
+      console.log('[Pipeline] Product mode — parallel: Enricher (1.5) || Stages 2→3 || Stage 5 (Kie.ai)')
 
-      // Запускаем параллельно:
+      // Три параллельных пути:
       //   Path A: Stage 1.5 Data Enricher (улучшение данных)
-      //   Path B: Stage 2 → Stage 3 → Stage 4 (генерация карточек)
-      const [enrichedContent, cardGenResult] = await Promise.all([
+      //   Path B: Stage 2 → Stage 3 (генерация маркетинговых карточек)
+      //   Path C: Stage 5 Kie.ai Image-to-Image (чистое фото товара, всегда 1 шт.)
+      const [enrichedContent, cardGenResult, cleanPhotoResult] = await Promise.all([
+        // Path A
         enrichProductData(
           photoBase64,
           productAnalysis,
           input.providerDescription,
           input.characteristics,
         ),
+        // Path B
         (async () => {
           // ─── STAGE 2: Prompt Planning ──────────────────────────────
           console.log('[Pipeline] Stage 2 — Prompt Planning')
@@ -145,27 +162,30 @@ export async function runTovarAIPipeline(
             throw new Error('All card generations failed')
           }
 
-          // ─── STAGE 4: Quality Check ────────────────────────────────
-          console.log('[Pipeline] Stage 4 — Quality Check')
-          const q = await checkCardQuality(
-            {
-              product_type: productAnalysis.product_type,
-              primary_color: productAnalysis.primary_color,
-              material: productAnalysis.material,
-            },
-            c,
-            input.providerDescription,
-          )
+          // Stage 4 (Quality Check) — ОТКЛЮЧЕН
+          // qaResults заполнится пустым массивом
 
-          return { prompts: p, cards: c, qaResults: q }
+          return { prompts: p, cards: c, qaResults: [] as QAResult[] }
+        })(),
+        // Path C: Stage 5 — всегда 1 чистое фото, не зависит от cardCount
+        (async () => {
+          console.log('[Pipeline] Stage 5 — Kie.ai Clean Product Photo')
+          const result = await generateCleanProductPhoto(photoBase64, productAnalysis)
+          if (result.success) {
+            console.log(`[Pipeline] Stage 5 ✅ — clean photo: ${result.imageUrl}`)
+          } else {
+            console.warn(`[Pipeline] Stage 5 ⚠️ — failed: ${result.error}`)
+          }
+          return result
         })(),
       ])
 
-      // Оба пути завершены — собираем результаты
+      // Собираем результаты со всех трёх путей
       prompts = cardGenResult.prompts
       cards = cardGenResult.cards
       qaResults = cardGenResult.qaResults
       enrichedData = enrichedContent
+      cleanPhoto = cleanPhotoResult
 
       // Мержим EnricherOutput + VisionOutput → ProductDraftData
       productData = mergeEnrichedData(
@@ -201,56 +221,58 @@ export async function runTovarAIPipeline(
       console.log(`[Pipeline] R2 upload ✅ — ${imageUrls.length} cards uploaded`)
 
     } else {
-      // ─── TEST MODE: sequential Stages 2→3→4 (без enricher) ────────
+      // ─── TEST MODE: sequential Stages 2→3, + Stage 5 параллельно ──
+      console.log('[Pipeline] Test mode — Stages 2→3 + Stage 5 (Kie.ai) parallel')
 
-      // ─── STAGE 2: Prompt Planning ──────────────────────────────────
-      status = 'planning'
-      callbacks?.onStageChange?.(status, 'Creating prompts...')
-      console.log('[Pipeline] Stage 2 — Prompt Planning')
+      // Stage 2→3 и Stage 5 запускаем параллельно
+      const [cardGenResult, cleanPhotoResult] = await Promise.all([
+        (async () => {
+          // ─── STAGE 2: Prompt Planning ──────────────────────────────
+          status = 'planning'
+          callbacks?.onStageChange?.(status, 'Creating prompts...')
+          console.log('[Pipeline] Stage 2 — Prompt Planning')
 
-      const styleRefs = loadStyleRefImages()
-      prompts = STAGE2_MODE === 'v2'
-        ? await planCardPromptsV2(productAnalysis, cardCount, input.providerDescription, input.priceAz, styleRefs)
-        : await planCardPrompts(productAnalysis, input.providerDescription, input.characteristics, input.priceAz, input.template)
-      console.log(
-        `[Pipeline] Stage 2 ✅ — ${prompts.cards.length} prompts, roles: ${prompts.roles.join(', ')}, palette: ${JSON.stringify(prompts.color_palette)}`,
-      )
+          const styleRefs = loadStyleRefImages()
+          const p = STAGE2_MODE === 'v2'
+            ? await planCardPromptsV2(productAnalysis, cardCount, input.providerDescription, input.priceAz, styleRefs)
+            : await planCardPrompts(productAnalysis, input.providerDescription, input.characteristics, input.priceAz, input.template)
+          console.log(
+            `[Pipeline] Stage 2 ✅ — ${p.cards.length} prompts, roles: ${p.roles.join(', ')}, palette: ${JSON.stringify(p.color_palette)}`,
+          )
 
-      // ─── STAGE 3: Parallel Image Generation ────────────────────────
-      status = 'generating'
-      callbacks?.onStageChange?.(status, `Generating ${cardCount} cards...`)
-      console.log('[Pipeline] Stage 3 — Image Generation (parallel)')
+          // ─── STAGE 3: Parallel Image Generation ────────────────────
+          status = 'generating'
+          callbacks?.onStageChange?.(status, `Generating ${cardCount} cards...`)
+          console.log('[Pipeline] Stage 3 — Image Generation (parallel)')
 
-      const cardsToGenerate = prompts.cards.slice(0, cardCount)
+          const cardsToGenerate = p.cards.slice(0, cardCount)
+          const c = await generateAllCards(cardsToGenerate, photoBase64)
+          console.log(`[Pipeline] Stage 3 ✅ — ${c.length}/${cardsToGenerate.length} cards generated`)
 
-      cards = await generateAllCards(cardsToGenerate, photoBase64)
-      console.log(`[Pipeline] Stage 3 ✅ — ${cards.length}/${cardsToGenerate.length} cards generated`)
+          if (c.length === 0) {
+            throw new Error('All card generations failed')
+          }
 
-      if (cards.length === 0) {
-        throw new Error('All card generations failed')
-      }
+          // Stage 4 (Quality Check) — ОТКЛЮЧЕН
+          return { prompts: p, cards: c, qaResults: [] as QAResult[] }
+        })(),
+        // Stage 5 — всегда 1 чистое фото
+        (async () => {
+          console.log('[Pipeline] Stage 5 — Kie.ai Clean Product Photo')
+          const result = await generateCleanProductPhoto(photoBase64, productAnalysis)
+          if (result.success) {
+            console.log(`[Pipeline] Stage 5 ✅ — clean photo: ${result.imageUrl}`)
+          } else {
+            console.warn(`[Pipeline] Stage 5 ⚠️ — failed: ${result.error}`)
+          }
+          return result
+        })(),
+      ])
 
-      // ─── STAGE 4: Quality Check ────────────────────────────────────
-      status = 'checking'
-      callbacks?.onStageChange?.(status, 'Checking quality...')
-      console.log('[Pipeline] Stage 4 — Quality Check')
-
-      qaResults = await checkCardQuality(
-        {
-          product_type: productAnalysis.product_type,
-          primary_color: productAnalysis.primary_color,
-          material: productAnalysis.material,
-        },
-        cards,
-        input.providerDescription,
-      )
-    }
-
-    // QA-проверка только репортит результат. Авто-регенерации НЕТ.
-    // Админ решает сам, хочет ли пересоздать конкретную карточку.
-    const failedQaCount = qaResults.filter(r => !r.passed).length
-    if (failedQaCount > 0) {
-      console.log(`[Pipeline] Stage 4 — ⚠️ ${failedQaCount} cards below QA threshold (no auto-retry)`)
+      prompts = cardGenResult.prompts
+      cards = cardGenResult.cards
+      qaResults = cardGenResult.qaResults
+      cleanPhoto = cleanPhotoResult
     }
 
     // Приблизительная стоимость (OpenRouter цены)
@@ -261,7 +283,7 @@ export async function runTovarAIPipeline(
 
     status = 'done'
     callbacks?.onStageChange?.(status, 'Done!')
-    console.log(`[Pipeline] ✅ Done — ${cards.length} cards, ~$${totalCost.toFixed(4)}`)
+    console.log(`[Pipeline] ✅ Done — ${cards.length} cards, cleanPhoto: ${cleanPhoto?.success ? 'yes' : 'no'}, ~$${totalCost.toFixed(4)}`)
 
     return {
       generationId: '', // будет заполнено при сохранении в БД
@@ -274,6 +296,7 @@ export async function runTovarAIPipeline(
       ...(productData ? { productData } : {}),
       ...(imageUrls ? { imageUrls } : {}),
       ...(enrichedData ? { enrichedData } : {}),
+      ...(cleanPhoto ? { cleanPhoto } : {}),
     }
   } catch (err) {
     status = 'failed'
@@ -292,6 +315,7 @@ export async function runTovarAIPipeline(
       ...(productData ? { productData } : {}),
       ...(imageUrls ? { imageUrls } : {}),
       ...(enrichedData ? { enrichedData } : {}),
+      ...(cleanPhoto ? { cleanPhoto } : {}),
     }
   }
 }
@@ -317,7 +341,7 @@ function estimateCost(cardCount: number, totalAttempts: number): number {
   // Примерный расход токенов на пайплайн:
   const VISION_PROMPT = 0        // Gemma free
   const PLANNER_TOKENS = 0.0015  // ~3000 токенов DeepSeek
-  const QA_TOKENS = 0.0005       // ~800 токенов GPT-4o-mini
+  const QA_TOKENS = 0            // Stage 4 отключен
   // Изображение: completion считается по output токенам, точное число
   // зависит от разрешения, ~2000-4000 output токенов на 1K картинку
   const IMAGE_COST_PER_CARD = TOVAR_AI_CONFIG.IMAGE_SIZE === '2K' ? 0.015 : 0.008

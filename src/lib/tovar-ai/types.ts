@@ -125,6 +125,27 @@ export interface QAResult {
   score: number // 0–100
 }
 
+// ─── Stage 5: Kie.ai Image-to-Image (Clean Product Photo) ──────────────────
+
+export interface KieImageToImageInput {
+  photoBase64: string        // исходное фото товара
+  productType: string        // из Vision analysis
+  category: string
+  primaryColor: string
+  material: string
+  shape: string
+  premiumLevel: string
+}
+
+export interface KieImageToImageResult {
+  success: boolean
+  imageUrl?: string          // URL сгенерированного чистого фото
+  imageBase64?: string       // base64 сгенерированного фото
+  taskId: string
+  costTime?: number          // длительность в мс
+  error?: string
+}
+
 // ─── Pipeline ────────────────────────────────────────────────────────────────
 
 export type GenerationStatus =
@@ -251,6 +272,7 @@ export interface PipelineResult {
   productData?: ProductDraftData // только в product mode
   imageUrls?: string[] // R2 URLs сгенерированных карточек
   enrichedData?: EnricherOutput // Stage 1.5 — данные до мержа с детерминированными полями
+  cleanPhoto?: KieImageToImageResult // Stage 5: Kie.ai чистое фото товара
 }
 
 // ─── Конфигурация (хардкод, только ключ из .env) ────────────────────────────
@@ -272,9 +294,12 @@ export const TOVAR_AI_CONFIG = {
   // OpenRouter
   OPENROUTER_BASE_URL: 'https://openrouter.ai/api/v1',
 
-  // Kei Proxy (n1leads.tapla.az) — Stage 3 image generation
+  // Kei Proxy (n1leads.tapla.az) — Stage 3 + Stage 5 image generation
   KEI_PROXY_URL: process.env.KEI_PROXY_URL || 'https://n1leads.tapla.az',
   PROXY_SECRET: process.env.PROXY_SECRET || '',
+
+  // Stage 5: Kie.ai Image-to-Image model (через тот же Kei Proxy)
+  KIE_AI_MODEL: 'grok-imagine/image-to-image' as const,
 
   /** Единственное что берётся из .env */
   get API_KEY() {
