@@ -37,3 +37,19 @@ export function createSignedHeaders(
     'X-Nonce': nonce,
   }
 }
+
+/**
+ * Creates a polling token for a taskId.
+ * Token = HMAC-SHA256(PROXY_SECRET, taskId)
+ * Kei-proxy verifies this token when polling /api/public/status.
+ */
+export function createPollingToken(taskId: string): string {
+  if (!PROXY_SECRET) {
+    throw new Error('PROXY_SECRET not configured')
+  }
+
+  return crypto
+    .createHmac('sha256', PROXY_SECRET)
+    .update(taskId)
+    .digest('hex')
+}

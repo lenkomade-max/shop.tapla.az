@@ -5,7 +5,7 @@
 // ============================================================================
 
 import { TOVAR_AI_CONFIG, type CardPrompt, type CardResult } from './types'
-import { createSignedHeaders } from './proxy-security'
+import { createSignedHeaders, createPollingToken } from './proxy-security'
 
 /**
  * Генерация одного изображения через Kei Proxy (Nano Banana 2).
@@ -87,7 +87,7 @@ export async function generateSingleCard(
   }
 
   const taskId: string = createData.data.taskId
-  const pollingToken: string = createData._pollingToken || ''
+  const pollingToken: string = createPollingToken(taskId)
 
   console.log(`[Stage 3 Kei] Card ${card.index} — taskId: ${taskId}`)
 
