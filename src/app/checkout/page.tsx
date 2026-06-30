@@ -22,6 +22,7 @@ import {
 import { useCart } from '@/store/CartContext';
 import { Container } from '@/components/ui/Container';
 import { useAuth } from '@/components/auth/AuthContext';
+import * as pixel from '@/lib/fbpixel';
 import SecurePaymentTransition from '@/components/checkout/SecurePaymentTransition';
 import SecurePaymentAnimation from '@/components/checkout/SecurePaymentAnimation';
 
@@ -119,14 +120,12 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     if (orderConfirmed) {
-      if (typeof window !== 'undefined' && 'fbq' in window) {
-        ;(window as any).fbq('track', 'Purchase', {
-          value: cartTotal,
-          currency: 'AZN',
-          content_ids: cartItems.map(i => i.product.id),
-          content_type: 'product',
-        });
-      }
+      pixel.event('Purchase', {
+        value: cartTotal,
+        currency: 'AZN',
+        content_ids: cartItems.map(i => i.product.id),
+        content_type: 'product',
+      })
     }
   }, [orderConfirmed]);
 

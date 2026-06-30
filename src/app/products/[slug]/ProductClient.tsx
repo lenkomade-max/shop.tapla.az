@@ -26,6 +26,7 @@ import { Container } from '@/components/ui/Container';
 import { Badge } from '@/components/ui/Badge';
 import { ProductCard } from '@/components/cards/ProductCard';
 import { useRouter } from 'next/navigation';
+import * as pixel from '@/lib/fbpixel';
 
 interface ProductClientProps {
   product: Product;
@@ -45,16 +46,14 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
     const onScroll = () => setScrolled(window.scrollY > 150);
     window.addEventListener('scroll', onScroll, { passive: true });
 
-    if (typeof window !== 'undefined' && 'fbq' in window) {
-      ;(window as any).fbq('track', 'ViewContent', {
-        content_ids: [product.id],
-        content_name: product.name,
-        content_category: product.category,
-        content_type: 'product',
-        value: product.price,
-        currency: 'AZN',
-      });
-    }
+    pixel.event('ViewContent', {
+      content_ids: [product.id],
+      content_name: product.name,
+      content_category: product.category,
+      content_type: 'product',
+      value: product.price,
+      currency: 'AZN',
+    })
 
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
@@ -97,15 +96,13 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
     setIsAdded(true);
     setTimeout(() => setIsAdded(false), 2000);
 
-    if (typeof window !== 'undefined' && 'fbq' in window) {
-      ;(window as any).fbq('track', 'AddToCart', {
-        content_ids: [product.id],
-        content_name: product.name,
-        content_type: 'product',
-        value: product.price * quantity,
-        currency: 'AZN',
-      });
-    }
+    pixel.event('AddToCart', {
+      content_ids: [product.id],
+      content_name: product.name,
+      content_type: 'product',
+      value: product.price * quantity,
+      currency: 'AZN',
+    })
   };
 
   const handleDirectOrder = () => {
