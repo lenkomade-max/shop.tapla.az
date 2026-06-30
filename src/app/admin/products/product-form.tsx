@@ -198,8 +198,8 @@ export function ProductForm({ product, error: initialError }: Props) {
       {/* Основное */}
       <section className="rounded-xl border bg-white p-6 shadow-sm">
         <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-zinc-500">Основное</h3>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="col-span-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="sm:col-span-2">
             <label className="mb-1 block text-xs font-medium text-zinc-600">Название</label>
             <input value={name} onChange={e => onNameChange(e.target.value)} required
               className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black" />
@@ -263,7 +263,7 @@ export function ProductForm({ product, error: initialError }: Props) {
       {/* Цены и рейтинг */}
       <section className="rounded-xl border bg-white p-6 shadow-sm">
         <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-zinc-500">Цены и рейтинг</h3>
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <div>
             <label className="mb-1 block text-xs font-medium text-zinc-600">Цена *</label>
             <input type="number" step="0.01" min="0" value={price} onChange={e => setPrice(e.target.value)} required
@@ -379,7 +379,7 @@ export function ProductForm({ product, error: initialError }: Props) {
       {/* Использование */}
       <section className="rounded-xl border bg-white p-6 shadow-sm">
         <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-zinc-500">Использование</h3>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="mb-1 block text-xs font-medium text-zinc-600">Как использовать</label>
             <textarea value={howToUse} onChange={e => setHowToUse(e.target.value)} rows={5}
@@ -442,7 +442,7 @@ function ArraySection({
           <div key={i} className="flex items-center gap-2">
             <input value={v} onChange={e => { const n = [...items]; n[i] = e.target.value; setItems(n); }}
               placeholder={placeholder}
-              className={`rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black ${compact ? 'w-40' : 'block w-full'}`} />
+              className={`rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black ${compact ? 'w-full sm:w-40' : 'block w-full'}`} />
             <button type="button" onClick={() => setItems(items.filter((_, j) => j !== i))}
               className="text-xs text-red-400 hover:text-red-600">{compact ? '✕' : 'Удалить'}</button>
           </div>
@@ -463,11 +463,11 @@ function ShadesSection({ shades, setShades }: {
           className="ml-3 text-xs font-normal text-zinc-400 hover:text-black">+ Добавить</button>
       </h3>
       {shades.map((s, i) => (
-        <div key={i} className="mb-3 flex items-end gap-3 rounded-lg border bg-zinc-50 p-3">
-          <div>
+        <div key={i} className="mb-3 flex flex-wrap items-end gap-3 rounded-lg border bg-zinc-50 p-3">
+          <div className="flex-1 min-w-0">
             <label className="mb-1 block text-xs text-zinc-500">Название</label>
             <input value={s.name} onChange={e => { const n = [...shades]; n[i] = { ...n[i], name: e.target.value }; setShades(n); }}
-              placeholder="Mirvari Ağ" className="block w-36 rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black" />
+              placeholder="Mirvari Ağ" className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black" />
           </div>
           <div>
             <label className="mb-1 block text-xs text-zinc-500">Цвет</label>
@@ -475,18 +475,18 @@ function ShadesSection({ shades, setShades }: {
               onChange={e => { const n = [...shades]; n[i] = { ...n[i], colorHex: e.target.value }; setShades(n); }}
               className="h-9 w-12 cursor-pointer rounded border" />
           </div>
-          <div>
+          <div className="flex-1 min-w-0">
             <label className="mb-1 block text-xs text-zinc-500">Label</label>
             <input value={s.label} onChange={e => { const n = [...shades]; n[i] = { ...n[i], label: e.target.value }; setShades(n); }}
-              placeholder="Pearl White" className="block w-28 rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black" />
+              placeholder="Pearl White" className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black" />
           </div>
-          <label className="flex items-center gap-1 pb-1 text-xs">
+          <label className="flex items-center gap-1 pb-1 text-xs shrink-0">
             <input type="checkbox" checked={s.isHot}
               onChange={e => { const n = [...shades]; n[i] = { ...n[i], isHot: e.target.checked }; setShades(n); }} />
             Hot
           </label>
           <button type="button" onClick={() => setShades(shades.filter((_, j) => j !== i))}
-            className="mb-1 text-xs text-red-400 hover:text-red-600">Удалить</button>
+            className="mb-1 text-xs text-red-400 hover:text-red-600 shrink-0">Удалить</button>
         </div>
       ))}
     </section>

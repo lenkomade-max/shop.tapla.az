@@ -9,7 +9,6 @@ import { getProfileByPhone, createGuestProfile } from './supabase/queries';
 
 export async function loginAction(password: string) {
   const ok = await authLogin(password);
-  if (ok) redirect('/admin');
   return ok;
 }
 

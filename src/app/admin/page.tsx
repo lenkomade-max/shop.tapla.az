@@ -32,7 +32,7 @@ export default async function AdminPage() {
         </div>
       )}
       <h2 className="mb-6 text-xl font-bold">Дашборд</h2>
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <NumberCard label="Товаров" value={productsCount ?? 0} href="/admin/products" />
         <NumberCard label="Заказов" value={ordersCount ?? 0} href="/admin/orders" />
       </div>

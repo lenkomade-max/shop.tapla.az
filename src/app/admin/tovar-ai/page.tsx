@@ -425,33 +425,33 @@ export default function TovarAIPage() {
         </p>
 
         {/* ─── Табы режимов ──────────────────────────────────────── */}
-        <div className="mt-4 flex gap-1 rounded-lg bg-zinc-100 p-1 w-fit">
+        <div className="mt-4 flex gap-1 rounded-lg bg-zinc-100 p-1 w-fit max-w-full overflow-x-auto scrollbar-none">
           <button
             onClick={() => setMode('test')}
-            className={`inline-flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+            className={`inline-flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition-colors whitespace-nowrap ${
               mode === 'test'
                 ? 'bg-white text-black shadow-sm'
                 : 'text-zinc-500 hover:text-zinc-700'
             }`}
           >
-            <RefreshCw className="h-3.5 w-3.5" />
+            <RefreshCw className="h-3.5 w-3.5 shrink-0" />
             Test
           </button>
           <button
             onClick={() => setMode('product')}
-            className={`inline-flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+            className={`inline-flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition-colors whitespace-nowrap ${
               mode === 'product'
                 ? 'bg-white text-black shadow-sm'
                 : 'text-zinc-500 hover:text-zinc-700'
             }`}
           >
-            <ShoppingBag className="h-3.5 w-3.5" />
+            <ShoppingBag className="h-3.5 w-3.5 shrink-0" />
             Məhsul
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* ══════════════════════════════════════════════════════════════════
             ЛЕВАЯ КОЛОНКА: загрузка + параметры
            ══════════════════════════════════════════════════════════════════ */}
@@ -697,9 +697,9 @@ export default function TovarAIPage() {
                     ? imageUrls[card.index - 1]
                     : `data:image/png;base64,${card.imageBase64}`
                   return (
-                    <div key={card.index} className="relative flex gap-4 rounded-lg border bg-zinc-50 overflow-hidden p-3">
+                    <div key={card.index} className="relative flex flex-col sm:flex-row gap-3 rounded-lg border bg-zinc-50 overflow-hidden p-3">
                       {/* Картинка */}
-                      <div className="relative w-28 h-28 shrink-0">
+                      <div className="relative w-full sm:w-28 h-48 sm:h-28 shrink-0">
                         <button
                           onClick={() => setLightboxIndex(card.index - 1)}
                           className="block w-full h-full p-0 border-0 bg-transparent cursor-pointer"
@@ -747,7 +747,7 @@ export default function TovarAIPage() {
                       <a
                         href={imgSrc}
                         download={`tapla_card_${card.index}_${card.role}.png`}
-                        className="absolute bottom-3 right-3 text-xs text-black underline"
+                        className="text-xs text-black underline shrink-0"
                       >
                         Yüklə
                       </a>
@@ -1046,7 +1046,7 @@ export default function TovarAIPage() {
                   </label>
                   <div className="flex flex-wrap gap-2">
                     {productData.tags.map((t, i) => (
-                      <div key={i} className="flex items-center gap-1">
+                      <div key={i} className="flex items-center gap-1 flex-1 min-w-0">
                         <input
                           value={t}
                           onChange={e => {
@@ -1055,7 +1055,7 @@ export default function TovarAIPage() {
                             updateProductField('tags', next)
                           }}
                           placeholder="Teq"
-                          className="w-36 rounded-lg border border-zinc-300 px-3 py-1.5 text-sm outline-none focus:border-black"
+                          className="w-full min-w-0 rounded-lg border border-zinc-300 px-3 py-1.5 text-sm outline-none focus:border-black"
                         />
                         <button
                           type="button"
@@ -1157,9 +1157,9 @@ export default function TovarAIPage() {
               {/* Close */}
               <button
                 onClick={() => setLightboxIndex(null)}
-                className="absolute top-4 right-4 z-10 p-2 text-white/70 hover:text-white"
+                className="absolute top-2 right-2 sm:top-4 sm:right-4 z-10 p-2 text-white/70 hover:text-white"
               >
-                <X className="h-6 w-6" />
+                <X className="h-5 w-5 sm:h-6 sm:w-6" />
               </button>
 
               {/* Counter */}
@@ -1171,9 +1171,9 @@ export default function TovarAIPage() {
               {lightboxIndex > 0 && (
                 <button
                   onClick={e => { e.stopPropagation(); setLightboxIndex(lightboxIndex - 1) }}
-                  className="absolute left-4 z-10 p-2 text-white/70 hover:text-white"
+                  className="absolute left-2 sm:left-4 z-10 p-1 sm:p-2 text-white/70 hover:text-white"
                 >
-                  <ChevronLeft className="h-8 w-8" />
+                  <ChevronLeft className="h-6 w-6 sm:h-8 sm:w-8" />
                 </button>
               )}
 
@@ -1193,9 +1193,9 @@ export default function TovarAIPage() {
               {lightboxIndex < cards.length - 1 && (
                 <button
                   onClick={e => { e.stopPropagation(); setLightboxIndex(lightboxIndex + 1) }}
-                  className="absolute right-4 z-10 p-2 text-white/70 hover:text-white"
+                  className="absolute right-2 sm:right-4 z-10 p-1 sm:p-2 text-white/70 hover:text-white"
                 >
-                  <ChevronRight className="h-8 w-8" />
+                  <ChevronRight className="h-6 w-6 sm:h-8 sm:w-8" />
                 </button>
               )}
             </div>

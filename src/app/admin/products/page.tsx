@@ -30,8 +30,8 @@ export default async function ProductsPage() {
         </Link>
       </div>
 
-      <div className="overflow-hidden rounded-xl border bg-white shadow-sm">
-        <table className="w-full text-left text-sm">
+      <div className="overflow-x-auto rounded-xl border bg-white shadow-sm">
+        <table className="w-full min-w-[600px] text-left text-sm">
           <thead className="border-b bg-zinc-50 text-xs uppercase text-zinc-500">
             <tr>
               <th className="px-4 py-3 font-medium">Название</th>

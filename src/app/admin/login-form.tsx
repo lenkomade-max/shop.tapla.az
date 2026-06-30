@@ -8,9 +8,14 @@ export function LoginForm() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setError(false);
     const form = new FormData(e.currentTarget);
     const ok = await loginAction(form.get('password') as string);
-    if (!ok) setError(true);
+    if (ok) {
+      window.location.href = '/admin';
+    } else {
+      setError(true);
+    }
   }
 
   return (
