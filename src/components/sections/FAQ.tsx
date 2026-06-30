@@ -22,10 +22,10 @@ export function FAQ({ faqs }: FAQProps) {
   );
 
   return (
-    <Section id="faq" py="lg">
+    <Section id="faq" py="sm">
       <Container>
         {/* Header */}
-        <div className="max-w-3xl mx-auto text-center space-y-3 mb-12 sm:mb-16">
+        <div className="max-w-3xl mx-auto text-center space-y-3 mb-6 sm:mb-8">
           <span className="text-[10px] tracking-[0.25em] font-bold text-neutral-400 uppercase">
             MÜŞTƏRİ XİDMƏTLƏRİ
           </span>
@@ -38,7 +38,7 @@ export function FAQ({ faqs }: FAQProps) {
         </div>
 
         {/* Dynamic FAQ Search Bar */}
-        <div className="max-w-xl mx-auto mb-12 relative font-sans">
+        <div className="max-w-xl mx-auto mb-6 relative font-sans">
           <input
             type="text"
             value={searchQuery}
@@ -50,7 +50,7 @@ export function FAQ({ faqs }: FAQProps) {
         </div>
 
         {/* Accordion Feed */}
-        <div className="max-w-3xl mx-auto mb-16 sm:mb-24">
+        <div className="max-w-3xl mx-auto mb-8 sm:mb-10">
           {filteredFaqs.length === 0 ? (
             <div className="text-center py-12 text-xs text-neutral-400 font-sans border border-neutral-100 p-8">
               Axtarışınıza uyğun sual tapılmadı. Zəhmət olmasa digər açar sözlərlə yenidən cəhd edin.

@@ -147,7 +147,7 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
         </button>
 
         {/* Breadcrumbs + back button */}
-        <div className="flex items-center space-x-2 text-[11px] tracking-widest text-[#b52525] uppercase mb-8">
+        <div className="flex items-center space-x-2 text-[11px] tracking-widest text-[#b52525] uppercase mb-8 font-sans">
           <button
             onClick={handleBack}
             className="flex items-center space-x-1.5 text-neutral-900 hover:text-[#b52525] transition-colors cursor-pointer mr-2 text-sm"

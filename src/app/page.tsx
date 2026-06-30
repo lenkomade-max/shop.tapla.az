@@ -52,11 +52,11 @@ export default async function Home() {
       {/* 3. Core Value Props & Diagnostic Quiz Row */}
       <ValueProps />
 
-      {/* 4. Steps Evening Ritual Showcase ("ALUNA İLƏ AXŞAM RİTUALI") */}
-      <FeaturesStep steps={steps} />
+      {/* 4. Steps Evening Ritual Showcase ("ALUNA İLƏ AXŞAM RİTUALI") — временно скрыто */}
+      {/* <FeaturesStep steps={steps} /> */}
 
-      {/* 5. Multi-Column Spotlight Editorial Banners */}
-      <PromoBanners />
+      {/* 5. Multi-Column Spotlight Editorial Banners — временно скрыто */}
+      {/* <PromoBanners /> */}
 
       {/* 6. Brand Quality Benefits Panel */}
       <Benefits benefits={benefits} />

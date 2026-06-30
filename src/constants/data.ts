@@ -397,8 +397,8 @@ export const CATEGORIES: Category[] = [
 export const BENEFITS_LIST: Benefit[] = [
   {
     id: 'ben-1',
-    title: 'RƏSMİ ZƏMANƏT',
-    description: 'Bütün məhsullar rəsmi distribütor zəmanəti ilə təqdim olunur. 2 ilədək zəmanət, problemsiz dəyişdirmə və təmir xidməti.',
+    title: 'KEYFİYYƏT TƏMİNATI',
+    description: 'Hər bir məhsul keyfiyyət yoxlamasından keçirilir. Məhsullarımızı əminliklə seçin — biz keyfiyyətə görə məsuliyyət daşıyırıq.',
     iconName: 'ShieldCheck',
   },
   {

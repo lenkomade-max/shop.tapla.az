@@ -72,10 +72,10 @@ export function ReviewsSection({ initialReviews }: ReviewsSectionProps) {
     });
 
   return (
-    <Section id="reviews" py="lg" variant="neutral">
+    <Section id="reviews" py="sm" variant="neutral">
       <Container>
         {/* Section Title */}
-        <div className="max-w-3xl mx-auto text-center space-y-3 mb-16">
+        <div className="max-w-3xl mx-auto text-center space-y-3 mb-8">
           <span className="text-[10px] tracking-[0.25em] font-bold text-neutral-400 uppercase">
             MÜŞTƏRİ MƏMNUNİYYƏTİ
           </span>
@@ -88,7 +88,7 @@ export function ReviewsSection({ initialReviews }: ReviewsSectionProps) {
         </div>
 
         {/* REVIEW DASHBOARD SNAPSHOT */}
-        <div className="bg-white border border-neutral-100 p-6 sm:p-8 md:p-10 shadow-xs mb-12 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center font-sans">
+        <div className="bg-white border border-neutral-100 p-6 sm:p-8 md:p-10 shadow-xs mb-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center font-sans">
           
           {/* Left Column: Average Ratings & recommendation count */}
           <div className="lg:col-span-4 text-center lg:text-left lg:border-r lg:border-neutral-100 lg:pr-8 space-y-4">

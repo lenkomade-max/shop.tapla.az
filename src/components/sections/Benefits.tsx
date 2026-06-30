@@ -28,10 +28,10 @@ export function Benefits({ benefits }: BenefitsProps) {
   };
 
   return (
-    <Section id="benefits" variant="neutral" py="lg">
+    <Section id="benefits" variant="neutral" py="sm">
       <Container>
         {/* Section Header */}
-        <div className="max-w-2xl mx-auto text-center space-y-3 mb-16 sm:mb-20">
+        <div className="max-w-2xl mx-auto text-center space-y-3 mb-8 sm:mb-10">
           <span className="text-[10px] tracking-[0.25em] font-bold text-neutral-400 uppercase">
             MÜKƏMMƏLLİK SİYASƏTİMİZ
           </span>
@@ -39,7 +39,7 @@ export function Benefits({ benefits }: BenefitsProps) {
             NİYƏ TAPLA MARKETPLACE?
           </Heading>
           <p className="text-xs sm:text-sm text-neutral-500 font-sans max-w-lg mx-auto leading-relaxed">
-            Rəsmi zəmanətli məhsullar, ən aşağı qiymətlər və sürətli çatdırılma — TAPLA MARKETPLACE fərqi ilə.
+            Keyfiyyətli məhsullar, ən aşağı qiymətlər və sürətli çatdırılma — TAPLA MARKETPLACE fərqi ilə.
           </p>
         </div>
 
