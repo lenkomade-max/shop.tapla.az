@@ -11,22 +11,18 @@ function normalize(s: string): string {
 function googleCategory(leafName: string, tags?: string[]): string {
   const cat = normalize(leafName)
 
+  const specific = matchGoogleCategory(cat)
+  if (specific) return specific
+
   // Try tags as fallback for better granularity
-  const tryTags = (arr: string[]): string | null => {
-    for (const t of arr) {
+  if (tags && tags.length > 0) {
+    for (const t of tags) {
       const n = normalize(t)
-      const r = matchGoogleCategory(n)
-      if (r) return r
+      const fromTags = matchGoogleCategory(n)
+      if (fromTags) return fromTags
     }
-    return null
   }
 
-  const r = matchGoogleCategory(cat)
-  if (r) return r
-  if (tags && tags.length > 0) {
-    const fromTags = tryTags(tags)
-    if (fromTags) return fromTags
-  }
   return 'Electronics'
 }
 
