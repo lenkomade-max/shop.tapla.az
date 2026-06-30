@@ -69,6 +69,17 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    const el = descRef.current;
+    if (!el) return;
+    // Check if content overflows beyond 5 lines
+    const lineHeight = parseFloat(getComputedStyle(el).lineHeight) || 20;
+    const maxHeight = lineHeight * 5;
+    if (el.scrollHeight > maxHeight + 2) {
+      setDescTruncated(true);
+    }
+  }, [product.description]);
+
   const handleBack = () => {
     router.back();
   };
@@ -82,6 +93,9 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
   // Interactive LED simulator state
   const [simColor, setSimColor] = useState<'red' | 'blue' | 'green' | 'yellow' | null>(null);
   const [showSimulator, setShowSimulator] = useState(false);
+  const [descExpanded, setDescExpanded] = useState(false);
+  const [descTruncated, setDescTruncated] = useState(false);
+  const descRef = useRef<HTMLParagraphElement>(null);
 
   const handleQuantityChange = (val: number) => {
     if (val >= 1 && val <= 10) {
@@ -132,21 +146,19 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
           <ArrowLeft className="h-5 w-5" />
         </button>
 
-        {/* Breadcrumbs + back button (static, always visible) */}
-        <div className="flex items-center space-x-2 text-[11px] tracking-widest text-neutral-400 uppercase mb-8">
+        {/* Breadcrumbs + back button */}
+        <div className="flex items-center space-x-2 text-[11px] tracking-widest text-[#b52525] uppercase mb-8">
           <button
             onClick={handleBack}
-            className="flex items-center space-x-1 hover:text-neutral-900 transition-colors cursor-pointer mr-2"
+            className="flex items-center space-x-1.5 text-neutral-900 hover:text-[#b52525] transition-colors cursor-pointer mr-2 text-sm"
           >
-            <ArrowLeft className="h-3.5 w-3.5" />
+            <ArrowLeft className="h-5 w-5" />
             <span>GERİ</span>
           </button>
-          <ChevronRight className="h-3 w-3" />
-          <Link href="/" className="hover:text-neutral-900 transition-colors">Ana səhifə</Link>
-          <ChevronRight className="h-3 w-3" />
-          <Link href="/#products" className="hover:text-neutral-900 transition-colors">Məhsullar</Link>
-          <ChevronRight className="h-3 w-3" />
-          <span className="text-neutral-600 font-medium">{product.name}</span>
+          <ChevronRight className="h-3 w-3 text-neutral-300" />
+          <Link href="/products" className="hover:text-neutral-900 transition-colors">Məhsullar</Link>
+          <ChevronRight className="h-3 w-3 text-neutral-300" />
+          <span className="text-[#b52525] font-medium">{product.name}</span>
         </div>
 
         {/* Product Layout Grid */}
@@ -221,7 +233,7 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
                   </button>
                 </div>
 
-                <p className="text-xs text-neutral-500 font-sans leading-relaxed">
+                <p className="text-xs text-[#b52525] font-sans leading-relaxed">
                   Cihazın LED işıqlarının üz dərinizə təsirini interaktiv şəkildə yoxlayın.
                 </p>
 
@@ -239,7 +251,7 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
                           <div className={`absolute inset-0 transition-all duration-700 z-0 rounded-full ${ledDetails[simColor].bg} animate-pulse`} />
                         )}
 
-                        <div className="absolute bottom-2 z-20 text-[9px] uppercase tracking-wider text-neutral-400 font-mono">
+                        <div className="absolute bottom-2 z-20 text-[9px] uppercase tracking-wider text-[#b52525] font-mono">
                           {simColor ? ledDetails[simColor].name : 'İŞIĞI SEÇİN'}
                         </div>
                       </div>
@@ -271,7 +283,7 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
                         className="bg-neutral-50 p-3 text-center border border-neutral-100"
                       >
                         <p className="text-[11px] font-bold text-neutral-800 uppercase tracking-widest mb-1">{ledDetails[simColor].name}</p>
-                        <p className="text-[11px] text-neutral-600 font-sans leading-relaxed">{ledDetails[simColor].action}</p>
+                        <p className="text-[11px] text-[#b52525] font-sans leading-relaxed">{ledDetails[simColor].action}</p>
                       </motion.div>
                     )}
                   </div>
@@ -283,13 +295,13 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
           {/* Right Column: Information & Actions */}
           <div className="lg:col-span-5 space-y-8">
             <div className="space-y-4">
-              <span className="text-[10px] tracking-widest uppercase text-neutral-400 font-bold block">
+              <span className="text-[10px] tracking-widest uppercase text-[#b52525] font-bold block">
                 {product.category}
               </span>
               <h1 className="text-2xl sm:text-3xl font-bold tracking-widest uppercase text-neutral-900 leading-tight font-sans">
                 {product.name}
               </h1>
-              <p className="text-sm font-sans text-neutral-500 leading-relaxed">
+              <p className="text-sm font-sans text-[#b52525] leading-relaxed">
                 {product.subtitle}
               </p>
 
@@ -313,14 +325,14 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
 
             {/* Price section */}
             <div className="space-y-1">
-              <span className="text-[9px] uppercase tracking-widest font-bold text-neutral-400 block">Qiymət</span>
+              <span className="text-[9px] uppercase tracking-widest font-bold text-[#b52525] block">Qiymət</span>
               <div className="flex items-baseline space-x-3">
                 <span className="text-2xl font-bold font-mono text-neutral-950">
                   {product.price.toFixed(2)} ₼
                 </span>
                 {product.originalPrice && (
                   <>
-                    <span className="text-base text-neutral-400 line-through font-mono">
+                    <span className="text-base text-[#b52525] line-through font-mono">
                       {product.originalPrice.toFixed(2)} ₼
                     </span>
                     <span className="text-[10px] bg-red-50 text-red-700 font-bold px-2 py-0.5 tracking-wider uppercase font-mono">
@@ -332,20 +344,49 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
               <p className="text-[10px] text-emerald-600 font-semibold tracking-wider uppercase">
                 Bakı daxili pulsuz kuryer çatdırılması (24 saat ərzində)
               </p>
+
+              {/* Quick Guarantees — под ценой на мобильных, на десктопе остаётся на месте */}
+              <div className="grid grid-cols-3 gap-2 text-center border-t border-b border-neutral-100 py-3 mt-3 text-[#b52525]">
+                <div className="flex flex-col items-center space-y-1">
+                  <BadgeCheck className="h-4 w-4" />
+                  <span className="text-[9px] tracking-wider uppercase font-semibold">Orijinal Məhsul</span>
+                </div>
+                <div className="flex flex-col items-center space-y-1">
+                  <Truck className="h-4 w-4" />
+                  <span className="text-[9px] tracking-wider uppercase font-semibold">Sürətli Çatdırılma</span>
+                </div>
+                <div className="flex flex-col items-center space-y-1">
+                  <Shield className="h-4 w-4" />
+                  <span className="text-[9px] tracking-wider uppercase font-semibold">Təhlükəsiz Alış-veriş</span>
+                </div>
+              </div>
             </div>
 
             {/* Description */}
-            <p className="text-xs text-neutral-600 font-sans leading-relaxed">
-              {product.description}
-            </p>
+            <div className="space-y-2">
+              <p
+                ref={descRef}
+                className={`text-xs text-[#b52525] font-sans leading-relaxed ${!descExpanded ? 'line-clamp-5' : ''}`}
+              >
+                {product.description}
+              </p>
+              {descTruncated && (
+                <button
+                  onClick={() => setDescExpanded(!descExpanded)}
+                  className="inline-flex items-center gap-1.5 text-[10px] font-bold tracking-widest uppercase border border-neutral-300 px-4 py-2 hover:bg-neutral-950 hover:text-white hover:border-neutral-950 transition-all duration-300 cursor-pointer"
+                >
+                  {descExpanded ? 'Bağla ↑' : 'Tam təsviri oxu ↓'}
+                </button>
+              )}
+            </div>
 
             {/* Kimlər üçün */}
             {product.idealFor && (
               <div className="space-y-2 pb-2">
-                <span className="text-[10px] tracking-widest uppercase font-bold text-neutral-500 block">
+                <span className="text-[10px] tracking-widest uppercase font-bold text-[#b52525] block">
                   KIMLƏR ÜÇÜN
                 </span>
-                <p className="text-xs text-neutral-600 leading-relaxed font-sans">
+                <p className="text-xs text-[#b52525] leading-relaxed font-sans">
                   {product.idealFor}
                 </p>
               </div>
@@ -354,7 +395,7 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
             {/* Color Shades Picker */}
             {product.shades && product.shades.length > 0 && (
               <div className="space-y-3">
-                <span className="text-[10px] tracking-widest uppercase font-bold text-neutral-500 block">
+                <span className="text-[10px] tracking-widest uppercase font-bold text-[#b52525] block">
                   Rəng Seçimi: <span className="text-neutral-900 font-semibold">{selectedShade?.name}</span>
                 </span>
                 <div className="flex items-center space-x-3">
@@ -470,22 +511,6 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
               </button>
             </div>
 
-            {/* Quick Guarantees Row */}
-            <div className="grid grid-cols-3 gap-2 text-center border-t border-b border-neutral-100 py-4 text-blue-600">
-              <div className="flex flex-col items-center space-y-1">
-                <BadgeCheck className="h-4 w-4 text-blue-600" />
-                <span className="text-[9px] tracking-wider uppercase font-semibold">Orijinal Məhsul</span>
-              </div>
-              <div className="flex flex-col items-center space-y-1">
-                <Truck className="h-4 w-4 text-blue-600" />
-                <span className="text-[9px] tracking-wider uppercase font-semibold">Sürətli Çatdırılma</span>
-              </div>
-              <div className="flex flex-col items-center space-y-1">
-                <Shield className="h-4 w-4 text-blue-600" />
-                <span className="text-[9px] tracking-wider uppercase font-semibold">Təhlükəsiz Alış-veriş</span>
-              </div>
-            </div>
-
             {/* Content Tabs (Benefits / How to use / Ingredients) */}
             <div className="space-y-4">
               <div className="flex border-b border-neutral-200">
@@ -496,7 +521,7 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
                     className={`pb-2.5 text-[10px] font-bold tracking-widest uppercase mr-6 border-b-2 transition-all cursor-pointer ${
                       activeTab === tab
                         ? 'border-neutral-950 text-neutral-950'
-                        : 'border-transparent text-neutral-400 hover:text-neutral-700'
+                        : 'border-transparent text-[#b52525] hover:text-neutral-700'
                     }`}
                   >
                     {tab === 'benefits' && 'FAYDALARI'}
@@ -507,7 +532,7 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
                 ))}
               </div>
 
-              <div className="pt-2 text-xs text-neutral-600 leading-relaxed font-sans min-h-[80px]">
+              <div className="pt-2 text-xs text-[#b52525] leading-relaxed font-sans min-h-[80px]">
                 {activeTab === 'benefits' && (
                   <ul className="space-y-2">
                     {product.benefits?.map((benefit, i) => (
@@ -535,7 +560,7 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
                     </div>
                     {product.useCases && product.useCases.length > 0 && (
                       <div>
-                        <h4 className="text-[10px] font-bold tracking-widest uppercase text-neutral-700 mb-2">ISTIFADE SSENARILERI</h4>
+                        <h4 className="text-[10px] font-bold tracking-widest uppercase text-[#b52525] mb-2">ISTIFADE SSENARILERI</h4>
                         <ul className="space-y-1">
                           {product.useCases.map((u, i) => (
                             <li key={i} className="flex items-start space-x-2">
@@ -548,7 +573,7 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
                     )}
                     {product.careInstructions && (
                       <div>
-                        <h4 className="text-[10px] font-bold tracking-widest uppercase text-neutral-700 mb-2">QULLUQ TƏLİMATI</h4>
+                        <h4 className="text-[10px] font-bold tracking-widest uppercase text-[#b52525] mb-2">QULLUQ TƏLİMATI</h4>
                         <p className="whitespace-pre-line leading-relaxed">{product.careInstructions}</p>
                       </div>
                     )}
@@ -562,7 +587,7 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
             {/* FAQ Accordion */}
             {product.faq && product.faq.length > 0 && (
               <div className="space-y-3 pt-4 border-t border-neutral-100">
-                <span className="text-[10px] tracking-widest uppercase font-bold text-neutral-500 block">
+                <span className="text-[10px] tracking-widest uppercase font-bold text-[#b52525] block">
                   TEZ-TEZ VERILƏN SUALLAR
                 </span>
                 <div className="space-y-2">
@@ -572,7 +597,7 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
                         {item.question}
                         <ChevronRight className="h-3 w-3 text-neutral-400 group-open:rotate-90 transition-transform shrink-0 ml-2" />
                       </summary>
-                      <div className="px-4 pb-3 text-xs text-neutral-500 leading-relaxed border-t border-neutral-100 pt-3">
+                      <div className="px-4 pb-3 text-xs text-[#b52525] leading-relaxed border-t border-neutral-100 pt-3">
                         {item.answer}
                       </div>
                     </details>
@@ -587,30 +612,30 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
         <div className="mt-24 border-t border-neutral-100 pt-16">
           <div className="mb-10 text-center max-w-lg mx-auto">
             <h2 className="text-lg font-bold tracking-widest uppercase text-neutral-950 mb-3">MÜŞTƏRİ RƏYLƏRİ</h2>
-            <p className="text-xs text-neutral-400 font-sans">Məhsulumuz haqqında real müştərilərimizdən gələn rəylərlə tanış olun.</p>
+            <p className="text-xs text-[#b52525] font-sans">Məhsulumuz haqqında real müştərilərimizdən gələn rəylərlə tanış olun.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-white p-6 border border-neutral-100 space-y-4">
               <div className="flex items-center justify-between">
                 <span className="font-bold text-xs text-neutral-900">Nərmin Məmmədova</span>
-                <span className="text-[10px] font-mono text-neutral-400">22 İyun 2026</span>
+                <span className="text-[10px] font-mono text-[#b52525]">22 İyun 2026</span>
               </div>
               <div className="flex text-amber-400">
                 {Array.from({ length: 5 }).map((_, i) => <Star key={i} className="h-3 w-3 fill-current" />)}
               </div>
-              <p className="text-xs text-neutral-600 leading-relaxed">
+              <p className="text-xs text-[#b52525] leading-relaxed">
                 Bu məhsulu TAPLA MARKETPLACE-dən aldım və çox məmnun qaldım. Keyfiyyət mükəmməldir, çatdırılma isə çox sürətli idi. Hər kəsə tövsiyə edirəm!
               </p>
             </div>
             <div className="bg-white p-6 border border-neutral-100 space-y-4">
               <div className="flex items-center justify-between">
                 <span className="font-bold text-xs text-neutral-900">Elnur Rzayev</span>
-                <span className="text-[10px] font-mono text-neutral-400">14 İyun 2026</span>
+                <span className="text-[10px] font-mono text-[#b52525]">14 İyun 2026</span>
               </div>
               <div className="flex text-amber-400">
                 {Array.from({ length: 5 }).map((_, i) => <Star key={i} className="h-3 w-3 fill-current" />)}
               </div>
-              <p className="text-xs text-neutral-600 leading-relaxed">
+              <p className="text-xs text-[#b52525] leading-relaxed">
                 Yoldaşıma hədiyyə olaraq sifariş vermişdim, çox bəyəndi. Xüsusilə çatdırılma sürəti inanılmazdır, sifarişdən bir neçə saat sonra ünvanımızda idi. Təşəkkürlər TAPLA!
               </p>
             </div>
