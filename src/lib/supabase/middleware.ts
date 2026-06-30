@@ -1,9 +1,30 @@
-import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { SignJWT, jwtVerify } from 'jose'
+
+const COOKIE_NAME = 'admin_token'
+const KEY = () => new TextEncoder().encode(process.env.ADMIN_PASSWORD || 'insecure-default-key-change-me')
 
 export async function updateSession(request: NextRequest) {
+  // Admin routes: только проверка admin_token, без Supabase.
+  // Supabase.auth.getClaims() триггерит рефреш сессии через setAll cookies,
+  // что создаёт новый NextResponse и на мобильных браузерах может сбросить
+  // admin_token. Админ-лейаут сам показывает форму логина.
+  if (request.nextUrl.pathname.startsWith('/admin')) {
+    const adminToken = request.cookies.get(COOKIE_NAME)?.value
+    if (adminToken) {
+      try {
+        await jwtVerify(adminToken, KEY())
+        return NextResponse.next({ request })
+      } catch {
+        // Просрочен / невалидный — пускаем, лейаут покажет логин
+      }
+    }
+    return NextResponse.next({ request })
+  }
+
   let supabaseResponse = NextResponse.next({ request })
 
+  const { createServerClient } = await import('@supabase/ssr')
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -21,40 +42,6 @@ export async function updateSession(request: NextRequest) {
   )
 
   await supabase.auth.getClaims()
-
-  // Admin protection
-  if (request.nextUrl.pathname.startsWith('/admin')) {
-    // 1. Сначала проверяем jose JWT (admin_token) — это основная авторизация админки
-    //    Если токен валидный — пропускаем без проверки Supabase
-    const adminToken = request.cookies.get('admin_token')?.value
-    if (adminToken) {
-      try {
-        const { jwtVerify } = await import('jose')
-        const key = new TextEncoder().encode(process.env.ADMIN_PASSWORD || 'insecure-default-key-change-me')
-        await jwtVerify(adminToken, key)
-        return supabaseResponse
-      } catch {
-        // admin_token невалидный — пробуем Supabase
-      }
-    }
-
-    // 2. Legacy Supabase auth check
-    try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('auth_user_id', user.id)
-          .single()
-        if (profile && profile.role !== 'admin') {
-          return NextResponse.redirect(new URL('/', request.url))
-        }
-      }
-    } catch {
-      // Если Supabase не отвечает — пропускаем, админ-лейаут сам проверит
-    }
-  }
 
   return supabaseResponse
 }
