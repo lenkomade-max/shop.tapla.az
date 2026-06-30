@@ -4,7 +4,7 @@ import { dbService } from '@/services/db'
 const BASE_URL = 'https://shop.tapla.az'
 
 function googleCategory(category: string): string {
-  const cat = (category || '').toLowerCase()
+  const cat = (category || '').toLowerCase().replace(/ı/g, 'i').replace(/i̇/g, 'i')
   if (cat.includes('notebook') || cat.includes('ultrabook') || cat.includes('noutbuk')) return 'Electronics > Computers > Notebooks'
   if (cat.includes('smartfon') || cat.includes('telefon') || cat.includes('phone')) return 'Electronics > Communications > Smartphones'
   if (cat.includes('planset') || cat.includes('tablet') || cat.includes('ipad')) return 'Electronics > Computers > Tablet Computers'
@@ -32,12 +32,16 @@ export async function GET() {
       .filter(Boolean)
       .map((img) => escapeXml(img))
 
-    const salePrice = p.originalPrice && p.originalPrice > p.price
-      ? `      <g:sale_price>${p.price.toFixed(2)} AZN</g:sale_price>`
-      : ''
+    const hasDiscount = p.originalPrice != null && Math.abs(p.originalPrice - p.price) > 0.01
+    const regularPrice = hasDiscount ? `      <g:price>${p.originalPrice!.toFixed(2)} AZN</g:price>` : `      <g:price>${p.price.toFixed(2)} AZN</g:price>`
+    const salePrice = hasDiscount ? `      <g:sale_price>${p.price.toFixed(2)} AZN</g:sale_price>` : ''
 
     const color = p.shades && p.shades.length > 0
       ? `      <g:color>${escapeXml(p.shades[0].name)}</g:color>`
+      : ''
+
+    const itemGroupId = p.shades && p.shades.length > 0
+      ? `      <g:item_group_id>${escapeXml(p.id)}</g:item_group_id>`
       : ''
 
     const tags = p.tags && p.tags.length > 0
@@ -52,15 +56,16 @@ export async function GET() {
       <link>${siteUrl}/products/${escapeXml(p.slug)}</link>
       <image_link>${escapeXml(imageUrl)}</image_link>
       ${additionalImages.length > 0 ? `<additional_image_link>${additionalImages.join(', ')}</additional_image_link>` : ''}
-      <g:price>${p.price.toFixed(2)} AZN</g:price>
+      ${regularPrice}
       ${salePrice}
       <g:availability>in_stock</g:availability>
-      <g:brand>TAPLA</g:brand>
+      <g:brand>TAPLA MARKETPLACE</g:brand>
       <g:condition>new</g:condition>
       <g:google_product_category>${escapeXml(googleCategory(p.category))}</g:google_product_category>
       <g:product_type>${escapeXml(p.category || '')}</g:product_type>
       ${tags}
       ${color}
+      ${itemGroupId}
     </item>`
   })
 
