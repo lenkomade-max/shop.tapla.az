@@ -5,7 +5,7 @@ import { Section } from '@/components/ui/Section';
 import { Container } from '@/components/ui/Container';
 import { Heading } from '@/components/ui/Heading';
 import { ProductCard } from '@/components/cards/ProductCard';
-import { Product, Shade } from '@/types';
+import { Product, Shade, Category } from '@/types';
 import { Modal } from '@/components/ui/Modal';
 import { useCart } from '@/store/CartContext';
 import { Star, CheckCircle, ShoppingBag, ShoppingCart, Minimize2, ZoomIn, ChevronRight, ArrowRight } from 'lucide-react';
@@ -18,26 +18,46 @@ interface ProductGridProps {
   products: Product[];
 }
 
-// Карта: старые category names → новые root slugs (для демо-товаров)
-const CATEGORY_NAME_MAP: Record<string, string> = {
-  'Notebook / Ultrabook': 'elektronika',
-  'Smartfon / Planşet': 'telefonlar-ve-plansetler',
-  'Aksesuar / Qadjet': 'aqilli-saat-ve-gadget',
-  'Planşet': 'telefonlar-ve-plansetler',
-};
-
-const CATEGORIES = [
-  { label: 'HAMSINI GÖSTƏR', value: 'all' },
-  { label: 'QULAQLIQ & AUDIO', value: 'qulaqliq-ve-audio' },
-  { label: 'TELEFON & PLANŞET', value: 'telefonlar-ve-plansetler' },
-  { label: 'MƏİŞƏT TEXNİKASI', value: 'kicik-meiset-texnikasi' },
-  { label: 'SAAT & GADGET', value: 'aqilli-saat-ve-gadget' },
-  { label: 'ELEKTRONIKA', value: 'elektronika' },
+// Цвета для табов (циклично)
+const TAB_COLORS = [
+  { active: 'text-emerald-600 after:bg-emerald-600', inactive: 'text-emerald-600' },
+  { active: 'text-blue-600 after:bg-blue-600', inactive: 'text-blue-600' },
+  { active: 'text-amber-600 after:bg-amber-500', inactive: 'text-amber-600' },
+  { active: 'text-violet-600 after:bg-violet-600', inactive: 'text-violet-600' },
+  { active: 'text-rose-600 after:bg-rose-600', inactive: 'text-rose-600' },
+  { active: 'text-cyan-600 after:bg-cyan-600', inactive: 'text-cyan-600' },
+  { active: 'text-orange-600 after:bg-orange-600', inactive: 'text-orange-600' },
+  { active: 'text-lime-600 after:bg-lime-600', inactive: 'text-lime-600' },
 ];
 
-function getProductCategoryValue(product: Product): string {
-  const mapped = CATEGORY_NAME_MAP[product.category];
-  return mapped || '';
+interface CategoryTab {
+  label: string;
+  value: string;
+  colorIndex: number;
+}
+
+function buildTabsAndMaps(cats: Category[]): {
+  tabs: CategoryTab[];
+  slugById: Map<string, string>;
+  slugByName: Map<string, string>;
+} {
+  const tabs: CategoryTab[] = [{ label: 'HAMSINI GÖSTƏR', value: 'all', colorIndex: -1 }];
+  const slugById = new Map<string, string>();
+  const slugByName = new Map<string, string>();
+  let colorIdx = 0;
+
+  function walk(list: Category[]) {
+    for (const cat of list) {
+      slugById.set(cat.id, cat.slug);
+      slugByName.set(cat.title.toLowerCase(), cat.slug);
+      if (!cat.parentId) {
+        tabs.push({ label: cat.title.toUpperCase(), value: cat.slug, colorIndex: colorIdx++ });
+      }
+      if (cat.children) walk(cat.children);
+    }
+  }
+  walk(cats);
+  return { tabs, slugById, slugByName };
 }
 
 export function ProductGrid({ products }: ProductGridProps) {
@@ -49,6 +69,22 @@ export function ProductGrid({ products }: ProductGridProps) {
   const [selectedShade, setSelectedShade] = useState<Shade | undefined>(undefined);
   const [purchaseQuantity, setPurchaseQuantity] = useState(1);
 
+  // Динамическая загрузка категорий из БД
+  const [tabs, setTabs] = useState<CategoryTab[]>([]);
+  const [slugById, setSlugById] = useState<Map<string, string>>(new Map());
+  const [slugByName, setSlugByName] = useState<Map<string, string>>(new Map());
+
+  useEffect(() => {
+    import('@/services/db').then(({ dbService }) => {
+      dbService.getCategoryTree().then((cats) => {
+        const { tabs: loaded, slugById: byId, slugByName: byName } = buildTabsAndMaps(cats);
+        setTabs(loaded);
+        setSlugById(byId);
+        setSlugByName(byName);
+      });
+    });
+  }, []);
+
   useEffect(() => {
     const savedScroll = sessionStorage.getItem('tapla_scroll');
     if (savedScroll) {
@@ -57,9 +93,19 @@ export function ProductGrid({ products }: ProductGridProps) {
     }
   }, []);
 
+  const getProductCategorySlug = (product: Product): string => {
+    if (product.categoryId && slugById.has(product.categoryId)) {
+      return slugById.get(product.categoryId)!;
+    }
+    if (product.category && slugByName.has(product.category.toLowerCase())) {
+      return slugByName.get(product.category.toLowerCase())!;
+    }
+    return '';
+  };
+
   const filteredProducts = selectedCategory === 'all'
     ? products
-    : products.filter(p => getProductCategoryValue(p) === selectedCategory);
+    : products.filter(p => getProductCategorySlug(p) === selectedCategory);
 
   const handleOpenQuickView = (product: Product) => {
     setQuickViewProduct(product);
@@ -103,38 +149,31 @@ export function ProductGrid({ products }: ProductGridProps) {
           </p>
         </div>
 
-        {/* Category Filter Tabs — premium rəngli */}
+        {/* Category Filter Tabs — динамические из БД, premium rəngli */}
         <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 mb-8 sm:mb-12 border-b border-neutral-100 pb-4">
-          {CATEGORIES.map((cat) => {
-            const isActive = selectedCategory === cat.value;
+          {tabs.map((tab) => {
+            const isActive = selectedCategory === tab.value;
+            const isAll = tab.value === 'all';
+            const color = TAB_COLORS[tab.colorIndex % TAB_COLORS.length];
+
+            const activeClass = isAll
+              ? 'text-neutral-950 font-bold after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-neutral-950'
+              : `font-bold ${color.active} after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full`;
+
+            const inactiveClass = isAll
+              ? 'text-neutral-400 hover:text-neutral-950'
+              : color.inactive;
+
             return (
               <button
-                key={cat.value}
-                onClick={() => setSelectedCategory(cat.value)}
+                key={tab.value}
+                onClick={() => setSelectedCategory(tab.value)}
                 className={clsx(
                   'text-[10px] sm:text-xs tracking-widest font-semibold uppercase relative py-2 transition-all duration-300 cursor-pointer',
-                  isActive && 'font-bold',
-                  cat.value === 'all' && (isActive
-                    ? 'text-neutral-950 after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-neutral-950'
-                    : 'text-neutral-400 hover:text-neutral-950'),
-                  cat.value === 'qulaqliq-ve-audio' && (isActive
-                    ? 'text-emerald-600 font-bold after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-emerald-600'
-                    : 'text-emerald-600'),
-                  cat.value === 'telefonlar-ve-plansetler' && (isActive
-                    ? 'text-blue-600 font-bold after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-blue-600'
-                    : 'text-blue-600'),
-                  cat.value === 'kicik-meiset-texnikasi' && (isActive
-                    ? 'text-amber-600 font-bold after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-amber-500'
-                    : 'text-amber-600'),
-                  cat.value === 'aqilli-saat-ve-gadget' && (isActive
-                    ? 'text-violet-600 font-bold after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-violet-600'
-                    : 'text-violet-600'),
-                  cat.value === 'elektronika' && (isActive
-                    ? 'text-rose-600 font-bold after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-rose-600'
-                    : 'text-rose-600'),
+                  isActive ? activeClass : inactiveClass,
                 )}
               >
-                {cat.label}
+                {tab.label}
               </button>
             );
           })}
