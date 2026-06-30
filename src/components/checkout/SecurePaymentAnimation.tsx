@@ -82,7 +82,7 @@ export default function SecurePaymentAnimation({
 
   return (
     <div className="w-full flex flex-col items-center justify-center py-4 px-0 sm:px-2 bg-transparent font-sans">
-      <div className="relative w-full aspect-[16/10] max-h-[320px] sm:max-h-none bg-slate-50/70 border border-slate-100 rounded-2xl overflow-hidden p-3 sm:p-6 flex flex-col justify-between shadow-sm">
+      <div className="relative w-full aspect-[16/10] max-h-[320px] sm:max-h-none bg-slate-50/70 border border-emerald-200 rounded-2xl overflow-hidden p-3 sm:p-6 flex flex-col justify-between shadow-sm">
 
         {/* Grid pattern */}
         <div className="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:16px_16px] opacity-40 pointer-events-none" />

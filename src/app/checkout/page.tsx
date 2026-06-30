@@ -754,24 +754,6 @@ export default function CheckoutPage() {
               </form>
             </div>
 
-            {/* Fixed bottom submit bar */}
-            <div className="fixed bottom-14 md:bottom-0 left-0 right-0 z-50 p-3">
-              <button
-                onClick={() => formRef.current?.requestSubmit()}
-                disabled={isSubmitting}
-                className="w-full bg-emerald-600 text-white text-[10px] tracking-widest font-bold uppercase py-3.5 border border-emerald-600 hover:bg-emerald-700 hover:border-emerald-700 transition-all duration-300 flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50 rounded-xl"
-              >
-                {isSubmitting ? (
-                  <span className="flex items-center space-x-2">
-                    <span className="animate-spin h-3.5 w-3.5 border-2 border-white border-t-transparent rounded-full" />
-                    <span>SİFARİŞ GÖNDƏRİLİR...</span>
-                  </span>
-                ) : (
-                  <span>SİFARİŞİ TƏSDİQLƏ VƏ TAMAMLA</span>
-                )}
-              </button>
-            </div>
-
             {/* Right: Cart Summary Column */}
             <div className="lg:col-span-5 bg-white border border-neutral-100 p-6 space-y-6 shadow-xs sticky top-28 rounded-xl">
               <h2 className="text-xs font-bold tracking-widest uppercase text-neutral-900 border-b border-neutral-100 pb-3">
