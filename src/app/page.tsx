@@ -14,7 +14,7 @@ export const revalidate = 120;
 
 export default async function Home() {
   // Concurrent server-side fetch calls
-  const [products, reviews, faqs, steps, benefits, heroSlides] = await Promise.all([
+  const [products, reviews, faqs, steps, benefits, heroSlides, categories] = await Promise.all([
     dbService.getProducts(),
     dbService.getReviews(),
     dbService.getFAQs(),
@@ -39,6 +39,7 @@ export default async function Home() {
           image_mobile: (s.image_mobile as string) || '',
         }))
       ),
+    dbService.getCategories(),
   ]);
 
   return (
@@ -47,7 +48,7 @@ export default async function Home() {
       <Hero slides={heroSlides} />
 
       {/* 2. Primary Products Grid with Quick View modal */}
-      <ProductGrid products={products} />
+      <ProductGrid products={products} categories={categories} />
 
       {/* 3. Core Value Props & Diagnostic Quiz Row */}
       <ValueProps />

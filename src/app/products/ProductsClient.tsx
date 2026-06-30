@@ -5,6 +5,7 @@ import { ProductCard } from '@/components/cards/ProductCard';
 import { Container } from '@/components/ui/Container';
 import { clsx } from 'clsx';
 import { Product, Category } from '@/types';
+import { getCategoryTabColors } from '@/lib/category-colors';
 
 interface ProductsClientProps {
   products: Product[];
@@ -68,7 +69,7 @@ export function ProductsClient({ products, categories }: ProductsClientProps) {
           </p>
         </div>
 
-        {/* Category Filter Tabs — динамические из БД */}
+        {/* Category Filter Tabs — dynamic from DB, premium colors */}
         {rootCategories.length > 0 && (
           <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 mb-8 border-b border-neutral-100 pb-4">
             <button
@@ -82,20 +83,22 @@ export function ProductsClient({ products, categories }: ProductsClientProps) {
             >
               HAMSINI GÖSTƏR
             </button>
-            {rootCategories.map(cat => (
-              <button
-                key={cat.slug}
-                onClick={() => setSelectedCategorySlug(cat.slug)}
-                className={clsx(
-                  'text-[10px] sm:text-xs tracking-widest font-semibold uppercase relative py-2 transition-colors cursor-pointer',
-                  selectedCategorySlug === cat.slug
-                    ? 'text-neutral-950 font-bold after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-neutral-950'
-                    : 'text-neutral-400 hover:text-neutral-950'
-                )}
-              >
-                {cat.title}
-              </button>
-            ))}
+            {rootCategories.map(cat => {
+              const isActive = selectedCategorySlug === cat.slug;
+              const colors = getCategoryTabColors(cat.slug);
+              return (
+                <button
+                  key={cat.slug}
+                  onClick={() => setSelectedCategorySlug(cat.slug)}
+                  className={clsx(
+                    'text-[10px] sm:text-xs tracking-widest font-semibold uppercase relative py-2 transition-colors cursor-pointer',
+                    isActive ? colors.active : colors.inactive
+                  )}
+                >
+                  {cat.title}
+                </button>
+              );
+            })}
           </div>
         )}
 

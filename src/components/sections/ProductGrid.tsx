@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Section } from '@/components/ui/Section';
 import { Container } from '@/components/ui/Container';
 import { Heading } from '@/components/ui/Heading';
 import { ProductCard } from '@/components/cards/ProductCard';
-import { Product, Shade } from '@/types';
+import { Product, Shade, Category } from '@/types';
 import { Modal } from '@/components/ui/Modal';
 import { useCart } from '@/store/CartContext';
 import { Star, CheckCircle, ShoppingBag, ShoppingCart, Minimize2, ZoomIn, ChevronRight, ArrowRight } from 'lucide-react';
@@ -13,76 +13,58 @@ import Image from 'next/image';
 import { clsx } from 'clsx';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { getCategoryTabColors } from '@/lib/category-colors';
 
 interface ProductGridProps {
   products: Product[];
+  categories: Category[];
 }
 
-// Карта: старые category names → новые root slugs (для демо-товаров)
-const CATEGORY_NAME_MAP: Record<string, string> = {
-  'Notebook / Ultrabook': 'elektronika',
-  'Smartfon / Planşet': 'telefonlar-ve-plansetler',
-  'Aksesuar / Qadjet': 'aqilli-saat-ve-gadget',
-  'Planşet': 'telefonlar-ve-plansetler',
-};
-
-const CATEGORIES = [
-  { label: 'HAMSINI GÖSTƏR', value: 'all' },
-  { label: 'QULAQLIQ & AUDIO', value: 'qulaqliq-ve-audio' },
-  { label: 'TELEFON & PLANŞET', value: 'telefonlar-ve-plansetler' },
-  { label: 'MƏİŞƏT TEXNİKASI', value: 'kicik-meiset-texnikasi' },
-  { label: 'SAAT & GADGET', value: 'aqilli-saat-ve-gadget' },
-  { label: 'ELEKTRONIKA', value: 'elektronika' },
-];
-
-const TAB_COLOR_CLASSES: Record<string, { active: string; inactive: string }> = {
-  'qulaqliq-ve-audio': {
-    active: 'text-emerald-600 font-bold after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-emerald-600',
-    inactive: 'text-emerald-600',
-  },
-  'telefonlar-ve-plansetler': {
-    active: 'text-blue-600 font-bold after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-blue-600',
-    inactive: 'text-blue-600',
-  },
-  'kicik-meiset-texnikasi': {
-    active: 'text-amber-600 font-bold after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-amber-500',
-    inactive: 'text-amber-600',
-  },
-  'aqilli-saat-ve-gadget': {
-    active: 'text-violet-600 font-bold after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-violet-600',
-    inactive: 'text-violet-600',
-  },
-  'elektronika': {
-    active: 'text-rose-600 font-bold after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-rose-600',
-    inactive: 'text-rose-600',
-  },
-};
-
-function getProductCategoryValue(product: Product): string {
-  const mapped = CATEGORY_NAME_MAP[product.category];
-  return mapped || '';
-}
-
-export function ProductGrid({ products }: ProductGridProps) {
+export function ProductGrid({ products, categories }: ProductGridProps) {
   const { addToCart, addToCartSilent } = useCart();
   const router = useRouter();
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedCategorySlug, setSelectedCategorySlug] = useState('all');
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [selectedShade, setSelectedShade] = useState<Shade | undefined>(undefined);
   const [purchaseQuantity, setPurchaseQuantity] = useState(1);
 
-  useEffect(() => {
-    const savedScroll = sessionStorage.getItem('tapla_scroll');
-    if (savedScroll) {
-      sessionStorage.removeItem('tapla_scroll');
-      requestAnimationFrame(() => window.scrollTo(0, Number(savedScroll)));
-    }
-  }, []);
+  const rootCategories = useMemo(() =>
+    categories
+      .filter(c => !c.parentId && c.status === 'active')
+      .sort((a, b) => a.sortOrder - b.sortOrder),
+    [categories]
+  );
 
-  const filteredProducts = selectedCategory === 'all'
+  const childrenMap = useMemo(() => {
+    const map = new Map<string, string[]>();
+    categories.forEach(c => {
+      if (c.parentId) {
+        if (!map.has(c.parentId)) map.set(c.parentId, []);
+        map.get(c.parentId)!.push(c.id);
+      }
+    });
+    return map;
+  }, [categories]);
+
+  const getAllDescendantIds = (catId: string): Set<string> => {
+    const ids = new Set<string>([catId]);
+    const children = childrenMap.get(catId) || [];
+    for (const childId of children) {
+      for (const id of getAllDescendantIds(childId)) {
+        ids.add(id);
+      }
+    }
+    return ids;
+  };
+
+  const filteredProducts = selectedCategorySlug === 'all'
     ? products
-    : products.filter(p => getProductCategoryValue(p) === selectedCategory);
+    : products.filter(p => {
+        const rootCat = rootCategories.find(c => c.slug === selectedCategorySlug);
+        if (!rootCat || !p.categoryId) return false;
+        return getAllDescendantIds(rootCat.id).has(p.categoryId);
+      });
 
   const handleOpenQuickView = (product: Product) => {
     setQuickViewProduct(product);
@@ -126,25 +108,32 @@ export function ProductGrid({ products }: ProductGridProps) {
           </p>
         </div>
 
-        {/* Category Filter Tabs — premium rəngli */}
+        {/* Category Filter Tabs — dynamic from DB, premium colors */}
         <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 mb-8 sm:mb-12 border-b border-neutral-100 pb-4">
-          {CATEGORIES.map((cat) => {
-            const isActive = selectedCategory === cat.value;
-            const colors = TAB_COLOR_CLASSES[cat.value];
+          <button
+            onClick={() => setSelectedCategorySlug('all')}
+            className={clsx(
+              'text-[10px] sm:text-xs tracking-widest font-semibold uppercase relative py-2 transition-colors cursor-pointer',
+              selectedCategorySlug === 'all'
+                ? 'text-neutral-950 font-bold after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-neutral-950'
+                : 'text-neutral-400 hover:text-neutral-950'
+            )}
+          >
+            HAMSINI GÖSTƏR
+          </button>
+          {rootCategories.map(cat => {
+            const isActive = selectedCategorySlug === cat.slug;
+            const colors = getCategoryTabColors(cat.slug);
             return (
               <button
-                key={cat.value}
-                onClick={() => setSelectedCategory(cat.value)}
+                key={cat.slug}
+                onClick={() => setSelectedCategorySlug(cat.slug)}
                 className={clsx(
                   'text-[10px] sm:text-xs tracking-widest font-semibold uppercase relative py-2 transition-colors cursor-pointer',
-                  cat.value === 'all'
-                    ? (isActive
-                        ? 'text-neutral-950 font-bold after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-neutral-950'
-                        : 'text-neutral-400 hover:text-neutral-950')
-                    : (isActive ? colors.active : colors.inactive),
+                  isActive ? colors.active : colors.inactive
                 )}
               >
-                {cat.label}
+                {cat.title}
               </button>
             );
           })}
