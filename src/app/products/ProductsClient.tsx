@@ -85,7 +85,7 @@ export function ProductsClient({ products, categories }: ProductsClientProps) {
             </button>
             {rootCategories.map(cat => {
               const isActive = selectedCategorySlug === cat.slug;
-              const colors = getCategoryTabColors(cat.slug);
+              const colors = getCategoryTabColors(cat.sortOrder);
               return (
                 <button
                   key={cat.slug}

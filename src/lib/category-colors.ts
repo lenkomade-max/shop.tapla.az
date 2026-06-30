@@ -1,7 +1,8 @@
 /**
  * Авто-цвета для категорий.
- * Хеширует slug → палитра из 8 цветов.
+ * По sort_order циклически → палитра из 8 цветов.
  * Новые категории автоматически получают цвет без обновления кода.
+ * Повторов нет пока категорий ≤ 8, дальше цикл.
  */
 
 const PALETTE: { active: string; inactive: string }[] = [
@@ -39,15 +40,10 @@ const PALETTE: { active: string; inactive: string }[] = [
   },
 ];
 
-/** Простой хеш строки → индекс палитры */
-function hashSlug(slug: string): number {
-  let h = 0;
-  for (let i = 0; i < slug.length; i++) {
-    h = (h * 31 + slug.charCodeAt(i)) | 0;
-  }
-  return Math.abs(h) % PALETTE.length;
-}
-
-export function getCategoryTabColors(slug: string): { active: string; inactive: string } {
-  return PALETTE[hashSlug(slug)];
+/**
+ * Выдаёт цвет по sortOrder.
+ * sortOrder 1..8 → цвета без повторов, 9+ → цикл сначала.
+ */
+export function getCategoryTabColors(sortOrder: number): { active: string; inactive: string } {
+  return PALETTE[(sortOrder - 1) % PALETTE.length];
 }
