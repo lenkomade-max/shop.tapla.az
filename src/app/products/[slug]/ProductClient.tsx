@@ -538,7 +538,7 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
             </div>
 
             {/* Content Tabs (Benefits / How to use / Ingredients) */}
-            <div className="space-y-4">
+            <div className="space-y-2">
               <div className="flex border-b border-neutral-200">
                 {(['benefits', 'features', 'howToUse', 'ingredients'] as const).map((tab) => (
                   <button
@@ -612,11 +612,11 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
             </div>
             {/* FAQ Accordion */}
             {product.faq && product.faq.length > 0 && (
-              <div className="space-y-3 pt-4 border-t border-neutral-100">
+              <div className="space-y-2 pt-2 border-t border-neutral-100">
                 <span className="text-[10px] tracking-widest uppercase font-bold text-[#b52525] block">
                   TEZ-TEZ VERILƏN SUALLAR
                 </span>
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   {product.faq.map((item, i) => (
                     <details key={i} className="group border border-neutral-100 bg-white">
                       <summary className="flex items-center justify-between px-4 py-3 text-xs font-medium text-neutral-800 cursor-pointer list-none hover:bg-neutral-50 transition-colors">
@@ -635,13 +635,13 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
         </div>
 
         {/* Dynamic Reviews Segment for current product */}
-        <div className="mt-12 border-t border-neutral-100 pt-8">
-          <div className="mb-6 text-center max-w-lg mx-auto">
+        <div className="mt-6 border-t border-neutral-100 pt-4">
+          <div className="mb-3 text-center max-w-lg mx-auto">
             <h2 className="text-lg font-bold tracking-widest uppercase text-neutral-950 mb-3">MÜŞTƏRİ RƏYLƏRİ</h2>
             <p className="text-xs text-neutral-400 font-sans">Məhsulumuz haqqında real müştərilərimizdən gələn rəylərlə tanış olun.</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white p-6 border border-neutral-100 space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-white p-4 border border-neutral-100 space-y-3">
               <div className="flex items-center justify-between">
                 <span className="font-bold text-xs text-neutral-900">Nərmin Məmmədova</span>
                 <span className="text-[10px] font-mono text-neutral-400">22 İyun 2026</span>
@@ -653,7 +653,7 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
                 Bu məhsulu TAPLA MARKETPLACE-dən aldım və çox məmnun qaldım. Keyfiyyət mükəmməldir, çatdırılma isə çox sürətli idi. Hər kəsə tövsiyə edirəm!
               </p>
             </div>
-            <div className="bg-white p-6 border border-neutral-100 space-y-4">
+            <div className="bg-white p-4 border border-neutral-100 space-y-3">
               <div className="flex items-center justify-between">
                 <span className="font-bold text-xs text-neutral-900">Elnur Rzayev</span>
                 <span className="text-[10px] font-mono text-neutral-400">14 İyun 2026</span>
@@ -670,8 +670,8 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
 
         {/* Related Products Showcase */}
         {relatedProducts.length > 0 && (
-          <div className="mt-12 border-t border-neutral-100 pt-8">
-            <div className="flex items-center justify-between mb-6">
+          <div className="mt-6 border-t border-neutral-100 pt-4">
+            <div className="flex items-center justify-between mb-3">
               <h2 className="text-sm sm:text-base font-bold tracking-widest uppercase text-neutral-950">
                 SİZİN ÜÇÜN SEÇDİKLƏRİMİZ
               </h2>
