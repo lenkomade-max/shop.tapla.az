@@ -3,18 +3,20 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { dbService } from '@/services/db'
 import { ProductCard } from '@/components/cards/ProductCard'
-import { CATEGORIES } from '@/constants/data'
 
 type Props = { params: Promise<{ slug: string }> }
 
+export const revalidate = 120
+
 export async function generateStaticParams() {
-  return CATEGORIES.filter(c => c.status === 'active').map(c => ({ slug: c.slug }))
+  const categories = await dbService.getCategories()
+  return categories.filter(c => c.status === 'active' && c.slug).map(c => ({ slug: c.slug }))
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const category = await dbService.getCategoryBySlug(slug)
-  if (!category) return { title: 'Kateqoriya tapılmadı' }
+  if (!category) return { title: 'Kateqoriya | TAPLA MARKETPLACE' }
 
   return {
     title: `${category.title} — TAPLA MARKETPLACE`,

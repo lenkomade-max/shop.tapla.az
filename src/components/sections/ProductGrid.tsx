@@ -149,7 +149,6 @@ export function ProductGrid({ products }: ProductGridProps) {
             );
           })}
         </div>
-        </div>
 
         {/* Link to all category pages */}
         <div className="text-center mb-10">

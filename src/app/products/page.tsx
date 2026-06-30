@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { dbService } from '@/services/db'
 import { ProductsClient } from './ProductsClient'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 120
 
 export const metadata: Metadata = {
   title: 'Məhsullar | TAPLA MARKETPLACE',
@@ -10,7 +10,10 @@ export const metadata: Metadata = {
 }
 
 export default async function ProductsPage() {
-  const products = await dbService.getProducts()
+  const [products, categories] = await Promise.all([
+    dbService.getProducts(),
+    dbService.getCategories(),
+  ])
 
-  return <ProductsClient products={products} />
+  return <ProductsClient products={products} categories={categories} />
 }

@@ -1,8 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Menu, X, ShoppingBag, Search, Trash2, Plus, Minus, ArrowRight } from 'lucide-react';
-import { NAVIGATION_ITEMS } from '@/constants/data';
 import { useCart } from '@/store/CartContext';
 import { Drawer } from '@/components/ui/Drawer';
 import { Badge } from '@/components/ui/Badge';
@@ -12,8 +11,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { AuthButton } from '@/components/auth/AuthButton';
+import type { Category } from '@/types';
 
-export function Header() {
+interface HeaderProps {
+  rootCategories?: Category[];
+}
+
+export function Header({ rootCategories = [] }: HeaderProps) {
   const router = useRouter();
   const {
     cartItems,
@@ -33,6 +37,36 @@ export function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [mounted, setMounted] = useState(false);
+
+  // Навигация: категории из БД + статические ссылки
+  const navigationItems = useMemo(() => [
+    {
+      label: 'MƏHSULLAR',
+      href: '/products',
+      children: rootCategories.map(cat => ({
+        label: cat.title,
+        href: `/kateqoriya/${cat.slug}`,
+      })),
+    },
+    {
+      label: 'KAMPANİYALAR',
+      href: '/#products',
+      isBadge: true,
+      badgeText: 'ENDİRİM',
+    },
+    {
+      label: 'RƏYLƏR',
+      href: '/#reviews',
+    },
+    {
+      label: 'HAQQIMIZDA',
+      href: '/about',
+    },
+    {
+      label: 'FAQ / DƏSTƏK',
+      href: '/#faq',
+    },
+  ], [rootCategories]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -89,7 +123,7 @@ export function Header() {
             </div>
 
             <nav className="hidden md:flex items-center space-x-8 text-xs font-semibold tracking-widest">
-              {NAVIGATION_ITEMS.slice(0, 3).map((item) => (
+              {navigationItems.slice(0, 3).map((item) => (
                 <div key={item.label} className="relative group">
                   <Link
                     href={item.href}
@@ -143,7 +177,7 @@ export function Header() {
               </button>
 
               <nav className="hidden md:flex items-center space-x-8 text-xs font-semibold tracking-widest mr-4">
-                {NAVIGATION_ITEMS.slice(3).map((item) => (
+                {navigationItems.slice(3).map((item) => (
                   <Link
                     key={item.label}
                     href={item.href}
@@ -197,7 +231,7 @@ export function Header() {
 
       <Drawer isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} title="MENYU" position="left">
         <div className="flex flex-col space-y-6 pt-4">
-          {NAVIGATION_ITEMS.map((item) => (
+          {navigationItems.map((item) => (
             <div key={item.label} className="border-b border-neutral-100 pb-3">
               <Link
                 href={item.href}

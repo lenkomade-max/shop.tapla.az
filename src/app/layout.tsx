@@ -7,6 +7,7 @@ import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { StickyMobileBar } from '@/components/layout/StickyMobileBar'
 import { FacebookPixel } from '@/components/layout/FacebookPixel'
+import { dbService } from '@/services/db'
 
 const FB_PIXEL_ID = '1880811039970349'
 
@@ -26,7 +27,9 @@ export const metadata: Metadata = {
   description: 'TAPLA MARKETPLACE — Azərbaycanda ən sərfəli qiymətlərlə elektronika, notebook, telefon, aksesuar və daha çoxu. Sürətli çatdırılma, zəmanət və etibarlı xidmət.',
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const rootCategories = await dbService.getCategoryTree()
+
   return (
     <html lang="az" className="scroll-smooth">
       <Script
@@ -58,7 +61,7 @@ fbq('init', '${FB_PIXEL_ID}');
         </noscript>
         <FacebookPixel />
         <AppProviders>
-          <Header />
+          <Header rootCategories={rootCategories} />
           <main className="flex-grow">
             {children}
           </main>

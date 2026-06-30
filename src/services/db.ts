@@ -116,10 +116,7 @@ export const dbService = {
       console.warn('DB products fetch failed, using local fallback:', err);
     }
 
-    if (category) {
-      return PRODUCTS.filter(p => p.category.toLowerCase().includes(category.toLowerCase()));
-    }
-    return PRODUCTS;
+    return [];
   },
 
   async getProductById(id: string): Promise<Product | null> {
@@ -139,7 +136,7 @@ export const dbService = {
       console.warn(`DB product fetch for ID ${id} failed, using local fallback:`, err);
     }
 
-    return PRODUCTS.find(p => p.id === id) || null;
+    return null;
   },
 
   async getProductBySlug(slug: string): Promise<Product | null> {
@@ -170,7 +167,7 @@ export const dbService = {
       console.warn(`DB product fetch for slug ${slug} failed, using local fallback:`, err);
     }
 
-    return PRODUCTS.find(p => p.slug === slug || p.id === slug) || null;
+    return null;
   },
 
   async getReviews(): Promise<Review[]> {
@@ -188,7 +185,7 @@ export const dbService = {
       console.warn('DB reviews fetch failed, using local fallback:', err);
     }
 
-    return REVIEWS;
+    return [];
   },
 
   async getFAQs(category?: string): Promise<FAQ[]> {
@@ -207,10 +204,7 @@ export const dbService = {
       console.warn('DB FAQs fetch failed, using local fallback:', err);
     }
 
-    if (category) {
-      return FAQS.filter(f => f.category.toLowerCase() === category.toLowerCase());
-    }
-    return FAQS;
+    return [];
   },
 
   // ——— Категории ———
@@ -230,7 +224,7 @@ export const dbService = {
     } catch (err) {
       console.warn('DB categories fetch failed, using local fallback:', err);
     }
-    return CATEGORIES.filter(c => c.status === 'active');
+    return [];
   },
 
   async getCategoryTree(): Promise<Category[]> {
@@ -268,12 +262,7 @@ export const dbService = {
       console.warn(`DB category fetch for slug ${slug} failed, using local fallback:`, err);
     }
 
-    const cat = CATEGORIES.find(c => c.slug === slug);
-    if (cat) {
-      cat.children = CATEGORIES.filter(c => c.parentId === cat.id && c.status === 'active')
-        .sort((a, b) => a.sortOrder - b.sortOrder);
-    }
-    return cat || null;
+    return null;
   },
 
   async getProductsByCategory(categorySlug: string): Promise<Product[]> {
@@ -310,7 +299,7 @@ export const dbService = {
       console.warn(`DB products by category fetch for ${categorySlug} failed, using local fallback:`, err);
     }
 
-    return PRODUCTS;
+    return [];
   },
 
   async getRitualSteps() {

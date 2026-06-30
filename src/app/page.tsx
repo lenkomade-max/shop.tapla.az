@@ -10,7 +10,7 @@ import { ReviewsSection } from '@/components/sections/ReviewsSection';
 import { FAQ } from '@/components/sections/FAQ';
 import { ValueProps } from '@/components/sections/ValueProps';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 120;
 
 export default async function Home() {
   // Concurrent server-side fetch calls

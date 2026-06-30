@@ -558,6 +558,7 @@ export async function saveCategory(formData: FormData): Promise<void> {
   }
 
   revalidatePath('/admin/categories')
+  revalidatePath('/products')
   revalidatePath('/', 'layout')
   redirect('/admin/categories')
 }
@@ -568,6 +569,7 @@ export async function deleteCategory(formData: FormData) {
   if (!id) return
   await supabaseAdmin.from('categories').delete().eq('id', id)
   revalidatePath('/admin/categories')
+  revalidatePath('/products')
   revalidatePath('/', 'layout')
 }
 

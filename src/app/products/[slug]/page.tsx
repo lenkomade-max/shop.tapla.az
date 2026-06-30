@@ -4,7 +4,7 @@ import type { Metadata } from 'next';
 import { dbService } from '@/services/db';
 import { ProductClient } from './ProductClient';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 120;
 
 interface Props {
   params: Promise<{ slug: string }>;
