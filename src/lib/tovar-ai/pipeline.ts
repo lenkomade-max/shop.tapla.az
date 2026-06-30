@@ -371,8 +371,14 @@ function mergeEnrichedData(
     images: [],
     supplier_url: supplierUrl,
     is_new: true,
-    shades: enriched.shades || [],
-    try_on_enabled: enriched.try_on_enabled ?? false,
+    // Shades: из AI-Enricher, иначе из Vision (primary + secondary colors)
+    shades: enriched.shades?.length
+      ? enriched.shades
+      : [analysis.primary_color, ...analysis.secondary_colors].filter(Boolean),
+    try_on_enabled: enriched.try_on_enabled ?? (
+      // Авто: включаем если товар имеет оттенки или это косметика/очки
+      (enriched.shades?.length || 0) > 1 || analysis.category === 'Kosmetika'
+    ),
     features: enriched.features_az?.length ? enriched.features_az : undefined,
     ideal_for: enriched.ideal_for_az || undefined,
     use_cases: enriched.use_cases_az?.length ? enriched.use_cases_az : undefined,

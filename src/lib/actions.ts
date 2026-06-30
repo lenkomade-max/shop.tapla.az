@@ -295,6 +295,7 @@ export async function createProductFromAI(
       compatibility: productData.compatibility || null,
       faq: productData.faq || [],
       search_keywords: productData.search_keywords || [],
+      rating: 5, // новый AI-товар — сразу 5 звёзд
     })
     .select('id')
     .single()

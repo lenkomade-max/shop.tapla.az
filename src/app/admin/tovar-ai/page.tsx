@@ -237,6 +237,30 @@ export default function TovarAIPage() {
       }
 
       setStage(data.success ? 'done' : 'error')
+
+      // ─── Product mode: авто-сохранение как черновик ──────────────────
+      if (mode === 'product' && data.success && data.productData && data.imageUrls?.length) {
+        const finalData = {
+          ...data.productData,
+          images: data.imageUrls,
+          features: data.productData.features || undefined,
+          ideal_for: data.productData.ideal_for || undefined,
+          use_cases: data.productData.use_cases || undefined,
+          care_instructions: data.productData.care_instructions || undefined,
+          compatibility: data.productData.compatibility || undefined,
+          faq: data.productData.faq || undefined,
+          search_keywords: data.productData.search_keywords || undefined,
+        }
+        try {
+          const id = await createProductFromAI(finalData, 'draft')
+          if (id) {
+            setSavedProductId(id)
+            setProductData(prev => prev ? { ...prev } : prev)
+          }
+        } catch {
+          // молча — продукт уже показан, юзер может сохранить вручную
+        }
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Naməlum xəta')
       setStage('error')
