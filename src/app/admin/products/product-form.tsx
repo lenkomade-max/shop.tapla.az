@@ -31,6 +31,40 @@ export function ProductForm({ product, error: initialError }: Props) {
   const [category, setCategory] = useState((product?.category as string) || '');
   const [categoryId, setCategoryId] = useState((product?.category_id as string) || '');
   const [categories, setCategories] = useState<Array<{ id: string; slug: string; title: string; parent_id: string | null }>>([]);
+
+  // Cascading category selection (3 levels)
+  const [selectedRoot, setSelectedRoot] = useState('');
+  const [selectedChild, setSelectedChild] = useState('');
+  const rootCats = categories.filter(c => !c.parent_id);
+  const childCats = categories.filter(c => selectedRoot && c.parent_id === selectedRoot);
+  const subCats = categories.filter(c => selectedChild && c.parent_id === selectedChild);
+
+  // On edit: restore hierarchy from existing categoryId
+  useEffect(() => {
+    if (categories.length === 0 || !categoryId) return;
+    const cat = categories.find(c => c.id === categoryId);
+    if (!cat) return;
+    if (!cat.parent_id) {
+      setSelectedRoot(cat.id);
+    } else {
+      const parent = categories.find(c => c.id === cat.parent_id);
+      if (parent && parent.parent_id) {
+        setSelectedRoot(parent.parent_id);
+        setSelectedChild(cat.parent_id);
+      } else if (parent) {
+        setSelectedRoot(cat.parent_id);
+      }
+    }
+  }, [categories, categoryId]);
+
+  // Auto-set categoryId when level-2 selected with no level-3
+  useEffect(() => {
+    if (!selectedChild) return;
+    if (subCats.length > 0) return;
+    if (categoryId) return;
+    const child = categories.find(c => c.id === selectedChild);
+    if (child) { setCategoryId(child.id); setCategory(child.title); }
+  }, [selectedChild, subCats.length]);
   const [howToUse, setHowToUse] = useState((product?.how_to_use as string) || '');
   const [ingredients, setIngredients] = useState((product?.ingredients as string) || '');
   const [supplierUrl, setSupplierUrl] = useState((product?.supplier_url as string) || '');
@@ -217,29 +251,53 @@ export function ProductForm({ product, error: initialError }: Props) {
               className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm font-mono outline-none focus:border-black" />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-medium text-zinc-600">Категория</label>
+            <label className="mb-1 block text-xs font-medium text-zinc-600">Kateqoriya</label>
             {categories.length > 0 ? (
-              <select
-                value={categoryId || category}
-                onChange={e => {
-                  const selected = categories.find(c => c.id === e.target.value);
-                  if (selected) { setCategoryId(selected.id); setCategory(selected.title); }
-                  else { setCategory(e.target.value); setCategoryId(''); }
-                }}
-                className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black bg-white"
-              >
-                <option value="">— Seçin —</option>
-                {categories.filter(c => !c.parent_id).map(root => (
-                  <optgroup key={root.id} label={root.title}>
-                    <option value={root.id}>{root.title}</option>
-                    {categories.filter(c => c.parent_id === root.id).map(sub => (
-                      <option key={sub.id} value={sub.id}>&nbsp;&nbsp;└ {sub.title}</option>
+              <div className="space-y-2">
+                <select
+                  value={selectedRoot}
+                  onChange={e => { setSelectedRoot(e.target.value); setSelectedChild(''); setCategoryId(''); setCategory(''); }}
+                  className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black bg-white"
+                >
+                  <option value="">— Root —</option>
+                  {rootCats.map(r => (
+                    <option key={r.id} value={r.id}>{r.title}</option>
+                  ))}
+                </select>
+                {childCats.length > 0 && (
+                  <select
+                    value={selectedChild}
+                    onChange={e => { setSelectedChild(e.target.value); setCategoryId(''); setCategory(''); }}
+                    className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black bg-white"
+                  >
+                    <option value="">— Kateqoriya —</option>
+                    {childCats.map(c => (
+                      <option key={c.id} value={c.id}>{c.title}</option>
                     ))}
-                  </optgroup>
-                ))}
-              </select>
+                  </select>
+                )}
+                {subCats.length > 0 && (
+                  <select
+                    value={categoryId}
+                    onChange={e => {
+                      const selected = subCats.find(c => c.id === e.target.value);
+                      if (selected) { setCategoryId(selected.id); setCategory(selected.title); }
+                    }}
+                    className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black bg-white"
+                  >
+                    <option value="">— Alt kateqoriya —</option>
+                    {subCats.map(s => (
+                      <option key={s.id} value={s.id}>{s.title}</option>
+                    ))}
+                  </select>
+                )}
+                {selectedChild && subCats.length === 0 && (
+                  <p className="text-xs text-emerald-600">Kateqoriya seçildi: {categories.find(c => c.id === selectedChild)?.title}</p>
+                )}
+              </div>
             ) : (
               <input value={category} onChange={e => setCategory(e.target.value)}
+                placeholder="Kateqoriya adı"
                 className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black" />
             )}
           </div>

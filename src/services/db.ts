@@ -230,7 +230,7 @@ export const dbService = {
   async getProductsByCategory(categorySlug: string): Promise<Product[]> {
     try {
       if (supabaseAdmin) {
-        // Find the category and all its descendant IDs
+        // Find the category
         const { data: catData } = await supabaseAdmin
           .from('categories')
           .select('id')
@@ -239,13 +239,28 @@ export const dbService = {
           .maybeSingle();
 
         if (catData) {
-          const { data: subCats } = await supabaseAdmin
+          // Level 1: direct children
+          const { data: directChildren } = await supabaseAdmin
             .from('categories')
             .select('id')
             .eq('status', 'active')
-            .or(`id.eq.${catData.id},parent_id.eq.${catData.id}`);
+            .eq('parent_id', catData.id);
 
-          const catIds = subCats?.map(c => c.id) || [catData.id];
+          const level1Ids = directChildren?.map(c => c.id) || [];
+
+          // Level 2: grandchildren (children of direct children)
+          let level2Ids: string[] = [];
+          if (level1Ids.length > 0) {
+            const { data: grandchildren } = await supabaseAdmin
+              .from('categories')
+              .select('id')
+              .eq('status', 'active')
+              .in('parent_id', level1Ids);
+            level2Ids = grandchildren?.map(c => c.id) || [];
+          }
+
+          // Combine all: self + children + grandchildren
+          const catIds = [catData.id, ...level1Ids, ...level2Ids];
 
           const { data, error } = await supabaseAdmin
             .from('products')
