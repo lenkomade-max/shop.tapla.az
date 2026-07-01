@@ -354,7 +354,30 @@ export function ProductForm({ product, error: initialError }: Props) {
         {/* Существующие URL + превью */}
         <div className="space-y-2">
           {images.map((url, i) => (
-            <div key={i} className="flex items-center gap-3 rounded-lg border bg-zinc-50 p-2">
+            <div key={i} className="flex items-center gap-2 rounded-lg border bg-zinc-50 p-2">
+              {/* Кнопки порядка */}
+              <div className="flex flex-col gap-0.5 shrink-0">
+                <button type="button"
+                  disabled={i === 0}
+                  onClick={() => {
+                    const next = [...images];
+                    [next[i-1], next[i]] = [next[i], next[i-1]];
+                    setImages(next);
+                  }}
+                  className="text-xs text-zinc-400 hover:text-black disabled:opacity-20 disabled:cursor-not-allowed leading-none px-0.5"
+                  title="Yuxarı"
+                >▲</button>
+                <button type="button"
+                  disabled={i === images.length - 1}
+                  onClick={() => {
+                    const next = [...images];
+                    [next[i], next[i+1]] = [next[i+1], next[i]];
+                    setImages(next);
+                  }}
+                  className="text-xs text-zinc-400 hover:text-black disabled:opacity-20 disabled:cursor-not-allowed leading-none px-0.5"
+                  title="Aşağı"
+                >▼</button>
+              </div>
               {url ? (
                 <img src={url} alt="" className="h-12 w-12 rounded-md object-cover border shrink-0" />
               ) : (
@@ -416,7 +439,7 @@ export function ProductForm({ product, error: initialError }: Props) {
         </div>
       )}
 
-      <div className="flex items-center gap-4">
+      <div className="sticky bottom-0 z-10 -mx-2 px-2 py-4 bg-white border-t shadow-md rounded-b-xl mt-8 flex items-center gap-4">
         <button
           type="submit"
           disabled={submitting}

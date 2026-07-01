@@ -96,6 +96,15 @@ export async function deleteProduct(formData: FormData) {
   revalidatePath('/', 'layout');
 }
 
+export async function updateProductStatus(formData: FormData) {
+  if (!(await checkAuth())) return;
+  const id = formData.get('id') as string;
+  const status = formData.get('status') as string;
+  if (!id || !status) return;
+  await supabaseAdmin.from('products').update({ status, updated_at: new Date().toISOString() }).eq('id', id);
+  revalidatePath('/admin/products');
+}
+
 export type SaveProductResult = {
   success: boolean
   error?: string

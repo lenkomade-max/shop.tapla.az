@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { DeleteButton } from './delete-button';
+import { StatusCell } from './status-cell';
 
 export default async function ProductsPage() {
   const { data: products, error } = await supabaseAdmin
@@ -65,13 +66,7 @@ export default async function ProductsPage() {
                 <td className="px-4 py-3">{p.price ? p.price.toLocaleString() + ' ₼' : '—'}</td>
                 <td className="px-4 py-3 text-zinc-500">{p.category || '—'}</td>
                 <td className="px-4 py-3">
-                  <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                    p.status === 'active' ? 'bg-green-100 text-green-700'
-                    : p.status === 'draft' ? 'bg-yellow-100 text-yellow-700'
-                    : 'bg-red-100 text-red-700'
-                  }`}>
-                    {p.status}
-                  </span>
+                  <StatusCell id={p.id} status={p.status} />
                 </td>
                 <td className="px-4 py-3 text-xs text-zinc-400">
                   {new Date(p.created_at).toLocaleDateString('ru')}
