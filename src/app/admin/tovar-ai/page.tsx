@@ -697,43 +697,12 @@ export default function TovarAIPage() {
             </div>
           )}
 
-          {/* ════════════════════════════════════════════════════════════════
-              CLEAN PHOTO — Stage 5 чистое фото товара
-             ════════════════════════════════════════════════════════════════ */}
-          {cleanPhoto && cleanPhoto.success && (
-            <div className="rounded-xl border bg-green-50/50 p-6 shadow-sm">
-              <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-zinc-500">
-                Təmiz məhsul şəkli (Stage 5 — Kie.ai)
-              </h3>
-              <p className="mb-3 text-xs text-zinc-500">
-                Ağ fon, logosuz, professional e-commerce foto. Marketplace üçün əsas şəkil kimi istifadə olunur.
-              </p>
-              <img
-                src={cleanPhoto.imageUrl || `data:image/png;base64,${cleanPhoto.imageBase64}`}
-                alt="Təmiz məhsul şəkli"
-                className="w-full rounded-lg border object-cover aspect-square bg-white"
-              />
-              {cleanPhoto.costTime && (
-                <p className="mt-2 text-xs text-zinc-400">
-                  {(cleanPhoto.costTime / 1000).toFixed(1)}s generasiya • taskId: {cleanPhoto.taskId}
-                </p>
-              )}
-            </div>
-          )}
-
-          {cleanPhoto && !cleanPhoto.success && (
-            <div className="rounded-lg bg-amber-50 p-4 text-sm text-amber-600 flex items-start gap-2">
-              <XCircle className="h-4 w-4 shrink-0 mt-0.5" />
-              Təmiz şəkil alınmadı: {cleanPhoto.error || 'naməlum xəta'}. Kartlar hazırdır.
-            </div>
-          )}
-
           {/* Карточки */}
           {cards.length > 0 && (
             <div className="rounded-xl border bg-white p-6 shadow-sm">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-bold uppercase tracking-wider text-zinc-500">
-                  Nəticə — {cards.length} kart
+                  Nəticə — {cards.length} kart{cleanPhoto?.success ? ' + təmiz foto' : ''}
                 </h3>
                 <button
                   onClick={downloadAll}
@@ -743,6 +712,38 @@ export default function TovarAIPage() {
                   Hamısını yüklə
                 </button>
               </div>
+
+              {/* Stage 5: чистое фото товара — в ряду с карточками */}
+              {cleanPhoto?.success && (
+                <div className="relative flex flex-col sm:flex-row gap-3 rounded-lg border bg-green-50/50 overflow-hidden p-3 mb-3">
+                  <div className="relative w-full sm:w-28 h-48 sm:h-28 shrink-0">
+                    <img
+                      src={cleanPhoto.imageUrl || `data:image/png;base64,${cleanPhoto.imageBase64}`}
+                      alt="Clean product"
+                      className="w-full h-full rounded-md object-cover border bg-white"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-zinc-800">Təmiz məhsul fotosu</p>
+                    <p className="text-xs text-zinc-500 mt-0.5">Ağ fon, logosuz — marketplace üçün</p>
+                    <p className="text-xs text-zinc-400 mt-1">Kie.ai grok-imagine</p>
+                  </div>
+                  <a
+                    href={cleanPhoto.imageUrl || `data:image/png;base64,${cleanPhoto.imageBase64}`}
+                    download="tapla_clean_photo.png"
+                    className="text-xs text-black underline shrink-0"
+                  >
+                    Yuklə
+                  </a>
+                </div>
+              )}
+
+              {cleanPhoto && !cleanPhoto.success && (
+                <div className="rounded-lg bg-amber-50 p-3 text-sm text-amber-600 flex items-start gap-2 mb-3">
+                  <XCircle className="h-4 w-4 shrink-0 mt-0.5" />
+                  Təmiz şəkil alınmadı: {cleanPhoto.error || 'naməlum xəta'}
+                </div>
+              )}
 
               <div className="space-y-4">
                 {cards.map(card => {

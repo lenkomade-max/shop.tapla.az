@@ -215,10 +215,21 @@ export async function runTovarAIPipeline(
         console.warn('[Pipeline] Category matching skipped:', catErr instanceof Error ? catErr.message : String(catErr))
       }
 
-      // Загружаем карточки в R2
-      const { uploadCardImages } = await import('@/lib/r2/upload')
+      // Загружаем карточки + чистое фото в R2
+      const { uploadCardImages, uploadImage } = await import('@/lib/r2/upload')
       imageUrls = await uploadCardImages(cards, productData.slug)
       console.log(`[Pipeline] R2 upload ✅ — ${imageUrls.length} cards uploaded`)
+
+      if (cleanPhoto?.success && cleanPhoto.imageBase64) {
+        try {
+          const cleanKey = `products/${productData.slug}/clean_photo.png`
+          const r2Url = await uploadImage(cleanPhoto.imageBase64, cleanKey, 'image/png')
+          cleanPhoto = { ...cleanPhoto, imageUrl: r2Url }
+          console.log(`[Pipeline] R2 clean photo ✅ — ${r2Url}`)
+        } catch (cleanUploadErr) {
+          console.warn('[Pipeline] R2 clean photo upload failed:', cleanUploadErr instanceof Error ? cleanUploadErr.message : String(cleanUploadErr))
+        }
+      }
 
     } else {
       // ─── TEST MODE: sequential Stages 2→3, + Stage 5 параллельно ──
