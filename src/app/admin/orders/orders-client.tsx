@@ -40,6 +40,10 @@ interface Order {
   status: string;
   payment_status: string;
   created_at: string;
+  delivery_method: string | null;
+  delivery_cost: number | null;
+  metro_station: string | null;
+  postal_code: string | null;
 }
 
 interface ActivityLogEntry {
@@ -58,6 +62,13 @@ const PAYMENT_METHOD_LABELS: Record<string, string> = {
   cash_delivery: 'Наличные',
   card_delivery: 'Карта курьеру',
   online_card: 'Pasha Bank',
+};
+
+const DELIVERY_METHOD_LABELS: Record<string, string> = {
+  courier_center: 'Курьер (центр)',
+  courier_outskirts: 'Курьер (окраина)',
+  metro: 'Метро',
+  post: 'Почта (Azərpoçt)',
 };
 
 const DEPOSIT_METHOD_LABELS: Record<string, string> = {
@@ -355,6 +366,32 @@ export default function OrdersClient({ orders, productMap, productImages, activi
                         <CreditCard className="h-3.5 w-3.5 text-zinc-400 flex-shrink-0" />
                         <span className="text-zinc-500">Депозит (5 AZN):</span>
                         <span className="font-medium">{DEPOSIT_METHOD_LABELS[o.deposit_method] || o.deposit_method}</span>
+                      </div>
+                    )}
+                    {o.delivery_method && (
+                      <div className="flex items-center gap-2 text-xs">
+                        <Truck className="h-3.5 w-3.5 text-zinc-400 flex-shrink-0" />
+                        <span className="text-zinc-500">Доставка:</span>
+                        <span className="font-medium">{DELIVERY_METHOD_LABELS[o.delivery_method] || o.delivery_method}</span>
+                      </div>
+                    )}
+                    {o.delivery_cost != null && o.delivery_cost > 0 && (
+                      <div className="flex items-center gap-2 text-xs">
+                        <span className="text-zinc-500">Стоимость доставки:</span>
+                        <span className="font-medium">{Number(o.delivery_cost).toFixed(2)} ₼</span>
+                      </div>
+                    )}
+                    {o.metro_station && (
+                      <div className="flex items-center gap-2 text-xs">
+                        <MapPin className="h-3.5 w-3.5 text-zinc-400 flex-shrink-0" />
+                        <span className="text-zinc-500">Станция метро:</span>
+                        <span className="font-medium">{o.metro_station}</span>
+                      </div>
+                    )}
+                    {o.postal_code && (
+                      <div className="flex items-center gap-2 text-xs">
+                        <span className="text-zinc-500">Почтовый индекс:</span>
+                        <span className="font-medium">{o.postal_code}</span>
                       </div>
                     )}
                     <div className="flex items-center gap-2 text-xs">

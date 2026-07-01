@@ -181,6 +181,9 @@ export default function CheckoutPage() {
     if (!form.fullName.trim()) errors.fullName = 'Ad və soyadınızı daxil edin';
     if (!form.phone.trim()) errors.phone = 'Əlaqə nömrənizi daxil edin';
     if (!form.address.trim()) errors.address = 'Çatdırılma ünvanını daxil edin';
+    if (!form.deliveryMethod) errors.deliveryMethod = 'Çatdırılma üsulunu seçin';
+    if (form.deliveryMethod === 'metro' && !form.metroStation) errors.metroStation = 'Metro stansiyasını seçin';
+    if (form.deliveryMethod === 'post' && !form.city) errors.city = 'Şəhəri seçin';
     if (form.deliveryMethod === 'post' && !form.postalCode.trim()) errors.postalCode = 'Poçt kodunu daxil edin';
 
     // online_card: card is entered on Pasha Bank's secure page — no client-side validation needed
@@ -631,38 +634,50 @@ export default function CheckoutPage() {
 
                         {/* Metro station dropdown inside the same row when selected */}
                         {opt.value === 'metro' && form.deliveryMethod === 'metro' && (
-                          <select
-                            name="metroStation"
-                            value={form.metroStation}
-                            onChange={handleInputChange}
-                            onClick={(e) => e.stopPropagation()}
-                            className="bg-neutral-50 border border-neutral-200 text-[9px] px-2 py-1.5 focus:outline-hidden focus:border-neutral-950 cursor-pointer rounded-lg max-w-[130px]"
-                          >
-                            <option value="">Stansiya</option>
-                            {BAKU_METRO_STATIONS.map(s => (
-                              <option key={s} value={s}>{s}</option>
-                            ))}
-                          </select>
+                          <div className="flex flex-col gap-1">
+                            <select
+                              name="metroStation"
+                              value={form.metroStation}
+                              onChange={handleInputChange}
+                              onClick={(e) => e.stopPropagation()}
+                              className={`bg-neutral-50 border ${formErrors.metroStation ? 'border-red-500' : 'border-neutral-200'} text-[9px] px-2 py-1.5 focus:outline-hidden focus:border-neutral-950 cursor-pointer rounded-lg max-w-[130px]`}
+                            >
+                              <option value="">Stansiya</option>
+                              {BAKU_METRO_STATIONS.map(s => (
+                                <option key={s} value={s}>{s}</option>
+                              ))}
+                            </select>
+                            {formErrors.metroStation && (
+                              <span className="text-[9px] font-semibold text-red-500 uppercase">{formErrors.metroStation}</span>
+                            )}
+                          </div>
                         )}
                       </label>
                     ))}
                   </div>
 
+                  {formErrors.deliveryMethod && (
+                    <span className="text-[9px] font-semibold text-red-500 uppercase">{formErrors.deliveryMethod}</span>
+                  )}
+
                   {/* Full address — always required */}
                   <div className="space-y-1">
                     <label className="text-[10px] tracking-wider uppercase font-semibold text-neutral-500">ŞƏHƏR</label>
                     {form.deliveryMethod === 'post' ? (
-                      <select
-                        name="city"
-                        value={form.city}
-                        onChange={handleInputChange}
-                        className="w-full bg-neutral-50 border border-neutral-200 text-xs px-4 py-3 focus:outline-hidden focus:border-neutral-950 cursor-pointer rounded-xl appearance-none"
-                      >
-                        <option value="">Şəhər seçin</option>
-                        {AZERBAIJAN_CITIES.map(c => (
-                          <option key={c} value={c}>{c}</option>
-                        ))}
-                      </select>
+                      <div className="space-y-1">
+                        <select
+                          name="city"
+                          value={form.city}
+                          onChange={handleInputChange}
+                          className={`w-full bg-neutral-50 border ${formErrors.city ? 'border-red-500' : 'border-neutral-200'} text-xs px-4 py-3 focus:outline-hidden focus:border-neutral-950 cursor-pointer rounded-xl appearance-none`}
+                        >
+                          <option value="">Şəhər seçin</option>
+                          {AZERBAIJAN_CITIES.map(c => (
+                            <option key={c} value={c}>{c}</option>
+                          ))}
+                        </select>
+                        {formErrors.city && <span className="text-[9px] font-semibold text-red-500 uppercase">{formErrors.city}</span>}
+                      </div>
                     ) : (
                       <div className="w-full bg-neutral-100 text-xs px-4 py-3 text-neutral-500 rounded-xl">
                         Bakı
