@@ -11,18 +11,19 @@ export default async function OrdersPage() {
 
   if (error) console.error('Admin orders fetch error:', error);
 
-  // Fetch products (names + first image)
+  // Fetch products (name, slug, images)
   const productIds = [...new Set((orders ?? []).map(o => o.product_id).filter(Boolean))] as string[];
   const { data: products } = productIds.length > 0
-    ? await supabaseAdmin.from('products').select('id, name, title, images').in('id', productIds)
+    ? await supabaseAdmin.from('products').select('id, name, title, slug, images').in('id', productIds)
     : { data: [] };
 
-  const productMap = new Map<string, string>();
-  const productImages = new Map<string, string>();
+  const productData = new Map<string, { name: string; slug: string; images: string[] }>();
   for (const p of (products ?? [])) {
-    productMap.set(p.id, p.name || p.title);
-    const imgs = (p.images as string[]) || [];
-    if (imgs.length > 0) productImages.set(p.id, imgs[0]);
+    productData.set(p.id, {
+      name: p.name || p.title,
+      slug: p.slug || p.id,
+      images: (p.images as string[]) || [],
+    });
   }
 
   // Fetch activity logs for all orders
@@ -46,8 +47,7 @@ export default async function OrdersPage() {
   return (
     <OrdersClient
       orders={(orders ?? []) as any}
-      productMap={productMap}
-      productImages={productImages}
+      productData={productData}
       activityLogs={activityLogs as any}
     />
   );

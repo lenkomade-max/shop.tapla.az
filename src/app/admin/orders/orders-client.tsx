@@ -19,6 +19,10 @@ import {
   History,
   User,
   Filter,
+  ExternalLink,
+  X,
+  ChevronLeft,
+  ChevronRight as ChevronRightIcon,
 } from 'lucide-react';
 
 // --- types ---
@@ -121,16 +125,23 @@ const PAYMENT_LABELS: Record<string, string> = {
 
 // --- component ---
 
+interface ProductInfo {
+  name: string;
+  slug: string;
+  images: string[];
+}
+
 interface Props {
   orders: Order[];
-  productMap: Map<string, string>;
-  productImages: Map<string, string>;
+  productData: Map<string, ProductInfo>;
   activityLogs: Map<string, ActivityLogEntry[]>;
 }
 
-export default function OrdersClient({ orders, productMap, productImages, activityLogs }: Props) {
+export default function OrdersClient({ orders, productData, activityLogs }: Props) {
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [filter, setFilter] = useState<string>('all');
+  const [previewProduct, setPreviewProduct] = useState<ProductInfo | null>(null);
+  const [previewImageIdx, setPreviewImageIdx] = useState(0);
 
   const toggle = (id: string) => {
     setExpanded(prev => {
@@ -262,8 +273,8 @@ export default function OrdersClient({ orders, productMap, productImages, activi
         {filtered.map(o => {
           const isExpanded = expanded.has(o.id);
           const logs = activityLogs.get(o.id) || [];
-          const productName = (o.product_id && productMap.get(o.product_id)) || '—';
-          const productImage = o.product_id ? productImages.get(o.product_id) : undefined;
+          const prodInfo = o.product_id ? productData.get(o.product_id) : undefined;
+          const productName = prodInfo?.name || '—';
 
           return (
             <div key={o.id} className="rounded-xl border bg-white shadow-sm overflow-hidden transition-all">
@@ -281,9 +292,12 @@ export default function OrdersClient({ orders, productMap, productImages, activi
                 </button>
 
                 {/* Product image */}
-                <div className="flex-shrink-0 h-10 w-10 rounded-lg bg-zinc-100 border border-zinc-200 overflow-hidden">
-                  {productImage ? (
-                    <img src={productImage} alt="" className="h-full w-full object-cover" />
+                <div
+                  className="flex-shrink-0 h-10 w-10 rounded-lg bg-zinc-100 border border-zinc-200 overflow-hidden cursor-pointer"
+                  onClick={e => { e.stopPropagation(); if (prodInfo) { setPreviewProduct(prodInfo); setPreviewImageIdx(0); } }}
+                >
+                  {prodInfo?.images[0] ? (
+                    <img src={prodInfo.images[0]} alt="" className="h-full w-full object-cover" />
                   ) : (
                     <Package className="h-5 w-5 text-zinc-300 m-2.5" />
                   )}
@@ -296,7 +310,23 @@ export default function OrdersClient({ orders, productMap, productImages, activi
                     <span className="text-xs text-zinc-400 font-mono whitespace-nowrap">{o.phone}</span>
                   </div>
                   <div className="flex items-center gap-2 mt-0.5">
-                    <span className="text-xs text-zinc-500 truncate max-w-[200px]">{productName}</span>
+                    <button
+                      onClick={e => { e.stopPropagation(); if (prodInfo) { setPreviewProduct(prodInfo); setPreviewImageIdx(0); } }}
+                      className="text-xs text-zinc-500 truncate max-w-[180px] hover:text-blue-600 hover:underline text-left cursor-pointer"
+                    >
+                      {productName}
+                    </button>
+                    {prodInfo?.slug && (
+                      <a
+                        href={`/products/${prodInfo.slug}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={e => e.stopPropagation()}
+                        className="flex-shrink-0 text-zinc-300 hover:text-blue-600 transition-colors"
+                      >
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    )}
                     <span className="text-[10px] text-zinc-300">×{o.quantity}</span>
                     <span className="text-xs font-medium text-zinc-700 ml-auto">{Number(o.total).toLocaleString()} ₼</span>
                   </div>
@@ -475,6 +505,71 @@ export default function OrdersClient({ orders, productMap, productImages, activi
       {filtered.length === 0 && filter !== 'all' && (
         <div className="text-center py-12 text-zinc-400 text-sm">
           Нет заказов по выбранному фильтру
+        </div>
+      )}
+
+      {/* Product Preview Modal */}
+      {previewProduct && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => setPreviewProduct(null)}>
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 py-3 border-b border-zinc-100">
+              <h3 className="text-sm font-semibold text-zinc-900 truncate pr-2">{previewProduct.name}</h3>
+              <button onClick={() => setPreviewProduct(null)} className="flex-shrink-0 p-1 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer">
+                <X className="h-4 w-4 text-zinc-400" />
+              </button>
+            </div>
+
+            {/* Image gallery */}
+            {previewProduct.images.length > 0 && (
+              <div className="relative bg-zinc-50">
+                <img
+                  src={previewProduct.images[previewImageIdx]}
+                  alt={previewProduct.name}
+                  className="w-full h-72 object-contain"
+                />
+                {previewProduct.images.length > 1 && (
+                  <>
+                    <button
+                      onClick={() => setPreviewImageIdx(prev => (prev - 1 + previewProduct.images.length) % previewProduct.images.length)}
+                      className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-1.5 shadow-sm transition-colors cursor-pointer"
+                    >
+                      <ChevronLeft className="h-4 w-4 text-zinc-600" />
+                    </button>
+                    <button
+                      onClick={() => setPreviewImageIdx(prev => (prev + 1) % previewProduct.images.length)}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-1.5 shadow-sm transition-colors cursor-pointer"
+                    >
+                      <ChevronRightIcon className="h-4 w-4 text-zinc-600" />
+                    </button>
+                    {/* Dots */}
+                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
+                      {previewProduct.images.map((_, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => setPreviewImageIdx(idx)}
+                          className={`h-1.5 rounded-full transition-all cursor-pointer ${idx === previewImageIdx ? 'w-4 bg-zinc-800' : 'w-1.5 bg-zinc-300'}`}
+                        />
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+
+            {/* Actions */}
+            <div className="px-5 py-4">
+              <a
+                href={`/products/${previewProduct.slug}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 w-full justify-center bg-zinc-900 text-white text-xs font-semibold uppercase tracking-wider py-2.5 px-4 rounded-xl hover:bg-zinc-800 transition-colors"
+              >
+                <ExternalLink className="h-3.5 w-3.5" />
+                Открыть товар на сайте
+              </a>
+            </div>
+          </div>
         </div>
       )}
     </div>
