@@ -999,10 +999,10 @@ export default function CheckoutPage() {
               </div>
 
               {/* Secure Checkout Banner */}
-              <div className="bg-[#FAF9F6] p-4 border border-neutral-150/60 flex items-start space-x-3 text-[11px] text-neutral-500 leading-relaxed font-sans rounded-xl">
-                <ShieldCheck className="h-5 w-5 text-neutral-800 flex-shrink-0 mt-0.5" />
+              <div className="bg-[#FAF9F6] p-4 border border-emerald-200 flex items-start space-x-3 text-[11px] text-neutral-500 leading-relaxed font-sans rounded-xl">
+                <ShieldCheck className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
                 <div className="space-y-1">
-                  <p className="font-semibold text-neutral-800">100% GÜVƏNLİ ALIŞ-VERİŞ</p>
+                  <p className="font-semibold text-emerald-800">100% GÜVƏNLİ ALIŞ-VERİŞ</p>
                   <p>TAPLA MARKETPLACE-də bütün əməliyyatlarınız SSL təhlükəsizlik protokolları ilə tam şifrələnir və qorunur.</p>
                 </div>
               </div>
