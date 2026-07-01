@@ -39,6 +39,7 @@ interface CheckoutForm {
   cardCvv: string;
   deliveryMethod: 'courier_center' | 'courier_outskirts' | 'metro' | 'post' | '';
   metroStation: string;
+  postalCode: string;
 }
 
 const BAKU_METRO_STATIONS = [
@@ -47,6 +48,22 @@ const BAKU_METRO_STATIONS = [
   'Xalqlar Dostluğu', 'Əhmədli', 'Həzi Aslanov', 'Şah İsmayıl Xətai',
   'Cəfər Cabbarlı', 'Nizami', 'Elmlər Akademiyası', 'İnşaatçılar',
   '20 Yanvar', 'Memar Əcəmi', 'Dərnəgül',
+]
+
+const AZERBAIJAN_CITIES = [
+  'Gəncə', 'Sumqayıt', 'Mingəçevir', 'Xırdalan', 'Şirvan',
+  'Naxçıvan', 'Lənkəran', 'Yevlax', 'Şəki', 'Xankəndi',
+  'Salyan', 'Bərdə', 'Xaçmaz', 'Ağcabədi', 'Qazax', 'Ağstafa',
+  'Tovuz', 'Gədəbəy', 'Göyçay', 'Sabirabad', 'İmişli', 'Beyləqan',
+  'Saatlı', 'Hacıqabul', 'Kürdəmir', 'Ucar', 'Zərdab', 'Ağdaş',
+  'Qəbələ', 'Oğuz', 'Balakən', 'Zaqatala', 'Qax', 'Şəmkir',
+  'Goranboy', 'Naftalan', 'Tərtər', 'Ağdam', 'Füzuli', 'Cəbrayıl',
+  'Zəngilan', 'Qubadlı', 'Laçın', 'Kəlbəcər', 'Xocalı', 'Xocavənd',
+  'Şuşa', 'Astara', 'Masallı', 'Yardımlı', 'Lerik', 'Cəlilabad',
+  'Biləsuvar', 'Neftçala', 'Siyəzən', 'Quba', 'Qusar', 'Xızı',
+  'Abşeron', 'Ağsu', 'Daşkəsən', 'Göygöl', 'İsmayıllı', 'Qobustan',
+  'Samux', 'Şabran', 'Şamaxı', 'Ordubad', 'Culfa', 'Babək',
+  'Şahbuz', 'Şərur', 'Ağdərə',
 ]
 
 export default function CheckoutPage() {
@@ -77,6 +94,7 @@ export default function CheckoutPage() {
     cardCvv: '',
     deliveryMethod: '',
     metroStation: '',
+    postalCode: '',
   });
 
   const [formErrors, setFormErrors] = useState<Partial<Record<keyof CheckoutForm, string>>>({});
@@ -163,6 +181,7 @@ export default function CheckoutPage() {
     if (!form.fullName.trim()) errors.fullName = 'Ad və soyadınızı daxil edin';
     if (!form.phone.trim()) errors.phone = 'Əlaqə nömrənizi daxil edin';
     if (!form.address.trim()) errors.address = 'Çatdırılma ünvanını daxil edin';
+    if (form.deliveryMethod === 'post' && !form.postalCode.trim()) errors.postalCode = 'Poçt kodunu daxil edin';
 
     // online_card: card is entered on Pasha Bank's secure page — no client-side validation needed
 
@@ -215,8 +234,12 @@ export default function CheckoutPage() {
         ...prev,
         deliveryMethod: value as CheckoutForm['deliveryMethod'],
         metroStation: value !== 'metro' ? '' : prev.metroStation,
-        city: (value === 'courier_center' || value === 'courier_outskirts' || value === 'metro') ? 'Bakı' : prev.city,
+        city: value === 'post' ? '' : 'Bakı',
+        postalCode: value !== 'post' ? '' : prev.postalCode,
       }))
+      setTimeout(() => {
+        document.querySelector('[name="address"]')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }, 100)
       return
     }
 
@@ -251,6 +274,7 @@ export default function CheckoutPage() {
       deliveryMethod: form.deliveryMethod,
       deliveryCost: deliveryCost,
       metroStation: form.metroStation,
+      postalCode: form.postalCode || undefined,
     });
 
     if (!result.success) {
@@ -281,6 +305,7 @@ export default function CheckoutPage() {
         deliveryMethod: form.deliveryMethod,
         deliveryCost: deliveryCost,
         metroStation: form.metroStation,
+        postalCode: form.postalCode,
         depositMethod: form.paymentMethod === 'cash_delivery' ? form.depositMethod : undefined,
       }));
       setRedirectUrl(result.redirectUrl);
@@ -625,21 +650,22 @@ export default function CheckoutPage() {
 
                   {/* Full address — always required */}
                   <div className="space-y-1">
-                    <label className="text-[10px] tracking-wider uppercase font-semibold text-neutral-500">
-                      {form.deliveryMethod === 'post' ? 'ŞƏHƏR *' : 'ŞƏHƏR'}
-                    </label>
+                    <label className="text-[10px] tracking-wider uppercase font-semibold text-neutral-500">ŞƏHƏR</label>
                     {form.deliveryMethod === 'post' ? (
-                      <input
-                        type="text"
+                      <select
                         name="city"
                         value={form.city}
                         onChange={handleInputChange}
-                        placeholder="Məs. Gəncə, Sumqayıt..."
-                        className="w-full bg-neutral-50 border border-neutral-200 text-xs px-4 py-3 focus:outline-hidden focus:border-neutral-950 rounded-xl"
-                      />
+                        className="w-full bg-neutral-50 border border-neutral-200 text-xs px-4 py-3 focus:outline-hidden focus:border-neutral-950 cursor-pointer rounded-xl appearance-none"
+                      >
+                        <option value="">Şəhər seçin</option>
+                        {AZERBAIJAN_CITIES.map(c => (
+                          <option key={c} value={c}>{c}</option>
+                        ))}
+                      </select>
                     ) : (
                       <div className="w-full bg-neutral-100 text-xs px-4 py-3 text-neutral-500 rounded-xl">
-                        {form.city || 'Bakı'}
+                        Bakı
                       </div>
                     )}
                   </div>
@@ -656,6 +682,21 @@ export default function CheckoutPage() {
                     />
                     {formErrors.address && <span className="text-[9px] font-semibold text-red-500 uppercase">{formErrors.address}</span>}
                   </div>
+
+                  {form.deliveryMethod === 'post' && (
+                    <div className="space-y-1">
+                      <label className="text-[10px] tracking-wider uppercase font-semibold text-neutral-500">POÇT KODU *</label>
+                      <input
+                        type="text"
+                        name="postalCode"
+                        value={form.postalCode}
+                        onChange={handleInputChange}
+                        placeholder="Məs. AZ1000"
+                        className={`w-full bg-neutral-50 border ${formErrors.postalCode ? 'border-red-500' : 'border-neutral-200'} text-xs px-4 py-3 focus:outline-hidden focus:border-neutral-950 rounded-xl`}
+                      />
+                      {formErrors.postalCode && <span className="text-[9px] font-semibold text-red-500 uppercase">{formErrors.postalCode}</span>}
+                    </div>
+                  )}
                 </div>
 
                 {/* Section 3: Payment details */}

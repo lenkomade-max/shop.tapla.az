@@ -392,6 +392,7 @@ export interface CheckoutFormData {
   deliveryMethod?: string
   deliveryCost?: number
   metroStation?: string
+  postalCode?: string
 }
 
 export async function submitOrder(formData: CheckoutFormData) {
@@ -435,6 +436,7 @@ export async function submitOrder(formData: CheckoutFormData) {
     delivery_method: formData.deliveryMethod || null,
     delivery_cost: formData.deliveryCost ?? null,
     metro_station: formData.metroStation || null,
+    postal_code: formData.postalCode || null,
     status: 'new',
     payment_status: 'pending',
     quantity: formData.items.reduce((s, i) => s + i.quantity, 0),
