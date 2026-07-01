@@ -37,7 +37,17 @@ interface CheckoutForm {
   cardNumber: string;
   cardExpiry: string;
   cardCvv: string;
+  deliveryMethod: 'courier_center' | 'courier_outskirts' | 'metro' | 'post' | '';
+  metroStation: string;
 }
+
+const BAKU_METRO_STATIONS = [
+  'İçərişəhər', 'Sahil', '28 May', 'Gənclik', 'Nəriman Nərimanov',
+  'Bakmil', 'Ulduz', 'Koroğlu', 'Qara Qarayev', 'Neftçilər',
+  'Xalqlar Dostluğu', 'Əhmədli', 'Həzi Aslanov', 'Şah İsmayıl Xətai',
+  'Cəfər Cabbarlı', 'Nizami', 'Elmlər Akademiyası', 'İnşaatçılar',
+  '20 Yanvar', 'Memar Əcəmi', 'Dərnəgül',
+]
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -65,9 +75,24 @@ export default function CheckoutPage() {
     cardNumber: '',
     cardExpiry: '',
     cardCvv: '',
+    deliveryMethod: '',
+    metroStation: '',
   });
 
   const [formErrors, setFormErrors] = useState<Partial<Record<keyof CheckoutForm, string>>>({});
+
+  const isFreeDelivery = cartTotal >= 50
+  const deliveryCost = (() => {
+    if (isFreeDelivery || !form.deliveryMethod) return 0
+    switch (form.deliveryMethod) {
+      case 'courier_center': return 5
+      case 'courier_outskirts': return 0 // кэш курьеру
+      case 'metro': return 3
+      case 'post': return 5
+      default: return 0
+    }
+  })()
+  const totalWithDelivery = cartTotal + deliveryCost
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -109,7 +134,7 @@ export default function CheckoutPage() {
         fullName: prev.fullName || profileFullName,
         phone: prev.phone || profile.phone || '',
         email: prev.email || profile.email || '',
-        city: prev.city !== 'Bakı' ? prev.city : (profile.city || prev.city),
+        city: profile.city || prev.city,
         address: profile.address || prev.address || '',
       }));
       requestAnimationFrame(() => {
@@ -185,6 +210,16 @@ export default function CheckoutPage() {
       return;
     }
 
+    if (name === 'deliveryMethod') {
+      setForm(prev => ({
+        ...prev,
+        deliveryMethod: value as CheckoutForm['deliveryMethod'],
+        metroStation: value !== 'metro' ? '' : prev.metroStation,
+        city: (value === 'courier_center' || value === 'courier_outskirts' || value === 'metro') ? 'Bakı' : prev.city,
+      }))
+      return
+    }
+
     setForm(prev => ({ ...prev, [name]: value }));
   };
 
@@ -212,7 +247,10 @@ export default function CheckoutPage() {
         quantity: item.quantity,
         shade: item.selectedShade?.name,
       })),
-      total: cartTotal,
+      total: totalWithDelivery,
+      deliveryMethod: form.deliveryMethod,
+      deliveryCost: deliveryCost,
+      metroStation: form.metroStation,
     });
 
     if (!result.success) {
@@ -239,7 +277,10 @@ export default function CheckoutPage() {
         phone: form.phone,
         city: form.city,
         address: form.address,
-        total: cartTotal,
+        total: totalWithDelivery,
+        deliveryMethod: form.deliveryMethod,
+        deliveryCost: deliveryCost,
+        metroStation: form.metroStation,
         depositMethod: form.paymentMethod === 'cash_delivery' ? form.depositMethod : undefined,
       }));
       setRedirectUrl(result.redirectUrl);
@@ -304,6 +345,18 @@ export default function CheckoutPage() {
                 <span className="font-bold text-neutral-900">{form.city}, {form.address}</span>
               </div>
 
+              {form.deliveryMethod && (
+                <div className="flex justify-between border-b border-neutral-200/60 pb-3">
+                  <span className="text-neutral-400 uppercase tracking-wider font-semibold">Çatdırılma:</span>
+                  <span className="font-bold text-neutral-900 uppercase text-[9px] text-right">
+                    {form.deliveryMethod === 'courier_center' && 'Bakı Mərkəz — Kuryer'}
+                    {form.deliveryMethod === 'courier_outskirts' && 'Bakı Mərkəzdən Kənar — Kuryer (kəş)'}
+                    {form.deliveryMethod === 'metro' && `Metro — ${form.metroStation}`}
+                    {form.deliveryMethod === 'post' && 'Poçt (Azərpoçt)'}
+                  </span>
+                </div>
+              )}
+
               <div className="flex justify-between border-b border-neutral-200/60 pb-3">
                 <span className="text-neutral-400 uppercase tracking-wider font-semibold">Ödəniş üsulu:</span>
                 <span className="font-bold text-neutral-900 uppercase text-[9px] text-right">
@@ -328,7 +381,7 @@ export default function CheckoutPage() {
 
               <div className="border-t border-neutral-200 pt-3 flex justify-between font-bold text-sm text-neutral-900">
                 <span>ÖDƏNİLƏN ÜMUMİ MƏBLƏĞ:</span>
-                <span className="font-mono">{cartTotal.toFixed(2)} ₼</span>
+                <span className="font-mono">{totalWithDelivery.toFixed(2)} ₼</span>
               </div>
             </div>
 
@@ -500,45 +553,108 @@ export default function CheckoutPage() {
                   </div>
                 </div>
 
-                {/* Section 2: Shipping details */}
+                {/* Section 2: Delivery method */}
                 <div className="space-y-4">
                   <div className="flex items-center space-x-2 border-b border-neutral-100 pb-2">
-                    <MapPin className="h-4 w-4 text-neutral-800" />
-                    <h2 className="text-xs font-bold tracking-widest uppercase text-neutral-900">2. ÇATDIRILMA ÜNVANI</h2>
+                    <Truck className="h-4 w-4 text-neutral-800" />
+                    <h2 className="text-xs font-bold tracking-widest uppercase text-neutral-900">2. ÇATDIRILMA ÜSULU</h2>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div className="space-y-1 sm:col-span-1">
-                      <label className="text-[10px] tracking-wider uppercase font-semibold text-neutral-500">ŞƏHƏR / RAYON *</label>
-                      <select
+                  {/* Free shipping banner */}
+                  {isFreeDelivery && form.deliveryMethod && (
+                    <div className="bg-emerald-50 border border-emerald-200/50 p-3 text-[10px] font-bold text-emerald-700 uppercase tracking-wider text-center rounded-xl">
+                      50 AZN-DƏN YUXARI SİFARİŞLƏRDƏ ÇATDIRILMA PULSUZDUR!
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 gap-1.5">
+                    {([
+                      { value: 'courier_center', label: 'Bakı Mərkəz — Kuryer', sub: 'Kuryer ünvanınıza çatdırır', price: 5 },
+                      { value: 'courier_outskirts', label: 'Bakı Mərkəzdən Kənar — Kuryer', sub: 'Kuryerə kəş ödəniş (5-10 ₼)', price: null as number | null },
+                      { value: 'metro', label: 'Metro ilə Çatdırılma', sub: 'Metro stansiyasında görüş', price: 3 },
+                      { value: 'post', label: 'Poçt (Azərpoçt)', sub: 'Azərbaycanın istənilən şəhərinə', price: 5 },
+                    ] as const).map(opt => (
+                      <label key={opt.value} className={`border px-3 py-2 flex items-center gap-2.5 cursor-pointer transition-all rounded-lg ${
+                        form.deliveryMethod === opt.value
+                          ? 'border-neutral-950 bg-neutral-50/50'
+                          : 'border-neutral-200 hover:border-neutral-400'
+                      }`}>
+                        <input
+                          type="radio"
+                          name="deliveryMethod"
+                          value={opt.value}
+                          checked={form.deliveryMethod === opt.value}
+                          onChange={handleInputChange}
+                          className="sr-only"
+                        />
+                        <div className={`w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                          form.deliveryMethod === opt.value ? 'border-neutral-950' : 'border-neutral-300'
+                        }`}>
+                          {form.deliveryMethod === opt.value && <div className="w-1.5 h-1.5 rounded-full bg-neutral-950" />}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-900 block leading-tight">{opt.label}</span>
+                          <span className="text-[9px] text-neutral-500 font-sans block truncate">{opt.sub}</span>
+                        </div>
+                        {opt.value === 'courier_outskirts' ? (
+                          <span className="text-[8px] font-bold text-amber-600 uppercase tracking-wider whitespace-nowrap">Kuriyerə kəş</span>
+                        ) : opt.price !== null && (
+                          <span className="text-[11px] font-mono font-bold text-neutral-900 whitespace-nowrap">
+                            {isFreeDelivery ? '0 ₼' : `${opt.price} ₼`}
+                          </span>
+                        )}
+
+                        {/* Metro station dropdown inside the same row when selected */}
+                        {opt.value === 'metro' && form.deliveryMethod === 'metro' && (
+                          <select
+                            name="metroStation"
+                            value={form.metroStation}
+                            onChange={handleInputChange}
+                            onClick={(e) => e.stopPropagation()}
+                            className="bg-neutral-50 border border-neutral-200 text-[9px] px-2 py-1.5 focus:outline-hidden focus:border-neutral-950 cursor-pointer rounded-lg max-w-[130px]"
+                          >
+                            <option value="">Stansiya</option>
+                            {BAKU_METRO_STATIONS.map(s => (
+                              <option key={s} value={s}>{s}</option>
+                            ))}
+                          </select>
+                        )}
+                      </label>
+                    ))}
+                  </div>
+
+                  {/* Full address — always required */}
+                  <div className="space-y-1">
+                    <label className="text-[10px] tracking-wider uppercase font-semibold text-neutral-500">
+                      {form.deliveryMethod === 'post' ? 'ŞƏHƏR *' : 'ŞƏHƏR'}
+                    </label>
+                    {form.deliveryMethod === 'post' ? (
+                      <input
+                        type="text"
                         name="city"
                         value={form.city}
                         onChange={handleInputChange}
-                        className="w-full bg-neutral-50 border border-neutral-200 text-xs px-3 py-3 focus:outline-hidden focus:border-neutral-950 cursor-pointer rounded-xl"
-                      >
-                        <option value="Bakı">Bakı (Pulsuz)</option>
-                        <option value="Sumqayıt">Sumqayıt (Pulsuz)</option>
-                        <option value="Xırdalan">Xırdalan (Pulsuz)</option>
-                        <option value="Gəncə">Gəncə (Azərpoçt)</option>
-                        <option value="Naxçıvan">Naxçıvan (Azərpoçt)</option>
-                        <option value="Lənkəran">Lənkəran (Azərpoçt)</option>
-                        <option value="Quba">Quba (Azərpoçt)</option>
-                        <option value="Şəki">Şəki (Azərpoçt)</option>
-                      </select>
-                    </div>
-
-                    <div className="space-y-1 sm:col-span-2">
-                      <label className="text-[10px] tracking-wider uppercase font-semibold text-neutral-500">TAM ÜNVAN *</label>
-                      <input
-                        type="text"
-                        name="address"
-                        value={form.address}
-                        onChange={handleInputChange}
-                        placeholder="Məs. Yasamal r., Mətbuat pr. ev 15, m. 42"
-                        className={`w-full bg-neutral-50 border ${formErrors.address ? 'border-red-500' : 'border-neutral-200'} text-xs px-4 py-3 focus:outline-hidden focus:border-neutral-950 rounded-xl`}
+                        placeholder="Məs. Gəncə, Sumqayıt..."
+                        className="w-full bg-neutral-50 border border-neutral-200 text-xs px-4 py-3 focus:outline-hidden focus:border-neutral-950 rounded-xl"
                       />
-                      {formErrors.address && <span className="text-[9px] font-semibold text-red-500 uppercase">{formErrors.address}</span>}
-                    </div>
+                    ) : (
+                      <div className="w-full bg-neutral-100 text-xs px-4 py-3 text-neutral-500 rounded-xl">
+                        {form.city || 'Bakı'}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-[10px] tracking-wider uppercase font-semibold text-neutral-500">TAM ÜNVAN *</label>
+                    <input
+                      type="text"
+                      name="address"
+                      value={form.address}
+                      onChange={handleInputChange}
+                      placeholder={form.deliveryMethod === 'metro' ? 'Metro stansiyası yaxınlığında görüş nöqtəsi' : 'Məs. Yasamal r., Mətbuat pr. ev 15, m. 42'}
+                      className={`w-full bg-neutral-50 border ${formErrors.address ? 'border-red-500' : 'border-neutral-200'} text-xs px-4 py-3 focus:outline-hidden focus:border-neutral-950 rounded-xl`}
+                    />
+                    {formErrors.address && <span className="text-[9px] font-semibold text-red-500 uppercase">{formErrors.address}</span>}
                   </div>
                 </div>
 
@@ -715,7 +831,7 @@ export default function CheckoutPage() {
                           {/* Info block based on selection */}
                           {form.depositMethod === 'pasha_bank' && (
                             <div className="bg-white border border-emerald-100/70 p-3 text-[10px] text-neutral-600 leading-relaxed font-sans rounded-xl">
-                              <strong className="text-emerald-700">5 AZN</strong> beh PASHA Bank ilə onlayn ödəniləcək. Qalan məbləği ({cartTotal >= 5 ? (cartTotal - 5).toFixed(2) : '0.00'} ₼) kuryerə çatdırılma zamanı nağd ödəyəcəksiniz.
+                              <strong className="text-emerald-700">5 AZN</strong> beh PASHA Bank ilə onlayn ödəniləcək. Qalan məbləği ({totalWithDelivery >= 5 ? (totalWithDelivery - 5).toFixed(2) : '0.00'} ₼) kuryerə çatdırılma zamanı nağd ödəyəcəksiniz.
                             </div>
                           )}
                           {form.depositMethod === 'whatsapp' && (
@@ -797,10 +913,28 @@ export default function CheckoutPage() {
                   <span className="tracking-wider uppercase">CƏMİ:</span>
                   <span className="font-mono font-semibold text-neutral-950">{cartTotal.toFixed(2)} ₼</span>
                 </div>
+                <div className="flex justify-between text-neutral-500 text-[9px]">
+                  <span className="tracking-wider uppercase">Məhsul sayı:</span>
+                  <span className="font-mono">{cartItems.reduce((s,i) => s + i.quantity, 0)} əd.</span>
+                </div>
                 <div className="flex justify-between text-neutral-500">
                   <span className="tracking-wider uppercase">ÇATDIRILMA:</span>
-                  <span className="font-semibold text-emerald-600 tracking-wider">PULSUZ</span>
+                  <span className={`font-semibold tracking-wider ${isFreeDelivery && form.deliveryMethod ? 'text-emerald-600' : 'text-neutral-600'}`}>
+                    {!form.deliveryMethod ? 'Seçilməyib' : isFreeDelivery ? 'PULSUZ' : `+${deliveryCost.toFixed(2)} ₼`}
+                  </span>
                 </div>
+                {form.deliveryMethod === 'courier_outskirts' && (
+                  <div className="flex justify-between text-[9px] text-amber-600">
+                    <span className="tracking-wider">Kuryerə kəş (sifarişə daxil deyil):</span>
+                    <span className="font-semibold">5-10 ₼</span>
+                  </div>
+                )}
+                {form.deliveryMethod === 'metro' && form.metroStation && (
+                  <div className="flex justify-between text-[9px] text-neutral-500">
+                    <span className="tracking-wider">Metro stansiyası:</span>
+                    <span className="font-semibold">{form.metroStation}</span>
+                  </div>
+                )}
 
                 {form.paymentMethod === 'cash_delivery' && (
                   <>
@@ -811,7 +945,7 @@ export default function CheckoutPage() {
                     <div className="flex justify-between text-neutral-500">
                       <span className="tracking-wider uppercase">QAPIDA ÖDƏNİLƏCƏK QALIQ:</span>
                       <span className="font-mono font-semibold text-neutral-950">
-                        {cartTotal >= 5 ? (cartTotal - 5).toFixed(2) : "0.00"} ₼
+                        {totalWithDelivery >= 5 ? (totalWithDelivery - 5).toFixed(2) : "0.00"} ₼
                       </span>
                     </div>
                   </>
@@ -819,7 +953,7 @@ export default function CheckoutPage() {
 
                 <div className="border-t border-neutral-100 pt-3 flex justify-between font-bold text-sm text-neutral-950">
                   <span>ÜMUMİ SİFARİŞ MƏBLƏĞİ:</span>
-                  <span className="font-mono text-base">{cartTotal.toFixed(2)} ₼</span>
+                  <span className="font-mono text-base">{totalWithDelivery.toFixed(2)} ₼</span>
                 </div>
               </div>
 

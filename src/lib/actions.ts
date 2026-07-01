@@ -389,6 +389,9 @@ export interface CheckoutFormData {
   depositMethod?: 'pasha_bank' | 'whatsapp'
   items: Array<{ productId: string; name: string; price: number; quantity: number; shade?: string }>
   total: number
+  deliveryMethod?: string
+  deliveryCost?: number
+  metroStation?: string
 }
 
 export async function submitOrder(formData: CheckoutFormData) {
@@ -429,6 +432,9 @@ export async function submitOrder(formData: CheckoutFormData) {
     deposit_status: depositMethod ? 'pending' : null,
     items: formData.items,
     total: formData.total,
+    delivery_method: formData.deliveryMethod || null,
+    delivery_cost: formData.deliveryCost ?? null,
+    metro_station: formData.metroStation || null,
     status: 'new',
     payment_status: 'pending',
     quantity: formData.items.reduce((s, i) => s + i.quantity, 0),

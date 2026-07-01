@@ -609,3 +609,12 @@ ALTER TABLE orders ADD CONSTRAINT orders_deposit_status_check CHECK (deposit_sta
 -- Расширяем CHECK для order_activity_log.field
 ALTER TABLE order_activity_log DROP CONSTRAINT IF EXISTS order_activity_log_field_check;
 ALTER TABLE order_activity_log ADD CONSTRAINT order_activity_log_field_check CHECK (field IN ('status', 'payment_status', 'deposit_status'));
+
+-- ============================================================================
+-- Миграция 2026-07-01: delivery fields
+-- ============================================================================
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS delivery_method TEXT;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS delivery_cost DECIMAL(10,2) DEFAULT 0;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS metro_station TEXT;
+ALTER TABLE orders DROP CONSTRAINT IF EXISTS orders_delivery_method_check;
+ALTER TABLE orders ADD CONSTRAINT orders_delivery_method_check CHECK (delivery_method IN ('courier_center', 'courier_outskirts', 'metro', 'post'));
