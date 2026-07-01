@@ -121,7 +121,7 @@ export default function SecurePaymentAnimation({
               )}
             </motion.div>
             <span className="text-[9px] sm:text-[10px] font-bold text-slate-700 mt-1 sm:mt-2">TAPLA</span>
-            <span className="text-[8px] sm:text-[9px] text-slate-400 font-mono">Mağaza</span>
+            <span className="text-[8px] sm:text-[9px] text-slate-400 font-mono">Marketplace</span>
           </div>
 
           {/* Bank */}
