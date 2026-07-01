@@ -3,10 +3,16 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { dbService } from '@/services/db'
 import { ProductCard } from '@/components/cards/ProductCard'
+import { JsonLd } from '@/components/seo/JsonLd'
+import { getBreadcrumbSchema } from '@/lib/seo/schemas/breadcrumb-schema'
+import { getItemListSchema } from '@/lib/seo/schemas/itemlist-schema'
+import { generateSEOMeta } from '@/lib/seo/meta-generator'
+
+const SITE_URL = 'https://shop.tapla.az'
 
 type Props = { params: Promise<{ slug: string }> }
 
-export const revalidate = 120
+export const revalidate = 3600
 
 export async function generateStaticParams() {
   const categories = await dbService.getCategories()
@@ -18,10 +24,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const category = await dbService.getCategoryBySlug(slug)
   if (!category) return { title: 'Kateqoriya | TAPLA MARKETPLACE' }
 
-  return {
-    title: `${category.title} — TAPLA MARKETPLACE`,
-    description: category.description || `${category.title} kateqoriyasında bütün məhsullar`,
-  }
+  return generateSEOMeta({
+    title: category.title,
+    description: category.description || `${category.title} kateqoriyasında bütün məhsullar — ən sərfəli qiymətlər, sürətli çatdırılma.`,
+    canonical: `${SITE_URL}/kateqoriya/${slug}`,
+    ogImage: category.image,
+    type: 'website',
+  })
 }
 
 export default async function CategoryPage({ params }: Props) {
@@ -49,8 +58,35 @@ export default async function CategoryPage({ params }: Props) {
   // Get subcategories if any
   const subcategories = category.children?.filter(c => c.status === 'active') || []
 
+  // JSON-LD
+  const breadcrumbItems = [
+    { name: 'Ana Səhifə', url: SITE_URL },
+    { name: 'Məhsullar', url: `${SITE_URL}/mehsullar` },
+  ]
+  if (parentCategory) {
+    breadcrumbItems.push({
+      name: parentCategory.title,
+      url: `${SITE_URL}/kateqoriya/${parentCategory.slug}`,
+    })
+  }
+  breadcrumbItems.push({
+    name: category.title,
+    url: `${SITE_URL}/kateqoriya/${slug}`,
+  })
+
+  const breadcrumbSchema = getBreadcrumbSchema(breadcrumbItems)
+  const itemListSchema = products.length > 0
+    ? getItemListSchema(
+        products.map(p => ({ name: p.name, slug: p.slug })),
+        category.title
+      )
+    : null
+
   return (
-    <div className="min-h-screen">
+    <>
+      <JsonLd data={breadcrumbSchema} />
+      <JsonLd data={itemListSchema} />
+      <div className="min-h-screen">
       {/* Breadcrumbs */}
       <div className="border-b border-neutral-100 bg-white">
         <div className="container mx-auto max-w-6xl px-4 py-3">
@@ -176,5 +212,6 @@ export default async function CategoryPage({ params }: Props) {
         </div>
       )}
     </div>
+      </>
   )
 }

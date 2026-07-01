@@ -1,0 +1,18 @@
+{
+  "name": "TAPLA MARKETPLACE",
+  "short_name": "TAPLA",
+  "description": "Onlayn Elektronika Mağazası — sərfəli qiymətlər, sürətli çatdırılma",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0a0a0a",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "lang": "az",
+  "dir": "ltr"
+}

@@ -631,6 +631,15 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
                 </div>
               </div>
             )}
+
+            {/* Tags Cloud — SEO only, visually hidden */}
+            {product.tags && product.tags.length > 0 && (
+              <div className="sr-only" aria-hidden="true">
+                {product.tags.slice(0, 30).map((tag, i) => (
+                  <span key={i}>{tag}{i < product.tags!.slice(0, 30).length - 1 ? ', ' : ''}</span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 

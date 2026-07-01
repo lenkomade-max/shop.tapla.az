@@ -1,9 +1,12 @@
 import { Container } from '@/components/ui/Container';
+import { generateSEOMeta } from '@/lib/seo/meta-generator';
+import type { Metadata } from 'next';
 
-export const metadata = {
-  title: 'Satıcı Müqaviləsi | TAPLA MARKETPLACE',
+export const metadata: Metadata = generateSEOMeta({
+  title: 'Satıcı Müqaviləsi',
   description: 'TAPLA MARKETPLACE satıcı müqaviləsi — satıcı qeydiyyatı və platformadan istifadə şərtləri.',
-};
+  canonical: 'https://shop.tapla.az/satici-muqavilesi',
+})
 
 export default function SellerAgreementPage() {
   return (

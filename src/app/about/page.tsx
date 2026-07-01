@@ -1,11 +1,16 @@
 import { Container } from '@/components/ui/Container';
 import Link from 'next/link';
 import { ShieldCheck, Truck, Headphones, HeartHandshake, Sparkles } from 'lucide-react';
+import { JsonLd } from '@/components/seo/JsonLd';
+import { getBreadcrumbSchema } from '@/lib/seo/schemas/breadcrumb-schema';
+import { generateSEOMeta } from '@/lib/seo/meta-generator';
+import type { Metadata } from 'next';
 
-export const metadata = {
-  title: 'Haqqımızda | TAPLA MARKETPLACE',
+export const metadata: Metadata = generateSEOMeta({
+  title: 'Haqqımızda',
   description: 'TAPLA MARKETPLACE — Azərbaycanda elektronika və rəqəmsal texnologiyalar sahəsində etibarlı onlayn platforma. Orijinal məhsullar, sürətli çatdırılma, peşəkar dəstək.',
-};
+  canonical: 'https://shop.tapla.az/haqqimizda',
+})
 
 const values = [
   {
@@ -38,8 +43,15 @@ const stats = [
 ];
 
 export default function AboutPage() {
+  const breadcrumbSchema = getBreadcrumbSchema([
+    { name: 'Ana Səhifə', url: 'https://shop.tapla.az' },
+    { name: 'Haqqımızda', url: 'https://shop.tapla.az/haqqimizda' },
+  ])
+
   return (
-    <main className="min-h-screen bg-white">
+    <>
+      <JsonLd data={breadcrumbSchema} />
+      <main className="min-h-screen bg-white">
       {/* Hero */}
       <section className="relative bg-neutral-950 text-white py-24 md:py-32 overflow-hidden">
         <div className="absolute top-0 right-0 h-96 w-96 rounded-full bg-white/[0.03] blur-3xl pointer-events-none" />
@@ -176,5 +188,6 @@ export default function AboutPage() {
         </Container>
       </section>
     </main>
+  </>
   );
 }

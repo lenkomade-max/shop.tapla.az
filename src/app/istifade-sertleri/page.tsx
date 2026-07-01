@@ -1,9 +1,12 @@
 import { Container } from '@/components/ui/Container';
+import { generateSEOMeta } from '@/lib/seo/meta-generator';
+import type { Metadata } from 'next';
 
-export const metadata = {
-  title: 'İstifadə Şərtləri | TAPLA MARKETPLACE',
+export const metadata: Metadata = generateSEOMeta({
+  title: 'İstifadə Şərtləri',
   description: 'TAPLA MARKETPLACE istifadə şərtləri — platformadan istifadə qaydaları, alqı-satqı şərtləri, məsuliyyətin məhdudlaşdırılması və zəmanətdən imtina.',
-};
+  canonical: 'https://shop.tapla.az/istifade-sertleri',
+})
 
 export default function TermsPage() {
   return (

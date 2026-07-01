@@ -1,9 +1,12 @@
 import { Container } from '@/components/ui/Container';
+import { generateSEOMeta } from '@/lib/seo/meta-generator';
+import type { Metadata } from 'next';
 
-export const metadata = {
-  title: 'Hüquqi Məlumat | TAPLA MARKETPLACE',
+export const metadata: Metadata = generateSEOMeta({
+  title: 'Hüquqi Məlumat',
   description: 'TAPLA TECHNOLOGIES M.M.C. — hüquqi məlumat, şirkət rekvizitləri və əlaqə ünvanları.',
-};
+  canonical: 'https://shop.tapla.az/huquqi-melumat',
+})
 
 export default function LegalNoticePage() {
   return (

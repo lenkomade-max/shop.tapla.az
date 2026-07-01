@@ -7,9 +7,12 @@ import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { StickyMobileBar } from '@/components/layout/StickyMobileBar'
 import { FacebookPixel } from '@/components/layout/FacebookPixel'
+import { JsonLd } from '@/components/seo/JsonLd'
+import { getOrganizationSchema, getWebSiteSchema } from '@/lib/seo/schemas/organization-schema'
 import { dbService } from '@/services/db'
 
 const FB_PIXEL_ID = '1880811039970349'
+const SITE_URL = 'https://shop.tapla.az'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const poppins = Poppins({
@@ -20,11 +23,26 @@ const poppins = Poppins({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
     default: 'TAPLA MARKETPLACE | Onlayn Elektronika Mağazası',
     template: '%s | TAPLA MARKETPLACE',
   },
   description: 'TAPLA MARKETPLACE — Azərbaycanda ən sərfəli qiymətlərlə elektronika, notebook, telefon, aksesuar və daha çoxu. Sürətli çatdırılma, zəmanət və etibarlı xidmət.',
+  robots: {
+    index: true,
+    follow: true,
+  },
+  openGraph: {
+    siteName: 'TAPLA MARKETPLACE',
+    locale: 'az_AZ',
+    type: 'website',
+  },
+  icons: {
+    icon: '/favicon.svg',
+    apple: '/favicon.svg',
+  },
+  manifest: '/manifest.json',
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -59,6 +77,8 @@ fbq('init', '${FB_PIXEL_ID}');
             alt=""
           />
         </noscript>
+        <JsonLd data={getOrganizationSchema()} />
+        <JsonLd data={getWebSiteSchema()} />
         <FacebookPixel />
         <AppProviders>
           <Header rootCategories={rootCategories} />

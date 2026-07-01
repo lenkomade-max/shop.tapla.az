@@ -9,6 +9,9 @@ import { ProductGrid } from '@/components/sections/ProductGrid';
 import { ReviewsSection } from '@/components/sections/ReviewsSection';
 import { FAQ } from '@/components/sections/FAQ';
 import { ValueProps } from '@/components/sections/ValueProps';
+import { JsonLd } from '@/components/seo/JsonLd';
+import { getWebSiteSchema } from '@/lib/seo/schemas/organization-schema';
+import { getBreadcrumbSchema } from '@/lib/seo/schemas/breadcrumb-schema';
 
 export const revalidate = 120;
 
@@ -42,8 +45,16 @@ export default async function Home() {
     dbService.getCategories(),
   ]);
 
+  const homeSchema = getWebSiteSchema()
+  const breadcrumbSchema = getBreadcrumbSchema([
+    { name: 'Ana Səhifə', url: 'https://shop.tapla.az' },
+  ])
+
   return (
-    <div className="overflow-hidden bg-white">
+    <>
+      <JsonLd data={homeSchema} />
+      <JsonLd data={breadcrumbSchema} />
+      <div className="overflow-hidden bg-white">
       {/* 1. Immersive Editorial Slide Show Hero */}
       <Hero slides={heroSlides} />
 
@@ -68,5 +79,6 @@ export default async function Home() {
       {/* 8. Localized FAQ Accordion with keyword search */}
       <FAQ faqs={faqs} />
     </div>
+      </>
   );
 }

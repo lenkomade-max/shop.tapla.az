@@ -1,9 +1,12 @@
 import { Container } from '@/components/ui/Container';
+import { generateSEOMeta } from '@/lib/seo/meta-generator';
+import type { Metadata } from 'next';
 
-export const metadata = {
-  title: 'Qaytarma Siyasəti | TAPLA MARKETPLACE',
+export const metadata: Metadata = generateSEOMeta({
+  title: 'Qaytarma Siyasəti',
   description: 'TAPLA MARKETPLACE qaytarma və mübadilə siyasəti — məhsulların geri qaytarılması, dəyişdirilməsi qaydaları, şərtləri və proseduru.',
-};
+  canonical: 'https://shop.tapla.az/qaytarma-siyaseti',
+})
 
 export default function ReturnPolicyPage() {
   return (

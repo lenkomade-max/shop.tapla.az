@@ -1,9 +1,12 @@
 import { Container } from '@/components/ui/Container';
+import { generateSEOMeta } from '@/lib/seo/meta-generator';
+import type { Metadata } from 'next';
 
-export const metadata = {
-  title: 'Məxfilik Siyasəti | TAPLA MARKETPLACE',
+export const metadata: Metadata = generateSEOMeta({
+  title: 'Məxfilik Siyasəti',
   description: 'TAPLA MARKETPLACE məxfilik siyasəti — şəxsi məlumatlarınızın toplanması, işlənməsi və qorunması qaydaları.',
-};
+  canonical: 'https://shop.tapla.az/mexfilik-siyaseti',
+})
 
 export default function PrivacyPage() {
   return (
