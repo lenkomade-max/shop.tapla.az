@@ -207,24 +207,10 @@ export const dbService = {
     return [];
   },
 
-  // ——— Категории ———
+  // ——— Категории (источник истины — CATEGORIES константа) ———
 
   async getCategories(): Promise<Category[]> {
-    try {
-      if (supabaseAdmin) {
-        const { data, error } = await supabaseAdmin
-          .from('categories')
-          .select('*')
-          .eq('status', 'active')
-          .order('sort_order', { ascending: true });
-        if (!error && data && data.length > 0) {
-          return (data as Record<string, unknown>[]).map(mapCategory);
-        }
-      }
-    } catch (err) {
-      console.warn('DB categories fetch failed, using local fallback:', err);
-    }
-    return [];
+    return CATEGORIES.filter(c => c.status === 'active');
   },
 
   async getCategoryTree(): Promise<Category[]> {
@@ -233,36 +219,12 @@ export const dbService = {
   },
 
   async getCategoryBySlug(slug: string): Promise<Category | null> {
-    try {
-      if (supabaseAdmin) {
-        const { data, error } = await supabaseAdmin
-          .from('categories')
-          .select('*')
-          .eq('slug', slug)
-          .eq('status', 'active')
-          .maybeSingle();
-        if (!error && data) {
-          const cat = mapCategory(data as Record<string, unknown>);
-
-          // Get children
-          const { data: children } = await supabaseAdmin
-            .from('categories')
-            .select('*')
-            .eq('parent_id', cat.id)
-            .eq('status', 'active')
-            .order('sort_order', { ascending: true });
-          if (children) {
-            cat.children = (children as Record<string, unknown>[]).map(mapCategory);
-          }
-
-          return cat;
-        }
-      }
-    } catch (err) {
-      console.warn(`DB category fetch for slug ${slug} failed, using local fallback:`, err);
+    const all = CATEGORIES.filter(c => c.status === 'active');
+    const cat = all.find(c => c.slug === slug) ?? null;
+    if (cat) {
+      cat.children = all.filter(c => c.parentId === cat.id);
     }
-
-    return null;
+    return cat;
   },
 
   async getProductsByCategory(categorySlug: string): Promise<Product[]> {

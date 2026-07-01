@@ -100,6 +100,100 @@ INSERT INTO categories (slug, title, description, parent_id, sort_order) VALUES
 ON CONFLICT (slug) DO NOTHING;
 
 -- ============================================================================
+-- 1.7 Kosmetika & Gözəllik (cat-root-7..16)
+-- ============================================================================
+INSERT INTO categories (slug, title, description, sort_order) VALUES
+  ('kosmetika', 'Kosmetika & Gözəllik', 'Üz baxımı, makiyaj, saç baxımı, ətir və daha çox', 7)
+ON CONFLICT (slug) DO NOTHING;
+
+-- Дочерние категории (parent = kosmetika)
+INSERT INTO categories (slug, title, description, parent_id, sort_order) VALUES
+  ('uz-baximi', 'Üz baxımı', 'Təmizləyici, nəmləndirici krem, serum, göz ətrafı baxım, maskalar, günəşdən qoruyucular',  (SELECT id FROM categories WHERE slug = 'kosmetika'), 1),
+  ('makiyaj', 'Makiyaj', 'Üz, göz, dodaq makiyajı, qaş məhsulları',                                         (SELECT id FROM categories WHERE slug = 'kosmetika'), 2),
+  ('sac-baximi', 'Saç baxımı', 'Şampun, kondisioner, saç maskası, saç yağı, boyalar',                    (SELECT id FROM categories WHERE slug = 'kosmetika'), 3),
+  ('beden-baximi', 'Bədən baxımı', 'Skrab, bədən kremi, təraş məhsulları, dezodorant',                  (SELECT id FROM categories WHERE slug = 'kosmetika'), 4),
+  ('etir', 'Ətir', 'Qadın, kişi, unisex ətirlər, nümunələr',                                           (SELECT id FROM categories WHERE slug = 'kosmetika'), 5),
+  ('dirnaq-mehsullari', 'Dırnaq məhsulları', 'Lak, gel-lak, base, top, dırnaq baxımı, manikür seti',   (SELECT id FROM categories WHERE slug = 'kosmetika'), 6),
+  ('kisi-baximi', 'Kişi baxımı', 'Kişilər üçün üz baxımı, təraş, saç, dezodorant',                      (SELECT id FROM categories WHERE slug = 'kosmetika'), 7),
+  ('kosmetik-aksesuarlar', 'Kosmetik aksesuarlar', 'Fırçalar, süngərlər, çanta, güzgü, daraq',          (SELECT id FROM categories WHERE slug = 'kosmetika'), 8),
+  ('elektrikli-gozellik-cihazlari', 'Elektrikli gözəllik cihazları',
+   'Epilyator, təraş maşını, saç qurutma, üz təmizləmə, masaj alətləri',                               (SELECT id FROM categories WHERE slug = 'kosmetika'), 9)
+ON CONFLICT (slug) DO NOTHING;
+
+-- Üz baxımı подкатегории
+INSERT INTO categories (slug, title, description, parent_id, sort_order) VALUES
+  ('uz-temizleyici', 'Üz təmizləyici', 'Təmizləyici gel, köpük, micellar su',          (SELECT id FROM categories WHERE slug = 'uz-baximi'), 1),
+  ('uz-krem', 'Üz kremi', 'Nəmləndirici, qidalandırıcı, gecə kremi',                  (SELECT id FROM categories WHERE slug = 'uz-baximi'), 2),
+  ('serum-ampula', 'Serum & Ampula', 'Vitamin C, hialuron turşusu, retinol serumlar', (SELECT id FROM categories WHERE slug = 'uz-baximi'), 3),
+  ('goz-etrafi-baxim', 'Göz ətrafı baxım', 'Göz altı kremin, yamaqlar',               (SELECT id FROM categories WHERE slug = 'uz-baximi'), 4),
+  ('uz-maskasi', 'Üz maskası', 'Parça, gil, krem maskalar',                            (SELECT id FROM categories WHERE slug = 'uz-baximi'), 5),
+  ('gunesden-qoruyucu', 'Günəşdən qoruyucu', 'SPF krem, günəş losyonu',              (SELECT id FROM categories WHERE slug = 'uz-baximi'), 6)
+ON CONFLICT (slug) DO NOTHING;
+
+-- Makiyaj подкатегории
+INSERT INTO categories (slug, title, description, parent_id, sort_order) VALUES
+  ('uz-makiyaji', 'Üz makiyajı', 'Tonal krem, pudra, konsiler, bb krem',   (SELECT id FROM categories WHERE slug = 'makiyaj'), 1),
+  ('goz-makiyaji', 'Göz makiyajı', 'Tuş, göz kölgəsi, göz qələmi, layner', (SELECT id FROM categories WHERE slug = 'makiyaj'), 2),
+  ('dodaq-makiyaji', 'Dodaq makiyajı', 'Pomada, dodaq parıltısı, dodaq qələmi', (SELECT id FROM categories WHERE slug = 'makiyaj'), 3),
+  ('qas-mehsullari', 'Qaş məhsulları', 'Qaş qələmi, qaş jeli, qaş boyası', (SELECT id FROM categories WHERE slug = 'makiyaj'), 4)
+ON CONFLICT (slug) DO NOTHING;
+
+-- Saç baxımı подкатегории
+INSERT INTO categories (slug, title, description, parent_id, sort_order) VALUES
+  ('sampun-kondisioner', 'Şampun & Kondisioner', 'Saç tipinə uyğun şampun, kondisioner, balzam',        (SELECT id FROM categories WHERE slug = 'sac-baximi'), 1),
+  ('sac-maskasi', 'Saç maskası', 'Qidalandırıcı, bərpaedici saç maskaları',                             (SELECT id FROM categories WHERE slug = 'sac-baximi'), 2),
+  ('sac-yagi-serum', 'Saç yağı & Serum', 'Saç uzatma, parıltı, dökülmə qarşı serumlar',                (SELECT id FROM categories WHERE slug = 'sac-baximi'), 3),
+  ('sac-kimi', 'Saç düzəldici & Lak', 'Saç spreyi, lak, düzəldici, köpük',                             (SELECT id FROM categories WHERE slug = 'sac-baximi'), 4),
+  ('sac-boyasi', 'Saç boyası', 'Daimi, yarımdaimi saç boyaları, təbii boyalar',                        (SELECT id FROM categories WHERE slug = 'sac-baximi'), 5)
+ON CONFLICT (slug) DO NOTHING;
+
+-- Bədən baxımı подкатегории
+INSERT INTO categories (slug, title, description, parent_id, sort_order) VALUES
+  ('beden-skrab-duz', 'Duz & Skrab', 'Bədən skrabı, duz, qəhvə skrabı',                     (SELECT id FROM categories WHERE slug = 'beden-baximi'), 1),
+  ('beden-krem-losyon', 'Bədən kremi & Losyon', 'Bədən nəmləndiricisi, losyon, yağ',        (SELECT id FROM categories WHERE slug = 'beden-baximi'), 2),
+  ('teras-mehsullari', 'Təraş məhsulları', 'Təraş köpüyü, jeli, təraşdan sonra losyon',     (SELECT id FROM categories WHERE slug = 'beden-baximi'), 3),
+  ('dezodorant', 'Dezodorant & Antiperspirant', 'Tərləməyə qarşı dezodorant, roll-on, sprey', (SELECT id FROM categories WHERE slug = 'beden-baximi'), 4)
+ON CONFLICT (slug) DO NOTHING;
+
+-- Ətir подкатегории
+INSERT INTO categories (slug, title, description, parent_id, sort_order) VALUES
+  ('qadin-etiri', 'Qadın ətirləri', 'Qadınlar üçün parfüm, eau de toilette',              (SELECT id FROM categories WHERE slug = 'etir'), 1),
+  ('kisi-etiri', 'Kişi ətirləri', 'Kişilər üçün parfüm, eau de toilette',                 (SELECT id FROM categories WHERE slug = 'etir'), 2),
+  ('unisex-etir', 'Unisex Ətir', 'Uni sex ətirlər, niş parfümlər',                        (SELECT id FROM categories WHERE slug = 'etir'), 3),
+  ('etir-numunesi', 'Nümunələr', 'Ətir nümunələri, tester parfümlər',                     (SELECT id FROM categories WHERE slug = 'etir'), 4)
+ON CONFLICT (slug) DO NOTHING;
+
+-- Dırnaq məhsulları подкатегории
+INSERT INTO categories (slug, title, description, parent_id, sort_order) VALUES
+  ('lak-gel-lak', 'Lak & Gel-lak', 'Dırnaq lakı, gel-lak, naxış lakları',           (SELECT id FROM categories WHERE slug = 'dirnaq-mehsullari'), 1),
+  ('base-top', 'Base & Top', 'Base coat, top coat, quruducu',                       (SELECT id FROM categories WHERE slug = 'dirnaq-mehsullari'), 2),
+  ('dirnaq-baximi', 'Dırnaq baxımı', 'Dırnaq gücləndirici, qida yağı, kutikula baxımı', (SELECT id FROM categories WHERE slug = 'dirnaq-mehsullari'), 3),
+  ('manikur-seti', 'Manikür seti', 'Manikür alətləri, setlər, fayllar',             (SELECT id FROM categories WHERE slug = 'dirnaq-mehsullari'), 4)
+ON CONFLICT (slug) DO NOTHING;
+
+-- Kişi baxımı подкатегории
+INSERT INTO categories (slug, title, description, parent_id, sort_order) VALUES
+  ('kisi-uz-baximi', 'Üz baxımı (kişi)', 'Kişilər üçün təmizləyici, krem, serum',              (SELECT id FROM categories WHERE slug = 'kisi-baximi'), 1),
+  ('kisi-sac-baximi', 'Saç baxımı (kişi)', 'Kişi şampunları, saç jeli, pomad',                 (SELECT id FROM categories WHERE slug = 'kisi-baximi'), 2),
+  ('kisi-dezodorant', 'Dezodorant & Təraş (kişi)', 'Kişi dezodorantları, təraş jeli, təraş dəsti', (SELECT id FROM categories WHERE slug = 'kisi-baximi'), 3)
+ON CONFLICT (slug) DO NOTHING;
+
+-- Kosmetik aksesuarlar подкатегории
+INSERT INTO categories (slug, title, description, parent_id, sort_order) VALUES
+  ('firca-sunger', 'Fırçalar & Süngərlər', 'Makiyaj fırçaları, beauty blender, toz süngər', (SELECT id FROM categories WHERE slug = 'kosmetik-aksesuarlar'), 1),
+  ('kosmetik-canta', 'Çanta & Qutu', 'Kosmetik çanta, tualet çantası, saxlayıcı qutular',  (SELECT id FROM categories WHERE slug = 'kosmetik-aksesuarlar'), 2),
+  ('guzgu-daraq', 'Güzgü & Daraq', 'Dəzgü, cib güzgüsü, saç darağı, fırça',               (SELECT id FROM categories WHERE slug = 'kosmetik-aksesuarlar'), 3)
+ON CONFLICT (slug) DO NOTHING;
+
+-- Elektrikli gözəllik cihazları подкатегории
+INSERT INTO categories (slug, title, description, parent_id, sort_order) VALUES
+  ('epilyator-teras', 'Epilyator & Təraş maşını', 'Qadın və kişi epilyatorları, təraş maşınları',       (SELECT id FROM categories WHERE slug = 'elektrikli-gozellik-cihazlari'), 1),
+  ('sac-qurutma-duzeltme', 'Saç qurutma & Düzəltmə', 'Fen, düzəldən, buruqlaşdıran, hava fırça',       (SELECT id FROM categories WHERE slug = 'elektrikli-gozellik-cihazlari'), 2),
+  ('uz-temizleme-cihazi', 'Üz təmizləmə cihazı', 'Ultrasəs, fırça, LED maskalar',                     (SELECT id FROM categories WHERE slug = 'elektrikli-gozellik-cihazlari'), 3),
+  ('masaj-aletleri', 'Masaj alətləri', 'Üz masajçısı, guaşa, rulon, masaj tabancası',                  (SELECT id FROM categories WHERE slug = 'elektrikli-gozellik-cihazlari'), 4)
+ON CONFLICT (slug) DO NOTHING;
+
+-- ============================================================================
 -- 2. LANDINGS
 -- ============================================================================
 CREATE TABLE IF NOT EXISTS landings (

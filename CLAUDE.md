@@ -13,7 +13,7 @@
 | Файл | О чём |
 |------|-------|
 | `docs/ARCHITECTURE.md` | Архитектура: структура, роуты, подсистемы, Supabase, деплой |
-| `docs/TOVAR-AI.md` | Tovar.AI: 4-стадийный пайплайн генерации карточек |
+| `docs/TOVAR-AI.md` | Tovar.AI: 6-стадийный пайплайн генерации карточек |
 | `docs/DESIGN-SYSTEM-MAP.md` | Дизайн-система Tovar.AI: триады, библиотеки, палитры |
 | `docs/AUTH.md` | Аутентификация: клиенты (Supabase Auth), админ (JWT), Guest Checkout |
 | `docs/LANDING-STANDARD.md` | Стандарт создания лендингов |
@@ -58,7 +58,7 @@ src/
 
 ## Подсистемы
 
-- **Tovar.AI** — AI-генерация карточек (4+ стадии, OpenRouter) → `docs/TOVAR-AI.md`
+- **Tovar.AI** — AI-генерация карточек (5 стадий, Kei Proxy + OpenRouter) → `docs/TOVAR-AI.md`
 - **Auth** — Supabase Auth (Email/Google) + JWT админка → `docs/AUTH.md`
 - **Checkout** — 3 способа, Pasha Bank через tapla.az gateway
 - **Landing System** — модульные лендинги, 9 типов секций

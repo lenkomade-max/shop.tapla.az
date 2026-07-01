@@ -105,6 +105,20 @@ export async function updateProductStatus(formData: FormData) {
   revalidatePath('/admin/products');
 }
 
+export async function updateProductCategory(formData: FormData) {
+  if (!(await checkAuth())) return;
+  const id = formData.get('id') as string;
+  const category = formData.get('category') as string;
+  const categoryId = formData.get('categoryId') as string;
+  if (!id) return;
+  await supabaseAdmin.from('products').update({
+    category: category || null,
+    category_id: categoryId || null,
+    updated_at: new Date().toISOString(),
+  }).eq('id', id);
+  revalidatePath('/admin/products');
+}
+
 export type SaveProductResult = {
   success: boolean
   error?: string

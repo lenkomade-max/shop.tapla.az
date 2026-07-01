@@ -118,10 +118,10 @@ src/
 │   │   ├── stage1.5-enricher.ts           # Stage 1.5: Обогащение данных товара
 │   │   ├── stage2-planner.ts              # Stage 2: Creative Director (Gemini Flash Lite)
 │   │   ├── stage2-planner-v2.ts           # Stage 2 v2: улучшенная версия
-│   │   ├── stage3-generate.ts             # Stage 3: Image Generation (Nano Banana 2)
-│   │   ├── stage3-generate-kei.ts         # Stage 3: KEI-прокси (альтернативный провайдер)
+│   │   ├── stage3-generate.ts             # Stage 3: OpenRouter V1 (не используется)
+│   │   ├── stage3-generate-kei.ts         # Stage 3: Kei Proxy V2 (основной)
 │   │   ├── stage4-qa.ts                   # Stage 4: Quality Check (Gemma 4 31B)
-│   │   ├── stage5-kie-image.ts            # Stage 5: KIE Image (экспериментальный)
+│   │   ├── stage5-kie-image.ts            # Stage 5: Kie.ai Image-to-Image (чистое фото)
 │   │   ├── pipeline.ts                    # Оркестратор всех стадий
 │   │   ├── index.ts                       # barrel export
 │   │   ├── proxy-security.ts              # Безопасность прокси
@@ -252,11 +252,11 @@ See `docs/DESIGN-SYSTEM-MAP.md` for design libraries, triads, palettes.
 
 **Pipeline:**
 1. **Stage 1 — Vision:** `google/gemma-4-31b-it` — анализирует фото, извлекает 25+ полей
-2. **Stage 1.5 — Enricher:** обогащает данные товара (features, use cases, ideal for)
-3. **Stage 2 — Planner:** `google/gemini-3.1-flash-lite` — 7 триад, Brand Identity Lock, 12 композиций
-4. **Stage 3 — Generate:** `google/gemini-3.1-flash-image-preview` (Nano Banana 2) — Promise.all, 3 параллельных
-5. **Stage 4 — QA:** `google/gemma-4-31b-it` — 5 проверок, score 0-100
-6. **Stage 5 — KIE Image (экспериментальный)**
+2. **Stage 1.5 — Enricher:** обогащает данные товара (features, use cases, ideal for, SEO). Параллельно с 2-4
+3. **Stage 2 — Planner v2:** `google/gemini-3.1-flash-lite` — LLM-driven, без хардкод-библиотек. V1 (устаревший): 7 триад, 12 композиций
+4. **Stage 3 — Generate:** Nano Banana 2 через Kei Proxy (n1leads.tapla.az). Promise.all, async upload→createTask→polling→download
+5. **Stage 4 — QA:** `OFF` (код сохранён)
+6. **Stage 5 — Kie.ai Image-to-Image:** grok-imagine/i2i — чистое фото товара (белый фон, без текста)
 
 **Design libraries:** 11 JSON-файлов в `lib/tovar-ai/design/`
 
@@ -349,7 +349,8 @@ See `docs/LANDING-STANDARD.md` for full guide.
 | Service | Purpose | Integration |
 |---------|---------|-------------|
 | Supabase | PostgreSQL + Auth | `lib/supabase/*` |
-| OpenRouter | AI API (Tovar.AI) | `lib/tovar-ai/*`, env: `OPENROUTER_API_KEY` |
+| OpenRouter | AI API (Stages 1, 1.5, 2) | `lib/tovar-ai/*`, env: `OPENROUTER_API_KEY` |
+| Kei Proxy | Image gen (Stages 3, 5) | n1leads.tapla.az, env: `PROXY_SECRET` |
 | Pasha Bank | Online payments | Via tapla.az gateway |
 | Cloudflare R2 | File storage (images) | `lib/r2/*`, env: `R2_*` |
 | Vercel | Hosting + deployment | Auto-deploy from GitHub |
@@ -369,8 +370,12 @@ SUPABASE_SECRET_KEY=sb_secret_...
 # Admin
 ADMIN_PASSWORD=...
 
-# OpenRouter (Tovar.AI)
+# OpenRouter (Stages 1, 1.5, 2)
 OPENROUTER_API_KEY=sk-or-v1-...
+
+# Kei Proxy (Stages 3, 5)
+KEI_PROXY_URL=https://n1leads.tapla.az
+PROXY_SECRET=...
 
 # Pasha Bank Gateway
 GATEWAY_API_KEY=...

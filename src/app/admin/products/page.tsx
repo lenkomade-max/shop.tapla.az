@@ -3,12 +3,17 @@ import Link from 'next/link';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { DeleteButton } from './delete-button';
 import { StatusCell } from './status-cell';
+import { CategoryCell } from './category-cell';
+import { fetchActiveCategories } from '@/lib/actions';
 
 export default async function ProductsPage() {
-  const { data: products, error } = await supabaseAdmin
-    .from('products')
-    .select('id, name, slug, title, price, status, category, supplier_url, created_at')
-    .order('created_at', { ascending: false });
+  const [{ data: products, error }, categories] = await Promise.all([
+    supabaseAdmin
+      .from('products')
+      .select('id, name, slug, title, price, status, category, supplier_url, created_at')
+      .order('created_at', { ascending: false }),
+    fetchActiveCategories(),
+  ]);
 
   if (error) {
     console.error('Admin products fetch error:', error);
@@ -64,7 +69,9 @@ export default async function ProductsPage() {
                 </td>
                 <td className="px-4 py-3 font-mono text-xs text-zinc-400">{p.slug}</td>
                 <td className="px-4 py-3">{p.price ? p.price.toLocaleString() + ' ₼' : '—'}</td>
-                <td className="px-4 py-3 text-zinc-500">{p.category || '—'}</td>
+                <td className="px-4 py-3">
+                  <CategoryCell id={p.id} category={p.category} categories={categories} />
+                </td>
                 <td className="px-4 py-3">
                   <StatusCell id={p.id} status={p.status} />
                 </td>

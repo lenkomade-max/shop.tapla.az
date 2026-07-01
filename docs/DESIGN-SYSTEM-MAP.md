@@ -382,21 +382,4 @@ pickSharedVisualTheme(triad, vision, visualThemes)
 
 ---
 
-## ЧТО Я ИЗМЕНИЛ (и что уже откатил)
-
-### Оставлено (полезное):
-- `cs41` Solution Relief в creative-styles.json
-- `ms31` Problem Solver в marketing-styles.json
-- `relief_solution` триада в stage2-planner.ts
-- `blurred_after_background` composition variation
-- `isProblemSolver()` — авто-определение товаров-решателей
-- `template` параметр в PipelineInput и API
-- 3 новых background_style в visual-themes.json (как определения, НЕ в category_matching)
-- Секция BLURRED LIFESTYLE BACKGROUND в BASE_PROMPT
-- Поддержка --template в CLI
-
-### Откачено (вредное):
-- ❌ blurred_* в category_matching (делало фон рандомным)
-- ❌ ROLE_VISUAL_THEMES для usage/lifestyle/solution (меняло фон без смысла)
-- ❌ glassmorphism badges в blurredBgInstruction (конфликт с BASE_PROMPT)
-- ❌ font specification в cs41 prompt_fragment
+##

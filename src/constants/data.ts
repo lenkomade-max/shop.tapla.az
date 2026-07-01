@@ -10,6 +10,7 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
       { label: 'Kiçik Məişət Texnikası', href: '/category/kicik-meiset-texnikasi' },
       { label: 'Ağıllı Saat & Gadget', href: '/category/aqilli-saat-ve-gadget' },
       { label: 'Sağlamlıq & İdman', href: '/category/saglamliq-ve-idman' },
+      { label: 'Kosmetika & Gözəllik', href: '/category/kosmetika' },
     ],
   },
   {
@@ -391,6 +392,251 @@ export const CATEGORIES: Category[] = [
     id: 'cat-root-6', slug: 'elektronika', title: 'Elektronika',
     description: 'Noutbuklar, DJI, kameralar, günəş panelləri',
     parentId: null, sortOrder: 6, status: 'active',
+  },
+  // ——— Kosmetika & Gözəllik (cat-root-7..15) ———
+  {
+    id: 'cat-root-7', slug: 'kosmetika', title: 'Kosmetika & Gözəllik',
+    description: 'Üz baxımı, makiyaj, saç baxımı, ətir və daha çox',
+    parentId: null, sortOrder: 7, status: 'active',
+  },
+  // Üz baxımı
+  {
+    id: 'cat-root-8', slug: 'uz-baximi', title: 'Üz baxımı',
+    description: 'Təmizləyici, nəmləndirici krem, serum, göz ətrafı baxım, maskalar, günəşdən qoruyucular',
+    parentId: 'cat-root-7', sortOrder: 1, status: 'active',
+  },
+  {
+    id: 'cat-sub-8-1', slug: 'uz-temizleyici', title: 'Üz təmizləyici',
+    description: 'Təmizləyici gel, köpük, micellar su',
+    parentId: 'cat-root-8', sortOrder: 1, status: 'active',
+  },
+  {
+    id: 'cat-sub-8-2', slug: 'uz-krem', title: 'Üz kremi',
+    description: 'Nəmləndirici, qidalandırıcı, gecə kremi',
+    parentId: 'cat-root-8', sortOrder: 2, status: 'active',
+  },
+  {
+    id: 'cat-sub-8-3', slug: 'serum-ampula', title: 'Serum & Ampula',
+    description: 'Vitamin C, hialuron turşusu, retinol serumlar',
+    parentId: 'cat-root-8', sortOrder: 3, status: 'active',
+  },
+  {
+    id: 'cat-sub-8-4', slug: 'goz-etrafi-baxim', title: 'Göz ətrafı baxım',
+    description: 'Göz altı kremin, yamaqlar',
+    parentId: 'cat-root-8', sortOrder: 4, status: 'active',
+  },
+  {
+    id: 'cat-sub-8-5', slug: 'uz-maskasi', title: 'Üz maskası',
+    description: 'Parça, gil, krem maskalar',
+    parentId: 'cat-root-8', sortOrder: 5, status: 'active',
+  },
+  {
+    id: 'cat-sub-8-6', slug: 'gunesden-qoruyucu', title: 'Günəşdən qoruyucu',
+    description: 'SPF krem, günəş losyonu',
+    parentId: 'cat-root-8', sortOrder: 6, status: 'active',
+  },
+  // Makiyaj
+  {
+    id: 'cat-root-9', slug: 'makiyaj', title: 'Makiyaj',
+    description: 'Üz, göz, dodaq makiyajı, qaş məhsulları',
+    parentId: 'cat-root-7', sortOrder: 2, status: 'active',
+  },
+  {
+    id: 'cat-sub-9-1', slug: 'uz-makiyaji', title: 'Üz makiyajı',
+    description: 'Tonal krem, pudra, konsiler, bb krem',
+    parentId: 'cat-root-9', sortOrder: 1, status: 'active',
+  },
+  {
+    id: 'cat-sub-9-2', slug: 'goz-makiyaji', title: 'Göz makiyajı',
+    description: 'Tuş, göz kölgəsi, göz qələmi, layner',
+    parentId: 'cat-root-9', sortOrder: 2, status: 'active',
+  },
+  {
+    id: 'cat-sub-9-3', slug: 'dodaq-makiyaji', title: 'Dodaq makiyajı',
+    description: 'Pomada, dodaq parıltısı, dodaq qələmi',
+    parentId: 'cat-root-9', sortOrder: 3, status: 'active',
+  },
+  {
+    id: 'cat-sub-9-4', slug: 'qas-mehsullari', title: 'Qaş məhsulları',
+    description: 'Qaş qələmi, qaş jeli, qaş boyası',
+    parentId: 'cat-root-9', sortOrder: 4, status: 'active',
+  },
+  // Saç baxımı
+  {
+    id: 'cat-root-10', slug: 'sac-baximi', title: 'Saç baxımı',
+    description: 'Şampun, kondisioner, saç maskası, saç yağı, boyalar',
+    parentId: 'cat-root-7', sortOrder: 3, status: 'active',
+  },
+  {
+    id: 'cat-sub-10-1', slug: 'sampun-kondisioner', title: 'Şampun & Kondisioner',
+    description: 'Saç tipinə uyğun şampun, kondisioner, balzam',
+    parentId: 'cat-root-10', sortOrder: 1, status: 'active',
+  },
+  {
+    id: 'cat-sub-10-2', slug: 'sac-maskasi', title: 'Saç maskası',
+    description: 'Qidalandırıcı, bərpaedici saç maskaları',
+    parentId: 'cat-root-10', sortOrder: 2, status: 'active',
+  },
+  {
+    id: 'cat-sub-10-3', slug: 'sac-yagi-serum', title: 'Saç yağı & Serum',
+    description: 'Saç uzatma, parıltı, dökülmə qarşı serumlar',
+    parentId: 'cat-root-10', sortOrder: 3, status: 'active',
+  },
+  {
+    id: 'cat-sub-10-4', slug: 'sac-kimi', title: 'Saç düzəldici & Lak',
+    description: 'Saç spreyi, lak, düzəldici, köpük',
+    parentId: 'cat-root-10', sortOrder: 4, status: 'active',
+  },
+  {
+    id: 'cat-sub-10-5', slug: 'sac-boyasi', title: 'Saç boyası',
+    description: 'Daimi, yarımdaimi saç boyaları, təbii boyalar',
+    parentId: 'cat-root-10', sortOrder: 5, status: 'active',
+  },
+  // Bədən baxımı
+  {
+    id: 'cat-root-11', slug: 'beden-baximi', title: 'Bədən baxımı',
+    description: 'Skrab, bədən kremi, təraş məhsulları, dezodorant',
+    parentId: 'cat-root-7', sortOrder: 4, status: 'active',
+  },
+  {
+    id: 'cat-sub-11-1', slug: 'beden-skrab-duz', title: 'Duz & Skrab',
+    description: 'Bədən skrabı, duz, qəhvə skrabı',
+    parentId: 'cat-root-11', sortOrder: 1, status: 'active',
+  },
+  {
+    id: 'cat-sub-11-2', slug: 'beden-krem-losyon', title: 'Bədən kremi & Losyon',
+    description: 'Bədən nəmləndiricisi, losyon, yağ',
+    parentId: 'cat-root-11', sortOrder: 2, status: 'active',
+  },
+  {
+    id: 'cat-sub-11-3', slug: 'teras-mehsullari', title: 'Təraş məhsulları',
+    description: 'Təraş köpüyü, jeli, təraşdan sonra losyon',
+    parentId: 'cat-root-11', sortOrder: 3, status: 'active',
+  },
+  {
+    id: 'cat-sub-11-4', slug: 'dezodorant', title: 'Dezodorant & Antiperspirant',
+    description: 'Tərləməyə qarşı dezodorant, roll-on, sprey',
+    parentId: 'cat-root-11', sortOrder: 4, status: 'active',
+  },
+  // Ətir
+  {
+    id: 'cat-root-12', slug: 'etir', title: 'Ətir',
+    description: 'Qadın, kişi, unisex ətirlər, nümunələr',
+    parentId: 'cat-root-7', sortOrder: 5, status: 'active',
+  },
+  {
+    id: 'cat-sub-12-1', slug: 'qadin-etiri', title: 'Qadın ətirləri',
+    description: 'Qadınlar üçün parfüm, eau de toilette',
+    parentId: 'cat-root-12', sortOrder: 1, status: 'active',
+  },
+  {
+    id: 'cat-sub-12-2', slug: 'kisi-etiri', title: 'Kişi ətirləri',
+    description: 'Kişilər üçün parfüm, eau de toilette',
+    parentId: 'cat-root-12', sortOrder: 2, status: 'active',
+  },
+  {
+    id: 'cat-sub-12-3', slug: 'unisex-etir', title: 'Unisex Ətir',
+    description: 'Uni sex ətirlər, niş parfümlər',
+    parentId: 'cat-root-12', sortOrder: 3, status: 'active',
+  },
+  {
+    id: 'cat-sub-12-4', slug: 'etir-numunesi', title: 'Nümunələr',
+    description: 'Ətir nümunələri, tester parfümlər',
+    parentId: 'cat-root-12', sortOrder: 4, status: 'active',
+  },
+  // Dırnaq məhsulları
+  {
+    id: 'cat-root-13', slug: 'dirnaq-mehsullari', title: 'Dırnaq məhsulları',
+    description: 'Lak, gel-lak, base, top, dırnaq baxımı, manikür seti',
+    parentId: 'cat-root-7', sortOrder: 6, status: 'active',
+  },
+  {
+    id: 'cat-sub-13-1', slug: 'lak-gel-lak', title: 'Lak & Gel-lak',
+    description: 'Dırnaq lakı, gel-lak, naxış lakları',
+    parentId: 'cat-root-13', sortOrder: 1, status: 'active',
+  },
+  {
+    id: 'cat-sub-13-2', slug: 'base-top', title: 'Base & Top',
+    description: 'Base coat, top coat, quruducu',
+    parentId: 'cat-root-13', sortOrder: 2, status: 'active',
+  },
+  {
+    id: 'cat-sub-13-3', slug: 'dirnaq-baximi', title: 'Dırnaq baxımı',
+    description: 'Dırnaq gücləndirici, qida yağı, kutikula baxımı',
+    parentId: 'cat-root-13', sortOrder: 3, status: 'active',
+  },
+  {
+    id: 'cat-sub-13-4', slug: 'manikur-seti', title: 'Manikür seti',
+    description: 'Manikür alətləri, setlər, fayllar',
+    parentId: 'cat-root-13', sortOrder: 4, status: 'active',
+  },
+  // Kişi baxımı
+  {
+    id: 'cat-root-14', slug: 'kisi-baximi', title: 'Kişi baxımı',
+    description: 'Kişilər üçün üz baxımı, təraş, saç, dezodorant',
+    parentId: 'cat-root-7', sortOrder: 7, status: 'active',
+  },
+  {
+    id: 'cat-sub-14-1', slug: 'kisi-uz-baximi', title: 'Üz baxımı (kişi)',
+    description: 'Kişilər üçün təmizləyici, krem, serum',
+    parentId: 'cat-root-14', sortOrder: 1, status: 'active',
+  },
+  {
+    id: 'cat-sub-14-2', slug: 'kisi-sac-baximi', title: 'Saç baxımı (kişi)',
+    description: 'Kişi şampunları, saç jeli, pomad',
+    parentId: 'cat-root-14', sortOrder: 2, status: 'active',
+  },
+  {
+    id: 'cat-sub-14-3', slug: 'kisi-dezodorant', title: 'Dezodorant & Təraş (kişi)',
+    description: 'Kişi dezodorantları, təraş jeli, təraş dəsti',
+    parentId: 'cat-root-14', sortOrder: 3, status: 'active',
+  },
+  // Kosmetik aksesuarlar
+  {
+    id: 'cat-root-15', slug: 'kosmetik-aksesuarlar', title: 'Kosmetik aksesuarlar',
+    description: 'Fırçalar, süngərlər, çanta, güzgü, daraq',
+    parentId: 'cat-root-7', sortOrder: 8, status: 'active',
+  },
+  {
+    id: 'cat-sub-15-1', slug: 'firca-sunger', title: 'Fırçalar & Süngərlər',
+    description: 'Makiyaj fırçaları, beauty blender, toz süngər',
+    parentId: 'cat-root-15', sortOrder: 1, status: 'active',
+  },
+  {
+    id: 'cat-sub-15-2', slug: 'kosmetik-canta', title: 'Çanta & Qutu',
+    description: 'Kosmetik çanta, tualet çantası, saxlayıcı qutular',
+    parentId: 'cat-root-15', sortOrder: 2, status: 'active',
+  },
+  {
+    id: 'cat-sub-15-3', slug: 'guzgu-daraq', title: 'Güzgü & Daraq',
+    description: 'Dəzgü, cib güzgüsü, saç darağı, fırça',
+    parentId: 'cat-root-15', sortOrder: 3, status: 'active',
+  },
+  // Elektrikli gözəllik cihazları
+  {
+    id: 'cat-root-16', slug: 'elektrikli-gozellik-cihazlari', title: 'Elektrikli gözəllik cihazları',
+    description: 'Epilyator, təraş maşını, saç qurutma, üz təmizləmə, masaj alətləri',
+    parentId: 'cat-root-7', sortOrder: 9, status: 'active',
+  },
+  {
+    id: 'cat-sub-16-1', slug: 'epilyator-teras', title: 'Epilyator & Təraş maşını',
+    description: 'Qadın və kişi epilyatorları, təraş maşınları',
+    parentId: 'cat-root-16', sortOrder: 1, status: 'active',
+  },
+  {
+    id: 'cat-sub-16-2', slug: 'sac-qurutma-duzeltme', title: 'Saç qurutma & Düzəltmə',
+    description: 'Fen, düzəldən, buruqlaşdıran, hava fırça',
+    parentId: 'cat-root-16', sortOrder: 2, status: 'active',
+  },
+  {
+    id: 'cat-sub-16-3', slug: 'uz-temizleme-cihazi', title: 'Üz təmizləmə cihazı',
+    description: 'Ultrasəs, fırça, LED maskalar',
+    parentId: 'cat-root-16', sortOrder: 3, status: 'active',
+  },
+  {
+    id: 'cat-sub-16-4', slug: 'masaj-aletleri', title: 'Masaj alətləri',
+    description: 'Üz masajçısı, guaşa, rulon, masaj tabancası',
+    parentId: 'cat-root-16', sortOrder: 4, status: 'active',
   },
 ];
 
