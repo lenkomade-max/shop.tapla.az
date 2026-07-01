@@ -5,21 +5,21 @@ import { getBreadcrumbSchema } from '@/lib/seo/schemas/breadcrumb-schema'
 
 export const metadata: Metadata = {
   title: 'Kolleksiyalar',
-  description: 'Məhsul kolleksiyalarımız — ən yaxşı seçimlər, xüsusi təkliflər və mövsümi endirimlər.',
+  description: 'Məhsul koleksiyalarımız — ən yaxşı seçimlər, xüsusi təkliflər və mövsümi endirimlər.',
   alternates: {
-    canonical: 'https://shop.tapla.az/kolleksiyalar',
+    canonical: 'https://shop.tapla.az/koleksiyalar',
   },
   openGraph: {
     title: 'Kolleksiyalar',
-    description: 'Məhsul kolleksiyalarımız — ən yaxşı seçimlər, xüsusi təkliflər və mövsümi endirimlər.',
-    url: 'https://shop.tapla.az/kolleksiyalar',
+    description: 'Məhsul koleksiyalarımız — ən yaxşı seçimlər, xüsusi təkliflər və mövsümi endirimlər.',
+    url: 'https://shop.tapla.az/koleksiyalar',
     siteName: 'TAPLA MARKETPLACE',
     locale: 'az_AZ',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Kolleksiyalar',
-    description: 'Məhsul kolleksiyalarımız — ən yaxşı seçimlər, xüsusi təkliflər və mövsümi endirimlər.',
+    description: 'Məhsul koleksiyalarımız — ən yaxşı seçimlər, xüsusi təkliflər və mövsümi endirimlər.',
   },
 }
 
@@ -33,7 +33,7 @@ export default async function CollectionsPage() {
 
   const breadcrumbSchema = getBreadcrumbSchema([
     { name: 'Ana Səhifə', url: 'https://shop.tapla.az' },
-    { name: 'Kolleksiyalar', url: 'https://shop.tapla.az/kolleksiyalar' },
+    { name: 'Kolleksiyalar', url: 'https://shop.tapla.az/koleksiyalar' },
   ])
 
   return (

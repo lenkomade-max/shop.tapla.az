@@ -10,7 +10,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages: { url: string; priority: number; changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency'] }[] = [
     { url: SITE_URL, priority: 1.0, changeFrequency: 'weekly' },
     { url: `${SITE_URL}/mehsullar`, priority: 0.8, changeFrequency: 'weekly' },
-    { url: `${SITE_URL}/kolleksiyalar`, priority: 0.7, changeFrequency: 'weekly' },
+    { url: `${SITE_URL}/koleksiyalar`, priority: 0.7, changeFrequency: 'weekly' },
     { url: `${SITE_URL}/haqqimizda`, priority: 0.6, changeFrequency: 'monthly' },
     { url: `${SITE_URL}/qaytarma-siyaseti`, priority: 0.4, changeFrequency: 'yearly' },
     { url: `${SITE_URL}/satici-muqavilesi`, priority: 0.4, changeFrequency: 'yearly' },
@@ -99,7 +99,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       if (collections) {
         for (const col of collections as Record<string, unknown>[]) {
           entries.push({
-            url: `${SITE_URL}/kolleksiyalar/${col.slug}`,
+            url: `${SITE_URL}/koleksiyalar/${col.slug}`,
             lastModified: col.updated_at ? new Date(col.updated_at as string) : new Date(),
             changeFrequency: 'weekly',
             priority: 0.7,
