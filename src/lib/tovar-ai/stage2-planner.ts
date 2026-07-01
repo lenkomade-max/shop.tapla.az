@@ -602,7 +602,6 @@ function buildUserPrompt(
   analysis: VisionOutput,
   providerDescription?: string,
   characteristics?: Record<string, string>,
-  priceAz?: string,
 ): string {
   const CREATIVE_STYLES = loadCreativeStyles()
   const MARKETING_STYLES = loadMarketingStyles()
@@ -710,7 +709,7 @@ function buildUserPrompt(
     providerDescription || 'Not provided',
     '',
     '## Product Price (ONLY if explicitly provided)',
-    priceAz || 'NO PRICE — do NOT invent any price. If price is given, always include AZN (e.g. \"29 AZN\").',
+    'NO PRICE — never invent or display any price.',
     '',
     '## Delivery & Warranty Rules',
     'Fast delivery ("SÜRƏTLİ ÇATDIRILMA") is a generic marketplace claim — allowed.',
@@ -954,7 +953,6 @@ export async function planCardPrompts(
   analysis: VisionOutput,
   providerDescription?: string,
   characteristics?: Record<string, string>,
-  priceAz?: string,
   template?: string,
 ): Promise<PromptsOutput> {
   const config = TOVAR_AI_CONFIG
@@ -987,7 +985,7 @@ export async function planCardPrompts(
   console.log(`[Stage 2] Roles: ${triad.roles.join(', ')}`)
   console.log(`[Stage 2] Creative Styles: ${cs.map((s, i) => `${i + 1}=${s.id}`).join(', ')}`)
 
-  const userPrompt = buildUserPrompt(triad, cs, colorPalette, sharedVt, analysis, providerDescription, characteristics, priceAz)
+  const userPrompt = buildUserPrompt(triad, cs, colorPalette, sharedVt, analysis, providerDescription, characteristics)
 
   const body = {
     model: config.PLANNER_MODEL,
@@ -1046,8 +1044,6 @@ export async function planCardPrompts(
     const cardMs = card.marketing_style
       ? marketingStyles.find(m => m.id === card.marketing_style) || ms[card.index - 1]
       : ms[card.index - 1]
-
-    const hasProviderPrice = Boolean(priceAz)
 
     // Гарантия — только если явно указана в описании
     const desc = (providerDescription || '').toLowerCase()
@@ -1113,7 +1109,7 @@ export async function planCardPrompts(
       `Motion Energy: ${motionItem?.prompt_fragment || sharedVt.motion}.`,
       `COMPOSITION VARIATION: ${variation.name} — ${variation.prompt_fragment}`,
       `COMMERCIAL DENSITY for this role: ${densityInfo.instruction} Use ${densityInfo.blocks} feature badges. Position them with pointer lines, not clustered or floating randomly.`,
-      hasProviderPrice ? `PRODUCT PRICE: ${priceAz}. Display this price on price-related cards. ALWAYS include "AZN" with the number (e.g. "29 AZN", not just "29"). Use it in commercial blocks.` : '⛔ NO PRICE: Do NOT invent or display any price.',
+      '⛔ NO PRICE: Never invent or display any price on any card.',
       !hasWarranty ? '⛔ NO WARRANTY: Description does NOT mention warranty. Do NOT invent warranty terms ("2 il zəmanət", "14 gün geri qaytarma").' : `WARRANTY mentioned in description — can display.`,
       'Delivery: Generic fast delivery claim is OK ("SÜRƏTLİ ÇATDIRILMA"). NEVER claim "pulsuz" or "free" unless explicitly stated.',
       `ADVERTISING ROLE: ${card.role}. ${ROLE_DESCRIPTIONS[card.role as CardRole] || card.role}.`,

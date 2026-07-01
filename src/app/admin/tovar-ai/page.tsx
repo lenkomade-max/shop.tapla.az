@@ -546,10 +546,10 @@ export default function TovarAIPage() {
             </p>
           </div>
 
-          {/* Цена */}
+          {/* Цена поставщика */}
           <div className="rounded-xl border bg-white p-6 shadow-sm">
             <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-zinc-500">
-              3. Qiymət (ixtiyari)
+              3. Təchizatçı qiyməti (admin üçün)
             </h3>
             <input
               type="text"
@@ -560,7 +560,7 @@ export default function TovarAIPage() {
               className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black disabled:opacity-50"
             />
             <p className="mt-1 text-xs text-zinc-400">
-              Yalnız real qiymət varsa yazın. Boş qoysanız — qiymət göstərilməyəcək.
+              AI-ə GÖNDƏRİLMİR. Yalnız admin üçün qeyd. Satış qiymətini ayrıca təyin edəcəksiniz.
             </p>
           </div>
 
@@ -923,9 +923,22 @@ export default function TovarAIPage() {
                   />
                 </div>
 
-                {/* Цена */}
+                {/* Цена поставщика */}
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-zinc-600">Qiymət (AZN)</label>
+                  <label className="mb-1 block text-xs font-medium text-zinc-600">Təchizatçı qiyməti (admin üçün)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={productData.supplier_price || ''}
+                    onChange={e => updateProductField('supplier_price', parseFloat(e.target.value) || undefined)}
+                    placeholder="AI-ə göndərilmir"
+                    className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black"
+                  />
+                </div>
+
+                {/* Цена продажи */}
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-zinc-600">Satış qiyməti (AZN)</label>
                   <input
                     type="number"
                     step="0.01"

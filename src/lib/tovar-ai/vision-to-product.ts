@@ -33,8 +33,9 @@ export function visionToProductData(
   // Категория — как есть из Vision
   const category = analysis.category
 
-  // Цена: из поля цены или оценка по premium_level
-  const price = parsePrice(priceAz) || estimatePrice(analysis.premium_level)
+  // Цена поставщика (для админки), цена продажи = 0 (админ ставит вручную)
+  const supplier_price = parsePrice(priceAz) || undefined
+  const price = 0
 
   // Преимущества = key_selling_points
   const benefits = analysis.key_selling_points.slice(0, 6)
@@ -64,6 +65,7 @@ export function visionToProductData(
     description,
     category,
     price,
+    supplier_price,
     benefits,
     how_to_use,
     ingredients,
@@ -212,16 +214,3 @@ function parsePrice(priceStr?: string): number | null {
   return parseFloat(match[1].replace(',', '.'))
 }
 
-/**
- * Оценка цены на основе уровня премиальности.
- * Возвращает примерную цену в AZN (для справки админа).
- */
-function estimatePrice(premiumLevel: VisionOutput['premium_level']): number {
-  switch (premiumLevel) {
-    case 'luxury':   return 199
-    case 'premium':  return 79
-    case 'mid':      return 29
-    case 'budget':   return 9
-    default:         return 0
-  }
-}

@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS products (
   description TEXT,
   price DECIMAL(10,2) NOT NULL DEFAULT 0,
   old_price DECIMAL(10,2),
+  supplier_price DECIMAL(10,2),       -- цена поставщика (для админа, в AI не идёт)
   rating DECIMAL(3,1) DEFAULT 0,
   reviews_count INTEGER DEFAULT 0,
   status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'draft', 'archived')),

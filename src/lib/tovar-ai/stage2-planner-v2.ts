@@ -19,7 +19,8 @@ import { TOVAR_AI_CONFIG, type VisionOutput, type PromptsOutput, type CardRole, 
 
 const HARD_RULES = `## HARD RULES — MUST FOLLOW
 
-**LANGUAGE:** ALL visible text in Azerbaijani Latin ONLY. Never English, never Russian, never Cyrillic.
+**NO PRICE:** Never invent or display any price, cost, or currency amount on any card.
+**LANGUAGE:** ALL visible text in Azerbaijani Latin ONLY.
 
 **BRAND & LOGO — CRITICAL DISTINCTION:**
 - PRESERVE manufacturer brand identity: brand name, logo, engraving physically on the product (NARS, Dyson, Apple, NYX, L'Oréal, Samsung, etc.) MUST stay visible and accurate. This is the product's identity — do NOT remove or alter it.
@@ -34,8 +35,7 @@ const HARD_RULES = `## HARD RULES — MUST FOLLOW
 **PRODUCT INTEGRITY:** Never alter product shape, color, or proportions. The product must be recognisable from photo.
 
 **DELIVERY:** Generic "SÜRƏTLİ ÇATDIRILMA" is OK. NEVER claim "pulsuz çatdırılma" or "free delivery".
-**WARRANTY:** ONLY if explicitly mentioned in description. Never invent warranty.
-**PRICE:** ONLY if explicitly provided. Always with "AZN" (e.g. "29 AZN"). Never bare numbers.`
+**WARRANTY:** ONLY if explicitly mentioned in description. Never invent warranty.`
 
 // ─── SYSTEM PROMPT ──────────────────────────────────────────────────────────
 
@@ -98,7 +98,7 @@ Only these should vary:
    - Describe what's DIFFERENT about this specific card
    - Be written in English (Nano Banana works best with English prompts)
    - Be at least 300 words — Nano Banana needs rich, detailed instructions to generate a dense infographic card
-   - **Include 6-10 text labels, badges, callouts, or feature pointers per card** — a card with only 2-3 text elements looks empty. Rich products should have more labels. Distribute them across the composition: headlines, feature callouts with pointer lines, spec badges, benefit tags, price/delivery info where available
+   - **Include 6-10 text labels, badges, callouts, or feature pointers per card** — a card with only 2-3 text elements looks empty. Rich products should have more labels. Distribute them across the composition: headlines, feature callouts with pointer lines, spec badges, benefit tags
    - **CRITICAL: never use words like "minimal", "minimalistic", "clean background", "modern studio", "premium studio" — these tell the image model to strip away typography. Instead describe rich commercial detail: "marketplace infographic card with integrated typography, feature labels, and commercial callouts"**
    - **EVERY prompt_en MUST explicitly include the hard rules: Azerbaijani Latin text only, no CTA buttons, no logos/brand names, no invented data, single frame, product integrity (shape/color/proportions unchanged). Do not assume the image model knows these rules — repeat them in every prompt.**
 
@@ -149,7 +149,6 @@ function buildUserPromptV2(
   analysis: VisionOutput,
   cardCount: number,
   providerDescription?: string,
-  priceAz?: string,
 ): string {
   const parts: string[] = []
 
@@ -162,15 +161,8 @@ function buildUserPromptV2(
     parts.push(providerDescription)
   }
 
-  if (priceAz) {
-    parts.push('')
-    parts.push('## PRICE (use exactly as provided, with AZN)')
-    parts.push(priceAz)
-  } else {
-    parts.push('')
-    parts.push('## PRICE')
-    parts.push('NO PRICE — do not invent or display any price.')
-  }
+  parts.push('')
+  parts.push('## PRICE: never invent')
 
   parts.push('')
   parts.push(HARD_RULES)
@@ -194,12 +186,11 @@ export async function planCardPromptsV2(
   analysis: VisionOutput,
   cardCount: number,
   providerDescription?: string,
-  priceAz?: string,
   styleRefImages?: string[],
 ): Promise<PromptsOutput> {
   const config = TOVAR_AI_CONFIG
   const systemPrompt = buildSystemPrompt(cardCount)
-  const userPrompt = buildUserPromptV2(analysis, cardCount, providerDescription, priceAz)
+  const userPrompt = buildUserPromptV2(analysis, cardCount, providerDescription)
 
   console.log(`[Stage 2 V2] LLM-driven Creative Director — ${cardCount} cards`)
   console.log(`[Stage 2 V2] Product: ${analysis.product_type}, category: ${analysis.category}, premium: ${analysis.premium_level}`)

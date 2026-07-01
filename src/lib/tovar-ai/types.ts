@@ -164,7 +164,7 @@ export interface PipelineInput {
   photoBase64?: string // или сразу base64 (для CLI)
   providerDescription?: string // описание поставщика
   characteristics?: Record<string, string> // доп. характеристики
-  priceAz?: string // цена (напр. "29 AZN") — только если задана юзером
+  priceAz?: string // цена поставщика (сохраняется в supplier_price, в AI НЕ идёт)
   mode?: PipelineMode // 'test' (по умолч.) | 'product'
   supplierUrl?: string // URL поставщика (только в product mode)
   cardCount?: number // сколько карточек генерить (1-10, по умолч. 3)
@@ -205,6 +205,7 @@ export interface ProductDraftData {
   category_id?: string | null     // UUID ссылка на categories.id
   category_slug?: string | null   // slug категории (для URL)
   price: number
+  supplier_price?: number     // цена поставщика (только для админки, в AI не идёт)
   benefits: string[]
   how_to_use: string
   ingredients: string | null

@@ -146,8 +146,8 @@ export async function runTovarAIPipeline(
           console.log('[Pipeline] Stage 2 — Prompt Planning')
           const styleRefs = loadStyleRefImages()
           const p = STAGE2_MODE === 'v2'
-            ? await planCardPromptsV2(productAnalysis, cardCount, input.providerDescription, input.priceAz, styleRefs)
-            : await planCardPrompts(productAnalysis, input.providerDescription, input.characteristics, input.priceAz, input.template)
+            ? await planCardPromptsV2(productAnalysis, cardCount, input.providerDescription, styleRefs)
+            : await planCardPrompts(productAnalysis, input.providerDescription, input.characteristics, input.template)
           console.log(
             `[Pipeline] Stage 2 (${STAGE2_MODE}) ✅ — ${p.cards.length} prompts, roles: ${p.roles.join(', ')}, palette: ${JSON.stringify(p.color_palette)}`,
           )
@@ -245,8 +245,8 @@ export async function runTovarAIPipeline(
 
           const styleRefs = loadStyleRefImages()
           const p = STAGE2_MODE === 'v2'
-            ? await planCardPromptsV2(productAnalysis, cardCount, input.providerDescription, input.priceAz, styleRefs)
-            : await planCardPrompts(productAnalysis, input.providerDescription, input.characteristics, input.priceAz, input.template)
+            ? await planCardPromptsV2(productAnalysis, cardCount, input.providerDescription, styleRefs)
+            : await planCardPrompts(productAnalysis, input.providerDescription, input.characteristics, input.template)
           console.log(
             `[Pipeline] Stage 2 ✅ — ${p.cards.length} prompts, roles: ${p.roles.join(', ')}, palette: ${JSON.stringify(p.color_palette)}`,
           )
@@ -376,7 +376,8 @@ function mergeEnrichedData(
   const subtitle = enriched.subtitle_az || analysis.key_selling_points[0] || ''
   const description = enriched.description_az || buildDescription(analysis)
   const category = analysis.category
-  const price = parsePrice(priceAz) || estimatePrice(analysis.premium_level)
+  const supplier_price = parsePrice(priceAz) || undefined
+  const price = 0 // админ ставит цену продажи вручную
   const benefits = enriched.benefits_az.length > 0
     ? enriched.benefits_az
     : analysis.key_selling_points.slice(0, 6)
@@ -399,6 +400,7 @@ function mergeEnrichedData(
     description,
     category,
     price,
+    supplier_price,
     benefits,
     how_to_use,
     ingredients,
@@ -475,16 +477,6 @@ function parsePrice(priceStr?: string): number | null {
   const match = priceStr.match(/(\d+(?:[.,]\d+)?)/)
   if (!match) return null
   return parseFloat(match[1].replace(',', '.'))
-}
-
-function estimatePrice(premiumLevel: VisionOutput['premium_level']): number {
-  switch (premiumLevel) {
-    case 'luxury': return 199
-    case 'premium': return 79
-    case 'mid': return 29
-    case 'budget': return 9
-    default: return 0
-  }
 }
 
 const AZ_STOP_WORDS = new Set([

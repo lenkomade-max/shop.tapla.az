@@ -35,6 +35,7 @@ export function ProductForm({ product, error: initialError }: Props) {
   const [ingredients, setIngredients] = useState((product?.ingredients as string) || '');
   const [supplierUrl, setSupplierUrl] = useState((product?.supplier_url as string) || '');
   const [price, setPrice] = useState(product?.price != null ? String(product.price) : '');
+  const [supplierPrice, setSupplierPrice] = useState(product?.supplier_price != null ? String(product.supplier_price) : '');
   const [originalPrice, setOriginalPrice] = useState(product?.old_price != null ? String(product.old_price) : '');
   const [rating, setRating] = useState(product?.rating != null ? String(product.rating) : '');
   const [reviewsCount, setReviewsCount] = useState(product?.reviews_count != null ? String(product.reviews_count) : '');
@@ -161,6 +162,7 @@ export function ProductForm({ product, error: initialError }: Props) {
       if (categoryId) fd.append('categoryId', categoryId);
       fd.append('price', price);
       if (originalPrice) fd.append('originalPrice', originalPrice);
+      if (supplierPrice) fd.append('supplierPrice', supplierPrice);
       fd.append('rating', rating || '0');
       fd.append('reviewsCount', reviewsCount || '0');
       fd.append('howToUse', howToUse);
@@ -267,6 +269,15 @@ export function ProductForm({ product, error: initialError }: Props) {
           <div>
             <label className="mb-1 block text-xs font-medium text-zinc-600">Цена *</label>
             <input type="number" step="0.01" min="0" value={price} onChange={e => setPrice(e.target.value)} required
+              className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black" />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-zinc-600">
+              Цена поставщика
+              <span className="ml-1 text-zinc-400 font-normal">(admin)</span>
+            </label>
+            <input type="number" step="0.01" min="0" value={supplierPrice} onChange={e => setSupplierPrice(e.target.value)}
+              placeholder="AI-ə getmir"
               className="block w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black" />
           </div>
           <div>

@@ -153,6 +153,7 @@ export async function saveProduct(formData: FormData): Promise<SaveProductResult
     description: formData.get('description') || '',
     price: Number(formData.get('price')) || 0,
     old_price: formData.get('originalPrice') ? Number(formData.get('originalPrice')) : null,
+    supplier_price: formData.get('supplierPrice') ? Number(formData.get('supplierPrice')) : null,
     rating: Number(formData.get('rating')) || 0,
     reviews_count: Number(formData.get('reviewsCount')) || 0,
     category: formData.get('category') || '',
@@ -224,6 +225,7 @@ export async function createProductFromAI(
     category_id?: string | null
     category_slug?: string | null
     price: number
+    supplier_price?: number
     benefits: string[]
     how_to_use: string
     ingredients?: string | null
@@ -277,6 +279,7 @@ export async function createProductFromAI(
       category: productData.category,
       category_id: productData.category_id || null,
       price: productData.price,
+      supplier_price: productData.supplier_price || null,
       status,
       benefits: productData.benefits,
       how_to_use: productData.how_to_use,
