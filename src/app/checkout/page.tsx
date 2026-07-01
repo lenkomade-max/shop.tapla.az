@@ -350,7 +350,7 @@ export default function CheckoutPage() {
                   <span className="text-neutral-400 uppercase tracking-wider font-semibold">Çatdırılma:</span>
                   <span className="font-bold text-neutral-900 uppercase text-[9px] text-right">
                     {form.deliveryMethod === 'courier_center' && 'Bakı Mərkəz — Kuryer'}
-                    {form.deliveryMethod === 'courier_outskirts' && 'Bakı Mərkəzdən Kənar — Kuryer (kəş)'}
+                    {form.deliveryMethod === 'courier_outskirts' && 'Bakı Mərkəzdən Kənar — Kuryer (Nagd)'}
                     {form.deliveryMethod === 'metro' && `Metro — ${form.metroStation}`}
                     {form.deliveryMethod === 'post' && 'Poçt (Azərpoçt)'}
                   </span>
@@ -570,7 +570,7 @@ export default function CheckoutPage() {
                   <div className="grid grid-cols-1 gap-1.5">
                     {([
                       { value: 'courier_center', label: 'Bakı Mərkəz — Kuryer', sub: 'Kuryer ünvanınıza çatdırır', price: 5 },
-                      { value: 'courier_outskirts', label: 'Bakı Mərkəzdən Kənar — Kuryer', sub: 'Kuryerə kəş ödəniş (5-10 ₼)', price: null as number | null },
+                      { value: 'courier_outskirts', label: 'Bakı Mərkəzdən Kənar — Kuryer', sub: 'Kuryerə Nagd ödəniş (5-10 ₼)', price: null as number | null },
                       { value: 'metro', label: 'Metro ilə Çatdırılma', sub: 'Metro stansiyasında görüş', price: 3 },
                       { value: 'post', label: 'Poçt (Azərpoçt)', sub: 'Azərbaycanın istənilən şəhərinə', price: 5 },
                     ] as const).map(opt => (
@@ -597,7 +597,7 @@ export default function CheckoutPage() {
                           <span className="text-[9px] text-neutral-500 font-sans block truncate">{opt.sub}</span>
                         </div>
                         {opt.value === 'courier_outskirts' ? (
-                          <span className="text-[8px] font-bold text-amber-600 uppercase tracking-wider whitespace-nowrap">Kuriyerə kəş</span>
+                          <span className="text-[8px] font-bold text-amber-600 uppercase tracking-wider whitespace-nowrap">Kuryerə Nagd</span>
                         ) : opt.price !== null && (
                           <span className="text-[11px] font-mono font-bold text-neutral-900 whitespace-nowrap">
                             {isFreeDelivery ? '0 ₼' : `${opt.price} ₼`}
@@ -925,7 +925,7 @@ export default function CheckoutPage() {
                 </div>
                 {form.deliveryMethod === 'courier_outskirts' && (
                   <div className="flex justify-between text-[9px] text-amber-600">
-                    <span className="tracking-wider">Kuryerə kəş (sifarişə daxil deyil):</span>
+                    <span className="tracking-wider">Kuryerə Nagd (sifarişə daxil deyil):</span>
                     <span className="font-semibold">5-10 ₼</span>
                   </div>
                 )}

@@ -111,13 +111,13 @@ export default function SecurePaymentAnimation({
             <motion.div
               animate={{
                 scale: (currentStep === 0 || currentStep === 1 || currentStep === 7) ? 1.1 : 0.95,
-                borderColor: (currentStep === 0 || currentStep === 1 || currentStep === 7) ? "#14b8a6" : "#e2e8f0",
+                borderColor: (currentStep === 0 || currentStep === 1 || currentStep === 7) ? "#3b82f6" : "#e2e8f0",
               }}
               className="w-10 h-10 sm:w-14 sm:h-14 rounded-2xl bg-white border-2 flex items-center justify-center shadow-sm relative"
             >
-              <Globe className={`w-5 h-5 sm:w-6 sm:h-6 ${(currentStep === 0 || currentStep === 1 || currentStep === 7) ? "text-teal-600" : "text-slate-400"}`} />
+              <Globe className={`w-5 h-5 sm:w-6 sm:h-6 ${(currentStep === 0 || currentStep === 1 || currentStep === 7) ? "text-blue-600" : "text-slate-400"}`} />
               {(currentStep === 0 || currentStep === 7) && (
-                <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-teal-500 rounded-full animate-ping" />
+                <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-blue-500 rounded-full animate-ping" />
               )}
             </motion.div>
             <span className="text-[9px] sm:text-[10px] font-bold text-slate-700 mt-1 sm:mt-2">TAPLA</span>
@@ -149,26 +149,26 @@ export default function SecurePaymentAnimation({
             <motion.div
               animate={{
                 scale: (currentStep === 4 || currentStep === 5) ? 1.1 : 0.95,
-                borderColor: (currentStep === 4 || currentStep === 5) ? "#f43f5e" : "#e2e8f0",
+                borderColor: (currentStep === 4 || currentStep === 5) ? "#10b981" : "#e2e8f0",
               }}
               className="w-10 h-10 sm:w-14 sm:h-14 rounded-2xl bg-white border-2 flex items-center justify-center shadow-sm relative"
             >
-              <Smartphone className={`w-5 h-5 sm:w-6 sm:h-6 ${(currentStep === 4 || currentStep === 5) ? "text-rose-600" : "text-slate-400"}`} />
+              <Smartphone className={`w-5 h-5 sm:w-6 sm:h-6 ${(currentStep === 4 || currentStep === 5) ? "text-emerald-600" : "text-slate-400"}`} />
               <AnimatePresence>
                 {(currentStep === 4 || currentStep === 5) && (
                   <motion.div
                     initial={{ opacity: 0, scale: 0.5 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0 }}
-                    className="absolute inset-0 bg-rose-50 rounded-[14px] flex items-center justify-center"
+                    className="absolute inset-0 bg-emerald-50 rounded-[14px] flex items-center justify-center"
                   >
-                    <Fingerprint className="w-5 h-5 sm:w-7 sm:h-7 text-rose-500 animate-pulse" />
+                    <Fingerprint className="w-5 h-5 sm:w-7 sm:h-7 text-emerald-500 animate-pulse" />
                   </motion.div>
                 )}
               </AnimatePresence>
             </motion.div>
             <span className="text-[9px] sm:text-[10px] font-bold text-slate-700 mt-1 sm:mt-2">Bank Tətbiqi</span>
-            <span className="text-[7px] sm:text-[9px] text-rose-500 font-bold font-mono">TƏSDİQ ET</span>
+            <span className="text-[7px] sm:text-[9px] text-emerald-500 font-bold font-mono">TƏSDİQ ET</span>
           </div>
 
           {/* Flow paths */}
@@ -176,14 +176,14 @@ export default function SecurePaymentAnimation({
             <svg className="w-full h-full" viewBox="0 0 400 40" preserveAspectRatio="xMidYMid meet">
               <path d="M 60,20 L 145,20" stroke="#cbd5e1" strokeWidth="2" fill="none" />
               {currentStep === 1 && (
-                <motion.circle r="4" fill="#14b8a6" animate={{ cx: [60, 145] }} transition={{ duration: 0.45, repeat: Infinity, ease: "easeInOut" }} />
+                <motion.circle r="4" fill="#3b82f6" animate={{ cx: [60, 145] }} transition={{ duration: 0.45, repeat: Infinity, ease: "easeInOut" }} />
               )}
               <path d="M 255,20 L 340,20" stroke="#cbd5e1" strokeWidth="2" fill="none" />
               {currentStep === 3 && (
                 <motion.circle r="4" fill="#f59e0b" animate={{ cx: [255, 340] }} transition={{ duration: 0.45, repeat: Infinity, ease: "easeInOut" }} />
               )}
               {currentStep === 5 && (
-                <motion.circle r="4" fill="#f43f5e" animate={{ cx: [340, 255] }} transition={{ duration: 0.45, repeat: Infinity, ease: "easeInOut" }} />
+                <motion.circle r="4" fill="#10b981" animate={{ cx: [340, 255] }} transition={{ duration: 0.45, repeat: Infinity, ease: "easeInOut" }} />
               )}
               {currentStep === 6 && (
                 <motion.circle r="4" fill="#0d9488" animate={{ cx: [145, 60] }} transition={{ duration: 0.45, repeat: Infinity, ease: "easeInOut" }} />
