@@ -342,7 +342,7 @@ export function ProductClient({ product, relatedProducts }: ProductClientProps) 
                 )}
               </div>
               <p className="text-[10px] text-emerald-600 font-semibold tracking-wider uppercase">
-                Bakı daxili pulsuz kuryer çatdırılması (24 saat ərzində)
+                50 AZN-dən yuxarı sifarişlərdə Bakı daxili pulsuz çatdırılma
               </p>
 
               {/* Quick Guarantees — под ценой на мобильных, на десктопе остаётся на месте */}
