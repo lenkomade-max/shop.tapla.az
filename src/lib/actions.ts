@@ -256,6 +256,7 @@ export async function createProductFromAI(
     ingredients?: string | null
     tags: string[]
     images: string[]
+    original_photos?: string[]
     supplier_url?: string
     is_new?: boolean
     shades?: Array<{ name: string; colorHex: string; isHot?: boolean; label?: string }>
@@ -311,6 +312,7 @@ export async function createProductFromAI(
       ingredients: productData.ingredients || null,
       tags: productData.tags,
       images: productData.images,
+      original_photos: productData.original_photos || [],
       supplier_url: productData.supplier_url || null,
       is_new: productData.is_new ?? true,
       shades: productData.shades || [],

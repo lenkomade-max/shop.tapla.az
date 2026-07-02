@@ -95,6 +95,41 @@ function slugify(text: string): string {
   return text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim()
 }
 
+function base64ToFile(base64: string, name: string): File {
+  const byteChars = atob(base64)
+  const byteNums = new Array(byteChars.length)
+  for (let i = 0; i < byteChars.length; i++) {
+    byteNums[i] = byteChars.charCodeAt(i)
+  }
+  const byteArr = new Uint8Array(byteNums)
+  const ext = name.split('.').pop()?.toLowerCase() || 'png'
+  const mime = ext === 'jpg' || ext === 'jpeg' ? 'image/jpeg'
+    : ext === 'webp' ? 'image/webp'
+    : ext === 'gif' ? 'image/gif'
+    : 'image/png'
+  return new File([byteArr], name, { type: mime })
+}
+
+async function uploadPhotosToR2(photos: { base64: string; name: string }[]): Promise<string[]> {
+  const urls: string[] = []
+  for (const photo of photos) {
+    try {
+      const file = base64ToFile(photo.base64, photo.name)
+      const fd = new FormData()
+      fd.append('file', file, photo.name)
+      fd.append('folder', 'products')
+      const resp = await fetch('/api/upload-image', { method: 'POST', body: fd })
+      if (resp.ok) {
+        const data = await resp.json()
+        if (data.url) urls.push(data.url)
+      }
+    } catch {
+      // молча — не критично
+    }
+  }
+  return urls
+}
+
 export default function TovarAIPage() {
   // ─── Общие состояния ──────────────────────────────────────────────────
   const [mode, setMode] = useState<Mode>('product')
@@ -122,6 +157,7 @@ export default function TovarAIPage() {
   const [imageUrls, setImageUrls] = useState<string[] | null>(null)
   const [cleanPhoto, setCleanPhoto] = useState<KieImageToImageResult | null>(null)
   const [savedProductId, setSavedProductId] = useState<string | null>(null)
+  const [originalPhotoUrls, setOriginalPhotoUrls] = useState<string[]>([])
   const [saving, setSaving] = useState(false)
   const [categories, setCategories] = useState<Array<{ id: string; slug: string; title: string; parent_id: string | null }>>([])
   const [cardCount, setCardCount] = useState(3)
@@ -245,12 +281,16 @@ export default function TovarAIPage() {
 
       // ─── Product mode: авто-сохранение как черновик ──────────────────
       if (mode === 'product' && data.success && data.productData && data.imageUrls?.length) {
-        // Добавляем cleanPhoto в images если есть
+        // Загружаем оригинальные фото в R2
+        const origUrls = photos.length > 0 ? await uploadPhotosToR2(photos) : []
+        if (origUrls.length > 0) setOriginalPhotoUrls(origUrls)
+
+        // Изображения: карточки сначала, чистое фото (grok) — последним
         const allImages = [...data.imageUrls]
         if (data.cleanPhoto?.success && data.cleanPhoto.imageUrl) {
-          allImages.unshift(data.cleanPhoto.imageUrl)
+          allImages.push(data.cleanPhoto.imageUrl)
         }
-        const finalData = {
+        const finalData: Record<string, unknown> = {
           ...data.productData,
           images: allImages,
           features: data.productData.features || undefined,
@@ -261,8 +301,11 @@ export default function TovarAIPage() {
           faq: data.productData.faq || undefined,
           search_keywords: data.productData.search_keywords || undefined,
         }
+        if (origUrls.length > 0) {
+          finalData.original_photos = origUrls
+        }
         try {
-          const id = await createProductFromAI(finalData, 'draft')
+          const id = await createProductFromAI(finalData as any, 'draft')
           if (id) {
             setSavedProductId(id)
             setProductData(prev => prev ? { ...prev } : prev)
@@ -347,9 +390,9 @@ export default function TovarAIPage() {
     try {
       const allImages = [...(imageUrls || [])]
       if (cleanPhoto?.success && cleanPhoto.imageUrl) {
-        allImages.unshift(cleanPhoto.imageUrl)
+        allImages.push(cleanPhoto.imageUrl)
       }
-      const finalData = {
+      const finalData: Record<string, unknown> = {
         ...productData,
         images: allImages,
         features: productData.features || undefined,
@@ -360,7 +403,10 @@ export default function TovarAIPage() {
         faq: productData.faq || undefined,
         search_keywords: productData.search_keywords || undefined,
       }
-      const id = await createProductFromAI(finalData, 'draft')
+      if (originalPhotoUrls.length > 0) {
+        finalData.original_photos = originalPhotoUrls
+      }
+      const id = await createProductFromAI(finalData as any, 'draft')
       if (id) {
         setSavedProductId(id)
       } else {
@@ -371,7 +417,7 @@ export default function TovarAIPage() {
     } finally {
       setSaving(false)
     }
-  }, [productData, imageUrls, cleanPhoto, saving])
+  }, [productData, imageUrls, cleanPhoto, originalPhotoUrls, saving])
 
   const handlePublish = useCallback(async () => {
     if (!productData || saving) return
@@ -380,9 +426,9 @@ export default function TovarAIPage() {
     try {
       const allImages = [...(imageUrls || [])]
       if (cleanPhoto?.success && cleanPhoto.imageUrl) {
-        allImages.unshift(cleanPhoto.imageUrl)
+        allImages.push(cleanPhoto.imageUrl)
       }
-      const finalData = {
+      const finalData: Record<string, unknown> = {
         ...productData,
         images: allImages,
         features: productData.features || undefined,
@@ -393,7 +439,10 @@ export default function TovarAIPage() {
         faq: productData.faq || undefined,
         search_keywords: productData.search_keywords || undefined,
       }
-      const id = await createProductFromAI(finalData, 'active')
+      if (originalPhotoUrls.length > 0) {
+        finalData.original_photos = originalPhotoUrls
+      }
+      const id = await createProductFromAI(finalData as any, 'active')
       if (id) {
         setSavedProductId(id)
       } else {
@@ -404,7 +453,7 @@ export default function TovarAIPage() {
     } finally {
       setSaving(false)
     }
-  }, [productData, imageUrls, cleanPhoto, saving])
+  }, [productData, imageUrls, cleanPhoto, originalPhotoUrls, saving])
 
   // ─── Скачать всё ──────────────────────────────────────────────────────
 
@@ -842,7 +891,7 @@ export default function TovarAIPage() {
           {/* ════════════════════════════════════════════════════════════════
               PRODUCT MODE: Форма редактирования данных товара
              ════════════════════════════════════════════════════════════════ */}
-          {mode === 'product' && productData && stage === 'done' && !savedProductId && (
+          {mode === 'product' && productData && stage === 'done' && (
             <div className="rounded-xl border bg-white p-6 shadow-sm">
               <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-zinc-500">
                 Məhsul məlumatları (AI-dən)
