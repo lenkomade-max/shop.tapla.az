@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120" width="400" height="240">
+  <circle cx="75.5" cy="60" r="39" fill="#EB001B" />
+  <circle cx="124.5" cy="60" r="39" fill="#F79E1B" />
+  <clipPath id="mc-clip">
+    <circle cx="75.5" cy="60" r="39" />
+  </clipPath>
+  <circle cx="124.5" cy="60" r="39" fill="#FF5F00" clip-path="url(#mc-clip)" />
+</svg>
