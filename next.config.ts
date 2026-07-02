@@ -43,6 +43,7 @@ const nextConfig: NextConfig = {
       { source: '/checkout', destination: '/sifaris', permanent: true },
       { source: '/collections', destination: '/koleksiyalar', permanent: true },
       { source: '/collections/:slug', destination: '/koleksiyalar/:slug', permanent: true },
+      { source: '/category', destination: '/kateqoriya', permanent: true },
       { source: '/category/:slug', destination: '/kateqoriya/:slug', permanent: true },
       { source: '/profile', destination: '/profil', permanent: true },
       // Legal pages: английские алиасы → азербайджанские
