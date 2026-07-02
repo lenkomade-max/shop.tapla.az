@@ -27,6 +27,8 @@ const nextConfig: NextConfig = {
       { source: '/mehsullar/:slug', destination: '/products/:slug' },
       { source: '/sifaris', destination: '/checkout' },
       { source: '/koleksiyalar', destination: '/collections' },
+      { source: '/koleksiyalar/:slug', destination: '/collections/:slug' },
+      { source: '/kateqoriya', destination: '/mehsullar' },
       { source: '/kateqoriya/:slug', destination: '/category/:slug' },
       { source: '/profil', destination: '/profile' },
     ];
@@ -41,6 +43,7 @@ const nextConfig: NextConfig = {
       { source: '/products/:slug', destination: '/mehsullar/:slug', permanent: true },
       { source: '/checkout', destination: '/sifaris', permanent: true },
       { source: '/collections', destination: '/koleksiyalar', permanent: true },
+      { source: '/collections/:slug', destination: '/koleksiyalar/:slug', permanent: true },
       { source: '/category/:slug', destination: '/kateqoriya/:slug', permanent: true },
       { source: '/profile', destination: '/profil', permanent: true },
       // Legal pages: английские алиасы → азербайджанские

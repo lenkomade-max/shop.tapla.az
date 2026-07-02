@@ -207,9 +207,24 @@ export const dbService = {
     return [];
   },
 
-  // ——— Категории (источник истины — CATEGORIES константа) ———
+  // ——— Категории (из Supabase) ———
 
   async getCategories(): Promise<Category[]> {
+    try {
+      if (supabaseAdmin) {
+        const { data, error } = await supabaseAdmin
+          .from('categories')
+          .select('*')
+          .eq('status', 'active')
+          .order('sort_order', { ascending: true });
+        if (!error && data && data.length > 0) {
+          return (data as Record<string, unknown>[]).map(mapCategory);
+        }
+      }
+    } catch (err) {
+      console.warn('DB categories fetch failed, using local fallback:', err);
+    }
+    // Fallback — если БД недоступна, используем константу
     return CATEGORIES.filter(c => c.status === 'active');
   },
 
@@ -219,6 +234,36 @@ export const dbService = {
   },
 
   async getCategoryBySlug(slug: string): Promise<Category | null> {
+    try {
+      if (supabaseAdmin) {
+        const { data, error } = await supabaseAdmin
+          .from('categories')
+          .select('*')
+          .eq('slug', slug)
+          .eq('status', 'active')
+          .maybeSingle();
+        if (!error && data) {
+          const cat = mapCategory(data as Record<string, unknown>);
+
+          // Get children
+          const { data: children } = await supabaseAdmin
+            .from('categories')
+            .select('*')
+            .eq('parent_id', cat.id)
+            .eq('status', 'active')
+            .order('sort_order', { ascending: true });
+          if (children) {
+            cat.children = (children as Record<string, unknown>[]).map(mapCategory);
+          }
+
+          return cat;
+        }
+      }
+    } catch (err) {
+      console.warn(`DB category fetch for slug ${slug} failed, using local fallback:`, err);
+    }
+
+    // Fallback — если БД недоступна
     const all = CATEGORIES.filter(c => c.status === 'active');
     const cat = all.find(c => c.slug === slug) ?? null;
     if (cat) {
