@@ -107,8 +107,8 @@ export default function TovarAIPage() {
   const [regeneratingIndex, setRegeneratingIndex] = useState<number | null>(null)
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
 
-  // Фото
-  const [photo, setPhoto] = useState<{ base64: string; name: string; size: number } | null>(null)
+  // Фото (несколько — для генерации и референсов)
+  const [photos, setPhotos] = useState<{ base64: string; name: string; size: number }[]>([])
   const [dragOver, setDragOver] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
@@ -146,7 +146,7 @@ export default function TovarAIPage() {
     const reader = new FileReader()
     reader.onload = () => {
       const base64 = (reader.result as string).split(',')[1]
-      setPhoto({ base64, name: file.name, size: file.size })
+      setPhotos(prev => [...prev, { base64, name: file.name, size: file.size }])
     }
     reader.readAsDataURL(file)
   }, [])
@@ -154,8 +154,8 @@ export default function TovarAIPage() {
   const onDrop = useCallback((e: DragEvent) => {
     e.preventDefault()
     setDragOver(false)
-    const file = e.dataTransfer.files[0]
-    if (file) handleFile(file)
+    const files = Array.from(e.dataTransfer.files)
+    files.forEach(f => handleFile(f))
   }, [handleFile])
 
   // ─── Вставка из буфера (Ctrl+V / Cmd+V) — глобальный ──────────────
@@ -183,15 +183,15 @@ export default function TovarAIPage() {
   const onDragOver = (e: DragEvent) => { e.preventDefault(); setDragOver(true) }
   const onDragLeave = () => setDragOver(false)
 
-  const removePhoto = () => {
-    setPhoto(null)
+  const removePhoto = (index: number) => {
+    setPhotos(prev => prev.filter((_, i) => i !== index))
     if (fileRef.current) fileRef.current.value = ''
   }
 
   // ─── Генерация ────────────────────────────────────────────────────────
 
   const generate = useCallback(async () => {
-    if (!photo) {
+    if (photos.length === 0) {
       setError('Əvvəlcə məhsul şəklini yükləyin')
       return
     }
@@ -211,7 +211,7 @@ export default function TovarAIPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          photoBase64: photo.base64,
+          photoBase64: photos[0].base64,
           providerDescription: description.trim() || undefined,
           priceAz: price.trim() || undefined,
           mode: mode,
@@ -276,7 +276,7 @@ export default function TovarAIPage() {
       setStage('error')
       setElapsed(((Date.now() - start) / 1000))
     }
-  }, [photo, description, price, mode, supplierUrl, cardCount])
+  }, [photos, description, price, mode, supplierUrl, cardCount])
 
   // ─── Регенерация одной карточки ───────────────────────────────────────
 
@@ -297,7 +297,7 @@ export default function TovarAIPage() {
   }, [lightboxIndex, cards.length])
 
   const regenerateCard = useCallback(async (index: number) => {
-    if (!photo || regeneratingIndex !== null) return
+    if (photos.length === 0 || regeneratingIndex !== null) return
 
     const promptData = cardPrompts.find(p => p.index === index)
     if (!promptData) {
@@ -313,7 +313,7 @@ export default function TovarAIPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          photoBase64: photo.base64,
+          photoBase64: photos[0].base64,
           cardPrompt: promptData,
         }),
       })
@@ -336,7 +336,7 @@ export default function TovarAIPage() {
     } finally {
       setRegeneratingIndex(null)
     }
-  }, [photo, cardPrompts, regeneratingIndex])
+  }, [photos, cardPrompts, regeneratingIndex])
 
   // ─── Сохранение товара (product mode) ─────────────────────────────────
 
@@ -477,53 +477,73 @@ export default function TovarAIPage() {
           {/* Drag & Drop фото */}
           <div className="rounded-xl border bg-white p-6 shadow-sm">
             <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-zinc-500">
-              1. Məhsul şəkli *
+              1. Məhsul şəkilləri *{' '}
+              <span className="font-normal text-zinc-400 text-xs">
+                ({photos.length} şəkil)
+              </span>
             </h3>
 
-            {photo ? (
-              <div className="relative">
-                <img
-                  src={`data:image/jpeg;base64,${photo.base64}`}
-                  alt={photo.name}
-                  className="w-full rounded-lg border object-cover aspect-square"
-                />
-                <button
-                  onClick={removePhoto}
-                  disabled={isBusy}
-                  className="absolute top-2 right-2 rounded-full bg-white/90 p-1.5 shadow hover:bg-white disabled:opacity-50"
-                >
-                  <X className="h-4 w-4 text-zinc-600" />
-                </button>
-                <p className="mt-2 text-xs text-zinc-400 text-center">
-                  {photo.name} • {(photo.size / 1024).toFixed(0)} KB
-                </p>
-              </div>
-            ) : (
-              <div
-                onDrop={onDrop}
-                onDragOver={onDragOver}
-                onDragLeave={onDragLeave}
-                onClick={() => fileRef.current?.click()}
-                className={`flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-12 cursor-pointer transition outline-none focus:border-black ${
-                  dragOver
-                    ? 'border-black bg-zinc-50'
-                    : 'border-zinc-300 hover:border-zinc-400'
-                }`}
-              >
-                <Upload className={`h-8 w-8 mb-3 ${dragOver ? 'text-black' : 'text-zinc-300'}`} />
-                <p className="text-sm font-medium text-zinc-600">
-                  Şəkili buraxın və ya klikləyin
-                </p>
-                <p className="text-xs text-zinc-400 mt-1">
-                  JPG, PNG, WebP • max 20 MB
-                </p>
+            {/* Сетка загруженных фото */}
+            {photos.length > 0 && (
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                {photos.map((p, i) => (
+                  <div key={i} className="relative rounded-lg border bg-zinc-50 overflow-hidden">
+                    <img
+                      src={`data:image/jpeg;base64,${p.base64}`}
+                      alt={p.name}
+                      className="w-full aspect-square object-cover"
+                    />
+                    {i === 0 && (
+                      <span className="absolute top-2 left-2 rounded bg-black px-2 py-0.5 text-[10px] font-bold text-white">
+                        Əsas
+                      </span>
+                    )}
+                    <button
+                      onClick={() => removePhoto(i)}
+                      disabled={isBusy}
+                      className="absolute top-2 right-2 rounded-full bg-white/90 p-1 shadow hover:bg-white disabled:opacity-50"
+                    >
+                      <X className="h-3.5 w-3.5 text-zinc-600" />
+                    </button>
+                    <p className="p-2 text-[10px] text-zinc-400 truncate">
+                      {p.name} • {(p.size / 1024).toFixed(0)} KB
+                    </p>
+                  </div>
+                ))}
               </div>
             )}
+
+            {/* Зона добавления */}
+            <div
+              onDrop={onDrop}
+              onDragOver={onDragOver}
+              onDragLeave={onDragLeave}
+              onClick={() => fileRef.current?.click()}
+              className={`flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 cursor-pointer transition outline-none focus:border-black ${
+                dragOver
+                  ? 'border-black bg-zinc-50'
+                  : 'border-zinc-300 hover:border-zinc-400'
+              }`}
+            >
+              <Upload className={`h-6 w-6 mb-2 ${dragOver ? 'text-black' : 'text-zinc-300'}`} />
+              <p className="text-sm font-medium text-zinc-600">
+                {photos.length === 0
+                  ? 'Şəkili buraxın və ya klikləyin'
+                  : 'Daha şəkil əlavə edin'}
+              </p>
+              <p className="text-xs text-zinc-400 mt-1">
+                JPG, PNG, WebP • max 20 MB • bir neçə şəkil əlavə edə bilərsiniz
+              </p>
+            </div>
             <input
               ref={fileRef}
               type="file"
               accept="image/*"
-              onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f) }}
+              multiple
+              onChange={e => {
+                const files = Array.from(e.target.files || []);
+                files.forEach(f => handleFile(f));
+              }}
               className="hidden"
             />
           </div>
@@ -618,7 +638,7 @@ export default function TovarAIPage() {
           {/* Кнопка генерации */}
           <button
             onClick={generate}
-            disabled={!photo || isBusy}
+            disabled={photos.length === 0 || isBusy}
             className="inline-flex items-center gap-2 rounded-lg bg-black px-8 py-3 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-40 disabled:cursor-not-allowed w-full justify-center"
           >
             {isBusy ? (
