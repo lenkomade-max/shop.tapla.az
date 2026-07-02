@@ -28,7 +28,6 @@ const nextConfig: NextConfig = {
       { source: '/sifaris', destination: '/checkout' },
       { source: '/koleksiyalar', destination: '/collections' },
       { source: '/koleksiyalar/:slug', destination: '/collections/:slug' },
-      { source: '/kateqoriya', destination: '/mehsullar' },
       { source: '/kateqoriya/:slug', destination: '/category/:slug' },
       { source: '/profil', destination: '/profile' },
     ];
