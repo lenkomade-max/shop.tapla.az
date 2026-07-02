@@ -270,6 +270,7 @@ export interface PipelineResult {
   cards: CardResult[]
   qa_results: QAResult[]
   cost: number
+  error?: string // сообщение об ошибке при status: 'failed'
   productData?: ProductDraftData // только в product mode
   imageUrls?: string[] // R2 URLs сгенерированных карточек
   enrichedData?: EnricherOutput // Stage 1.5 — данные до мержа с детерминированными полями

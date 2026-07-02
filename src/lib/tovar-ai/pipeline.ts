@@ -314,10 +314,11 @@ export async function runTovarAIPipeline(
     const errorMsg = err instanceof Error ? err.message : String(err)
     console.error(`[Pipeline] ❌ Failed at stage "${status}":`, errorMsg)
 
-    // Возвращаем частичный результат — то что успели
+    // Возвращаем частичный результат — то что успели, + сообщение об ошибке для UI
     return {
       generationId: '',
       status,
+      error: errorMsg,
       product_analysis: productAnalysis!,
       prompts: prompts!,
       cards,

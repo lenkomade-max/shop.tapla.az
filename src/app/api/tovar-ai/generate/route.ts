@@ -58,6 +58,7 @@ export async function POST(request: Request) {
       qa_results: result.qa_results,
       cost: result.cost,
       status: result.status,
+      error: result.error ?? null, // сообщение об ошибке при status: 'failed'
       // Product mode — данные товара и R2 URLs
       productData: result.productData ?? null,
       imageUrls: result.imageUrls ?? null,

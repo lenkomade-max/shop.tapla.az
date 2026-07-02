@@ -277,6 +277,9 @@ export default function TovarAIPage() {
         setCleanPhoto(data.cleanPhoto)
       }
 
+      if (!data.success && data.error) {
+        setError(data.error)
+      }
       setStage(data.success ? 'done' : 'error')
 
       // ─── Product mode: авто-сохранение как черновик ──────────────────
