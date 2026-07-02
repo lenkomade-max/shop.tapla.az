@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useCallback } from 'react'
+import Image from 'next/image'
 import { Loader2, CheckCircle2, XCircle, ImageIcon, RefreshCw } from 'lucide-react'
 
 type Stage = 'idle' | 'analyzing' | 'planning' | 'generating' | 'done' | 'error'
@@ -16,6 +17,7 @@ interface Props {
   productId: string
   productName: string
   mainImage: string | null
+  originalPhotos: string[]
 }
 
 const ROLE_LABELS: Record<string, string> = {
@@ -37,7 +39,7 @@ const STAGE_LABELS: Record<Stage, string> = {
   error: 'Xəta baş verdi',
 }
 
-export function GenerateCardsClient({ productId, productName, mainImage }: Props) {
+export function GenerateCardsClient({ productId, productName, mainImage, originalPhotos }: Props) {
   const [stage, setStage] = useState<Stage>('idle')
   const [cards, setCards] = useState<CardData[]>([])
   const [error, setError] = useState('')
@@ -97,17 +99,27 @@ export function GenerateCardsClient({ productId, productName, mainImage }: Props
 
         <div className="grid grid-cols-2 gap-6">
           <div>
-            <p className="mb-1 text-xs font-medium text-zinc-600">Məhsulun əsas şəkili</p>
+            <p className="mb-1 text-xs font-medium text-zinc-600">
+              {originalPhotos.length > 0 ? 'Orijinal foto (əsas)' : 'Məhsulun əsas şəkili'}
+            </p>
             {mainImage ? (
-              <img
-                src={mainImage}
-                alt={productName}
-                className="w-full max-w-xs rounded-lg border object-cover aspect-square"
-              />
+              <div className="relative w-full max-w-xs aspect-square">
+                <Image
+                  src={mainImage}
+                  alt={productName}
+                  fill
+                  className="rounded-lg border object-cover"
+                />
+              </div>
             ) : (
               <div className="w-full max-w-xs aspect-square rounded-lg border bg-zinc-100 flex items-center justify-center text-zinc-400 text-sm">
                 Şəkil yoxdur
               </div>
+            )}
+            {originalPhotos.length > 0 && (
+              <p className="mt-1 text-xs text-zinc-400">
+                Orijinal fotodan generasiya • {originalPhotos.length} orijinal foto yüklənib
+              </p>
             )}
           </div>
 
@@ -210,6 +222,7 @@ export function GenerateCardsClient({ productId, productName, mainImage }: Props
           <div className="grid grid-cols-3 gap-4">
             {cards.map(card => (
               <div key={card.index} className="rounded-lg border bg-zinc-50 overflow-hidden">
+                {/* eslint-disable-next-line @next/next/no-img-element — base64 data URI */}
                 <img
                   src={`data:image/png;base64,${card.imageBase64}`}
                   alt={`Card ${card.index}`}

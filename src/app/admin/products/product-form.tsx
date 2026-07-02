@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback, DragEvent, useRef } from 'reac
 import { useRouter } from 'next/navigation';
 import { saveProduct } from '@/lib/actions';
 import { fetchActiveCategories } from '@/lib/actions';
-import { Upload, Loader2, X } from 'lucide-react';
+import { Upload, Loader2 } from 'lucide-react';
 import { PriceCalculator } from '@/components/PriceCalculator';
 
 interface Props {
@@ -79,6 +79,9 @@ export function ProductForm({ product, error: initialError }: Props) {
 
   const [images, setImages] = useState<string[]>(
     Array.isArray(product?.images) ? (product?.images as string[]) : ['']
+  );
+  const [originalPhotos, setOriginalPhotos] = useState<string[]>(
+    Array.isArray(product?.original_photos) ? (product?.original_photos as string[]) : ['']
   );
   const [benefits, setBenefits] = useState<string[]>(
     Array.isArray(product?.benefits) ? (product?.benefits as string[]) : ['']
@@ -207,6 +210,7 @@ export function ProductForm({ product, error: initialError }: Props) {
       if (tryOnEnabled) fd.append('tryOnEnabled', 'true');
 
       images.filter(Boolean).forEach(img => fd.append('images', img));
+      originalPhotos.filter(Boolean).forEach(img => fd.append('originalPhotos', img));
       benefits.filter(Boolean).forEach(b => fd.append('benefits', b));
       tags.filter(Boolean).forEach(t => fd.append('tags', t));
       fd.append('shades', JSON.stringify(shades.filter(s => s.name)));
@@ -378,6 +382,105 @@ export function ProductForm({ product, error: initialError }: Props) {
         currentPrice={price}
         onApply={(val) => setPrice(String(val))}
       />
+
+      {/* Orijinal Fotolar — yalnız admin üçün */}
+      <section className="rounded-xl border bg-white p-6 shadow-sm">
+        <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-zinc-500">
+          Orijinal Fotolar
+          <span className="ml-2 text-xs font-normal text-zinc-400">(yalnız admin — müştərilərə görsənmir)</span>
+          <button type="button" onClick={() => setOriginalPhotos([...originalPhotos, ''])}
+            className="ml-3 text-xs font-normal text-zinc-400 hover:text-black">+ URL</button>
+        </h3>
+
+        <div
+          onDrop={async (e) => {
+            e.preventDefault(); setUploadDragOver(false);
+            const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+            for (const file of files) {
+              const url = await uploadToR2(file);
+              if (url) setOriginalPhotos(prev => [...prev.filter(Boolean), url]);
+            }
+          }}
+          onDragOver={e => { e.preventDefault(); setUploadDragOver(true); }}
+          onDragLeave={() => setUploadDragOver(false)}
+          onClick={() => fileInputRef.current?.click()}
+          className={`flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 cursor-pointer transition mb-4 outline-none focus:border-black ${
+            uploadDragOver ? 'border-black bg-zinc-50' : 'border-zinc-300 hover:border-zinc-400'
+          }`}
+        >
+          {uploading ? (
+            <Loader2 className="h-6 w-6 animate-spin text-black mb-2" />
+          ) : (
+            <Upload className={`h-6 w-6 mb-2 ${uploadDragOver ? 'text-black' : 'text-zinc-300'}`} />
+          )}
+          <p className="text-sm font-medium text-zinc-600">
+            {uploading ? 'Yüklənir...' : 'Orijinal şəkili buraxın və ya klikləyin'}
+          </p>
+          <p className="text-xs text-zinc-400 mt-1">JPG, PNG, WebP • max 20 MB</p>
+        </div>
+
+        <div className="space-y-2">
+          {originalPhotos.map((url, i) => (
+            <div key={i} className="flex items-center gap-2 rounded-lg border bg-zinc-50 p-2">
+              <div className="flex flex-col gap-0.5 shrink-0">
+                <button type="button"
+                  disabled={i === 0}
+                  onClick={() => {
+                    const next = [...originalPhotos];
+                    [next[i-1], next[i]] = [next[i], next[i-1]];
+                    setOriginalPhotos(next);
+                  }}
+                  className="text-xs text-zinc-400 hover:text-black disabled:opacity-20 disabled:cursor-not-allowed leading-none px-0.5"
+                  title="Yuxarı"
+                >▲</button>
+                <button type="button"
+                  disabled={i === originalPhotos.length - 1}
+                  onClick={() => {
+                    const next = [...originalPhotos];
+                    [next[i], next[i+1]] = [next[i+1], next[i]];
+                    setOriginalPhotos(next);
+                  }}
+                  className="text-xs text-zinc-400 hover:text-black disabled:opacity-20 disabled:cursor-not-allowed leading-none px-0.5"
+                  title="Aşağı"
+                >▼</button>
+              </div>
+              {url ? (
+                <img src={url} alt="" className="h-12 w-12 rounded-md object-cover border shrink-0" />
+              ) : (
+                <div className="h-12 w-12 rounded-md border bg-zinc-100 flex items-center justify-center shrink-0">
+                  <Upload className="h-4 w-4 text-zinc-300" />
+                </div>
+              )}
+              <input
+                value={url}
+                onChange={e => {
+                  const next = [...originalPhotos];
+                  next[i] = e.target.value;
+                  setOriginalPhotos(next);
+                }}
+                placeholder="https://... və ya yuxarıdan şəkil yükləyin"
+                className="flex-1 rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-black"
+              />
+              <button type="button" onClick={() => setOriginalPhotos(originalPhotos.filter((_, j) => j !== i))}
+                className="text-xs text-red-400 hover:text-red-600 shrink-0 p-1">✕</button>
+            </div>
+          ))}
+        </div>
+        {originalPhotos.some(u => u) && (
+          <p className="mt-2 text-xs text-zinc-400">
+            {originalPhotos.filter(Boolean).length} orijinal foto • AI kart yaratmaq üçün istifadə olunur
+          </p>
+        )}
+
+        {isEdit && originalPhotos.some(u => u) && (
+          <a
+            href={`/admin/products/${product?.id}/generate-cards`}
+            className="mt-3 inline-flex items-center gap-2 rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 transition"
+          >
+            AI ilə kart yarat
+          </a>
+        )}
+      </section>
 
       {/* Изображения */}
       <section className="rounded-xl border bg-white p-6 shadow-sm">

@@ -139,6 +139,7 @@ export async function saveProduct(formData: FormData): Promise<SaveProductResult
   }
 
   const images = formData.getAll('images').filter(Boolean) as string[]
+  const originalPhotos = formData.getAll('originalPhotos').filter(Boolean) as string[]
   const benefits = formData.getAll('benefits').filter(Boolean) as string[]
   const tags = formData.getAll('tags').filter(Boolean) as string[]
 
@@ -188,6 +189,7 @@ export async function saveProduct(formData: FormData): Promise<SaveProductResult
     is_new: formData.get('isNew') === 'true',
     try_on_enabled: formData.get('tryOnEnabled') === 'true',
     images,
+    original_photos: originalPhotos,
     benefits,
     tags,
     shades,

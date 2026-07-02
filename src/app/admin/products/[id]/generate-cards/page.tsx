@@ -12,7 +12,7 @@ export default async function GenerateCardsPage({ params }: Props) {
 
   const { data: product } = await supabaseAdmin
     .from('products')
-    .select('id, name, title, slug, images')
+    .select('id, name, title, slug, images, original_photos')
     .eq('id', id)
     .single()
 
@@ -27,9 +27,16 @@ export default async function GenerateCardsPage({ params }: Props) {
     )
   }
 
-  const mainImage = Array.isArray(product.images) && product.images.length > 0
-    ? String(product.images[0])
-    : null
+  const originalPhotos: string[] = Array.isArray(product.original_photos)
+    ? (product.original_photos as string[]).filter(Boolean)
+    : []
+
+  // Приоритет: первое оригинальное фото, затем первое изображение
+  const mainImage = originalPhotos.length > 0
+    ? originalPhotos[0]
+    : (Array.isArray(product.images) && product.images.length > 0
+        ? String(product.images[0])
+        : null)
 
   return (
     <div>
@@ -40,6 +47,12 @@ export default async function GenerateCardsPage({ params }: Props) {
             className="text-xs text-zinc-400 hover:text-black mb-1 inline-block"
           >
             ← Товары
+          </Link>
+          <Link
+            href={`/admin/products/${id}/edit`}
+            className="text-xs text-zinc-400 hover:text-black mb-1 inline-block ml-3"
+          >
+            ← Редактировать
           </Link>
           <h2 className="text-xl font-bold">Генерация карточек</h2>
           <p className="text-sm text-zinc-500 mt-0.5">
@@ -52,6 +65,7 @@ export default async function GenerateCardsPage({ params }: Props) {
         productId={product.id}
         productName={product.name || product.title || ''}
         mainImage={mainImage}
+        originalPhotos={originalPhotos}
       />
     </div>
   )

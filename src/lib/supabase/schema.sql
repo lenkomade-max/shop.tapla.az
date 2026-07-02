@@ -619,3 +619,8 @@ ALTER TABLE orders ADD COLUMN IF NOT EXISTS metro_station TEXT;
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS postal_code TEXT;
 ALTER TABLE orders DROP CONSTRAINT IF EXISTS orders_delivery_method_check;
 ALTER TABLE orders ADD CONSTRAINT orders_delivery_method_check CHECK (delivery_method IN ('courier_center', 'courier_outskirts', 'metro', 'post'));
+
+-- ============================================================================
+-- Миграция 2026-07-02: original_photos для товаров
+-- ============================================================================
+ALTER TABLE products ADD COLUMN IF NOT EXISTS original_photos JSONB DEFAULT '[]'::jsonb;
