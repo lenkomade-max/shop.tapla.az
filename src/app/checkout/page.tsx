@@ -79,6 +79,9 @@ export default function CheckoutPage() {
   const [generatedOrderNumber, setGeneratedOrderNumber] = useState('');
   const [orderError, setOrderError] = useState('');
   const [orderItems, setOrderItems] = useState<Array<{ name: string; price: number; quantity: number; shade?: string }>>([]);
+  const [acceptedTerms, setAcceptedTerms] = useState(true);
+  const [showStickyFooter, setShowStickyFooter] = useState(false);
+  const footerSentinelRef = useRef<HTMLDivElement>(null);
 
   // Local form state
   const [form, setForm] = useState<CheckoutForm>({
@@ -171,6 +174,17 @@ export default function CheckoutPage() {
       })
     }
   }, [orderConfirmed]);
+
+  useEffect(() => {
+    const sentinel = footerSentinelRef.current;
+    if (!sentinel) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setShowStickyFooter(!entry.isIntersecting),
+      { rootMargin: '-1px 0px 0px 0px' }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [mounted]);
 
   if (!mounted) {
     return <div className="min-h-screen bg-[#FAF9F6] pt-32 text-center text-xs uppercase tracking-widest font-mono">Yüklənir...</div>;
@@ -523,10 +537,10 @@ export default function CheckoutPage() {
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+          <><div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
             {/* Left: Input Form details */}
             <div className="lg:col-span-7 bg-white border border-neutral-100 p-6 sm:p-8 space-y-8 shadow-xs rounded-xl">
-              <form ref={formRef} onSubmit={handleSubmit} className="space-y-8">
+              <form ref={formRef} id="checkout-form" onSubmit={handleSubmit} className="space-y-8">
                 {/* Section 1: Customer Details */}
                 <div className="space-y-4">
                   <div className="flex items-center space-x-2 border-b border-neutral-100 pb-2">
@@ -908,10 +922,31 @@ export default function CheckoutPage() {
                   </div>
                 )}
 
+                {/* Terms & Conditions Checkbox */}
+                <div className="bg-neutral-50 border border-neutral-200 p-4 rounded-xl">
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={acceptedTerms}
+                      onChange={(e) => setAcceptedTerms(e.target.checked)}
+                      className="mt-0.5 h-4 w-4 shrink-0 accent-neutral-950 cursor-pointer"
+                    />
+                    <span className="text-[10px] text-neutral-600 font-sans leading-relaxed">
+                      Mən TAPLA MARKETPLACE-in{' '}
+                      <Link href="/istifade-sertleri" target="_blank" className="text-neutral-950 font-bold underline underline-offset-2 decoration-neutral-300 hover:decoration-neutral-950 transition-colors">İstifadə Şərtlərini</Link>
+                      ,{' '}
+                      <Link href="/mexfilik-siyaseti" target="_blank" className="text-neutral-950 font-bold underline underline-offset-2 decoration-neutral-300 hover:decoration-neutral-950 transition-colors">Məxfilik Siyasətini</Link>
+                      {' '}və{' '}
+                      <Link href="/qaytarma-siyaseti" target="_blank" className="text-neutral-950 font-bold underline underline-offset-2 decoration-neutral-300 hover:decoration-neutral-950 transition-colors">Qaytarma Siyasətini</Link>
+                      {' '}oxudum və qəbul edirəm.
+                    </span>
+                  </label>
+                </div>
+
                 {/* Form Submit Button — статичный, всегда на месте */}
                 <button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !acceptedTerms}
                   className="w-full bg-emerald-600 text-white text-[10px] tracking-widest font-bold uppercase py-4 border border-emerald-600 hover:bg-emerald-700 hover:border-emerald-700 transition-all duration-300 flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50 rounded-xl"
                 >
                   {isSubmitting ? (
@@ -919,11 +954,16 @@ export default function CheckoutPage() {
                       <span className="animate-spin h-3.5 w-3.5 border-2 border-white border-t-transparent rounded-full" />
                       <span>SİFARİŞ GÖNDƏRİLİR...</span>
                     </span>
+                  ) : !acceptedTerms ? (
+                    <span>QAYDALARI QƏBUL EDİN</span>
                   ) : (
                     <span>SİFARİŞİ TƏSDİQLƏ VƏ TAMAMLA</span>
                   )}
                 </button>
               </form>
+
+              {/* Sentinel for sticky footer CTA detection */}
+              <div ref={footerSentinelRef} className="h-1" />
             </div>
 
             {/* Right: Cart Summary Column */}
@@ -1023,7 +1063,41 @@ export default function CheckoutPage() {
               </div>
             </div>
           </div>
-        )}
+
+          {/* Sticky Bottom Bar — appears when submit button is scrolled out of view */}
+          <div className={`fixed bottom-14 md:bottom-0 left-0 right-0 z-50 bg-white border-t border-neutral-200 p-3 shadow-lg transition-opacity duration-300 ${
+            showStickyFooter ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          }`}>
+            <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
+              <label className="flex items-center gap-2 cursor-pointer shrink-0">
+                <input
+                  type="checkbox"
+                  checked={acceptedTerms}
+                  onChange={(e) => setAcceptedTerms(e.target.checked)}
+                  className="h-3.5 w-3.5 accent-neutral-950 cursor-pointer"
+                />
+                <span className="text-[9px] text-neutral-500 font-sans leading-tight">
+                  İstifadə Şərtlərini qəbul edirəm
+                </span>
+              </label>
+              <button
+                type="submit"
+                form="checkout-form"
+                disabled={isSubmitting || !acceptedTerms}
+                className="w-full sm:w-auto bg-emerald-600 text-white text-[9px] tracking-widest font-bold uppercase py-2.5 px-6 border border-emerald-600 hover:bg-emerald-700 hover:border-emerald-700 transition-all duration-300 flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50 shrink-0 rounded-lg whitespace-nowrap"
+              >
+                {isSubmitting ? (
+                  <span className="flex items-center space-x-1.5">
+                    <span className="animate-spin h-3 w-3 border-2 border-white border-t-transparent rounded-full" />
+                    <span>GÖNDƏRİLİR...</span>
+                  </span>
+                ) : (
+                  <span>SİFARİŞİ TƏSDİQLƏ</span>
+                )}
+              </button>
+            </div>
+          </div>
+          </>)}
       </Container>
     </div>
   );
