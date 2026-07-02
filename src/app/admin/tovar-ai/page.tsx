@@ -278,7 +278,8 @@ export default function TovarAIPage() {
       }
 
       if (!data.success && data.error) {
-        setError(data.error)
+        const stageLabel = data.failedStage ? `[${data.failedStage}] ` : ''
+        setError(stageLabel + data.error)
       }
       setStage(data.success ? 'done' : 'error')
 

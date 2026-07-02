@@ -107,8 +107,11 @@ export async function runTovarAIPipeline(
   const isProductMode = input.mode === 'product'
   const cardCount = clampCardCount(input.cardCount ?? config.DEFAULT_CARD_COUNT)
 
+  let failedStage: string | undefined
+
   try {
     // ─── STAGE 1: Vision Analysis ────────────────────────────────────
+    failedStage = 'stage1-vision'
     status = 'analyzing'
     callbacks?.onStageChange?.(status, 'Analyzing product photo...')
     console.log('[Pipeline] Stage 1 — Vision Analysis')
@@ -134,49 +137,60 @@ export async function runTovarAIPipeline(
       //   Path C: Stage 5 Kie.ai Image-to-Image (чистое фото товара, всегда 1 шт.)
       const [enrichedContent, cardGenResult, cleanPhotoResult] = await Promise.all([
         // Path A
-        enrichProductData(
-          photoBase64,
-          productAnalysis,
-          input.providerDescription,
-          input.characteristics,
-        ),
+        (async () => {
+          try {
+            return await enrichProductData(
+              photoBase64,
+              productAnalysis,
+              input.providerDescription,
+              input.characteristics,
+            )
+          } catch (e) {
+            throw new Error(`[stage1.5-enricher] ${e instanceof Error ? e.message : String(e)}`)
+          }
+        })(),
         // Path B
         (async () => {
-          // ─── STAGE 2: Prompt Planning ──────────────────────────────
-          console.log('[Pipeline] Stage 2 — Prompt Planning')
-          const styleRefs = loadStyleRefImages()
-          const p = STAGE2_MODE === 'v2'
-            ? await planCardPromptsV2(productAnalysis, cardCount, input.providerDescription, styleRefs)
-            : await planCardPrompts(productAnalysis, input.providerDescription, input.characteristics, input.template)
-          console.log(
-            `[Pipeline] Stage 2 (${STAGE2_MODE}) ✅ — ${p.cards.length} prompts, roles: ${p.roles.join(', ')}, palette: ${JSON.stringify(p.color_palette)}`,
-          )
+          try {
+            // ─── STAGE 2: Prompt Planning ──────────────────────────────
+            console.log('[Pipeline] Stage 2 — Prompt Planning')
+            const styleRefs = loadStyleRefImages()
+            const p = STAGE2_MODE === 'v2'
+              ? await planCardPromptsV2(productAnalysis, cardCount, input.providerDescription, styleRefs)
+              : await planCardPrompts(productAnalysis, input.providerDescription, input.characteristics, input.template)
+            console.log(
+              `[Pipeline] Stage 2 (${STAGE2_MODE}) ✅ — ${p.cards.length} prompts, roles: ${p.roles.join(', ')}, palette: ${JSON.stringify(p.color_palette)}`,
+            )
 
-          // ─── STAGE 3: Parallel Image Generation ────────────────────
-          console.log('[Pipeline] Stage 3 — Image Generation (parallel)')
-          const cardsToGen = p.cards.slice(0, cardCount)
-          const c = await generateAllCards(cardsToGen, photoBase64)
-          console.log(`[Pipeline] Stage 3 ✅ — ${c.length}/${cardsToGen.length} cards generated`)
+            // ─── STAGE 3: Parallel Image Generation ────────────────────
+            console.log('[Pipeline] Stage 3 — Image Generation (parallel)')
+            const cardsToGen = p.cards.slice(0, cardCount)
+            const c = await generateAllCards(cardsToGen, photoBase64)
+            console.log(`[Pipeline] Stage 3 ✅ — ${c.length}/${cardsToGen.length} cards generated`)
 
-          if (c.length === 0) {
-            throw new Error('All card generations failed')
+            if (c.length === 0) {
+              throw new Error('All card generations failed')
+            }
+
+            return { prompts: p, cards: c, qaResults: [] as QAResult[] }
+          } catch (e) {
+            throw new Error(`[stage2-3-generate] ${e instanceof Error ? e.message : String(e)}`)
           }
-
-          // Stage 4 (Quality Check) — ОТКЛЮЧЕН
-          // qaResults заполнится пустым массивом
-
-          return { prompts: p, cards: c, qaResults: [] as QAResult[] }
         })(),
         // Path C: Stage 5 — всегда 1 чистое фото, не зависит от cardCount
         (async () => {
-          console.log('[Pipeline] Stage 5 — Kie.ai Clean Product Photo')
-          const result = await generateCleanProductPhoto(photoBase64, productAnalysis)
-          if (result.success) {
-            console.log(`[Pipeline] Stage 5 ✅ — clean photo: ${result.imageUrl}`)
-          } else {
-            console.warn(`[Pipeline] Stage 5 ⚠️ — failed: ${result.error}`)
+          try {
+            console.log('[Pipeline] Stage 5 — Kie.ai Clean Product Photo')
+            const result = await generateCleanProductPhoto(photoBase64, productAnalysis)
+            if (result.success) {
+              console.log(`[Pipeline] Stage 5 ✅ — clean photo: ${result.imageUrl}`)
+            } else {
+              console.warn(`[Pipeline] Stage 5 ⚠️ — failed: ${result.error}`)
+            }
+            return result
+          } catch (e) {
+            throw new Error(`[stage5-kie-image] ${e instanceof Error ? e.message : String(e)}`)
           }
-          return result
         })(),
       ])
 
@@ -200,6 +214,7 @@ export async function runTovarAIPipeline(
       )
 
       // Матчинг AI-категории → БД categories
+      failedStage = 'category-match'
       try {
         const { matchCategoryFromAI } = await import('@/lib/supabase/categories')
         const matched = await matchCategoryFromAI(productAnalysis.category)
@@ -216,6 +231,7 @@ export async function runTovarAIPipeline(
       }
 
       // Загружаем карточки + чистое фото в R2
+      failedStage = 'r2-upload'
       const { uploadCardImages, uploadImage } = await import('@/lib/r2/upload')
       imageUrls = await uploadCardImages(cards, productData.slug)
       console.log(`[Pipeline] R2 upload ✅ — ${imageUrls.length} cards uploaded`)
@@ -238,45 +254,53 @@ export async function runTovarAIPipeline(
       // Stage 2→3 и Stage 5 запускаем параллельно
       const [cardGenResult, cleanPhotoResult] = await Promise.all([
         (async () => {
-          // ─── STAGE 2: Prompt Planning ──────────────────────────────
-          status = 'planning'
-          callbacks?.onStageChange?.(status, 'Creating prompts...')
-          console.log('[Pipeline] Stage 2 — Prompt Planning')
+          try {
+            // ─── STAGE 2: Prompt Planning ──────────────────────────────
+            status = 'planning'
+            callbacks?.onStageChange?.(status, 'Creating prompts...')
+            console.log('[Pipeline] Stage 2 — Prompt Planning')
 
-          const styleRefs = loadStyleRefImages()
-          const p = STAGE2_MODE === 'v2'
-            ? await planCardPromptsV2(productAnalysis, cardCount, input.providerDescription, styleRefs)
-            : await planCardPrompts(productAnalysis, input.providerDescription, input.characteristics, input.template)
-          console.log(
-            `[Pipeline] Stage 2 ✅ — ${p.cards.length} prompts, roles: ${p.roles.join(', ')}, palette: ${JSON.stringify(p.color_palette)}`,
-          )
+            const styleRefs = loadStyleRefImages()
+            const p = STAGE2_MODE === 'v2'
+              ? await planCardPromptsV2(productAnalysis, cardCount, input.providerDescription, styleRefs)
+              : await planCardPrompts(productAnalysis, input.providerDescription, input.characteristics, input.template)
+            console.log(
+              `[Pipeline] Stage 2 ✅ — ${p.cards.length} prompts, roles: ${p.roles.join(', ')}, palette: ${JSON.stringify(p.color_palette)}`,
+            )
 
-          // ─── STAGE 3: Parallel Image Generation ────────────────────
-          status = 'generating'
-          callbacks?.onStageChange?.(status, `Generating ${cardCount} cards...`)
-          console.log('[Pipeline] Stage 3 — Image Generation (parallel)')
+            // ─── STAGE 3: Parallel Image Generation ────────────────────
+            status = 'generating'
+            callbacks?.onStageChange?.(status, `Generating ${cardCount} cards...`)
+            console.log('[Pipeline] Stage 3 — Image Generation (parallel)')
 
-          const cardsToGenerate = p.cards.slice(0, cardCount)
-          const c = await generateAllCards(cardsToGenerate, photoBase64)
-          console.log(`[Pipeline] Stage 3 ✅ — ${c.length}/${cardsToGenerate.length} cards generated`)
+            const cardsToGenerate = p.cards.slice(0, cardCount)
+            const c = await generateAllCards(cardsToGenerate, photoBase64)
+            console.log(`[Pipeline] Stage 3 ✅ — ${c.length}/${cardsToGenerate.length} cards generated`)
 
-          if (c.length === 0) {
-            throw new Error('All card generations failed')
+            if (c.length === 0) {
+              throw new Error('All card generations failed')
+            }
+
+            // Stage 4 (Quality Check) — ОТКЛЮЧЕН
+            return { prompts: p, cards: c, qaResults: [] as QAResult[] }
+          } catch (e) {
+            throw new Error(`[stage2-3-generate] ${e instanceof Error ? e.message : String(e)}`)
           }
-
-          // Stage 4 (Quality Check) — ОТКЛЮЧЕН
-          return { prompts: p, cards: c, qaResults: [] as QAResult[] }
         })(),
         // Stage 5 — всегда 1 чистое фото
         (async () => {
-          console.log('[Pipeline] Stage 5 — Kie.ai Clean Product Photo')
-          const result = await generateCleanProductPhoto(photoBase64, productAnalysis)
-          if (result.success) {
-            console.log(`[Pipeline] Stage 5 ✅ — clean photo: ${result.imageUrl}`)
-          } else {
-            console.warn(`[Pipeline] Stage 5 ⚠️ — failed: ${result.error}`)
+          try {
+            console.log('[Pipeline] Stage 5 — Kie.ai Clean Product Photo')
+            const result = await generateCleanProductPhoto(photoBase64, productAnalysis)
+            if (result.success) {
+              console.log(`[Pipeline] Stage 5 ✅ — clean photo: ${result.imageUrl}`)
+            } else {
+              console.warn(`[Pipeline] Stage 5 ⚠️ — failed: ${result.error}`)
+            }
+            return result
+          } catch (e) {
+            throw new Error(`[stage5-kie-image] ${e instanceof Error ? e.message : String(e)}`)
           }
-          return result
         })(),
       ])
 
@@ -312,13 +336,19 @@ export async function runTovarAIPipeline(
   } catch (err) {
     status = 'failed'
     const errorMsg = err instanceof Error ? err.message : String(err)
-    console.error(`[Pipeline] ❌ Failed at stage "${status}":`, errorMsg)
+
+    // Извлекаем префикс этапа из ошибки: "[stage1-vision] ..." → stage1-vision
+    const stageMatch = errorMsg.match(/^\[([^\]]+)\]\s/)
+    const parsedStage = stageMatch ? stageMatch[1] : (failedStage || 'unknown')
+
+    console.error(`[Pipeline] ❌ Failed at ${parsedStage}:`, errorMsg)
 
     // Возвращаем частичный результат — то что успели, + сообщение об ошибке для UI
     return {
       generationId: '',
       status,
       error: errorMsg,
+      failedStage: parsedStage,
       product_analysis: productAnalysis!,
       prompts: prompts!,
       cards,

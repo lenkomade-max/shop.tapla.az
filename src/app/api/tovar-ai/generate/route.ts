@@ -59,6 +59,7 @@ export async function POST(request: Request) {
       cost: result.cost,
       status: result.status,
       error: result.error ?? null, // сообщение об ошибке при status: 'failed'
+      failedStage: result.failedStage ?? null, // на каком этапе ошибка
       // Product mode — данные товара и R2 URLs
       productData: result.productData ?? null,
       imageUrls: result.imageUrls ?? null,

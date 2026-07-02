@@ -271,6 +271,7 @@ export interface PipelineResult {
   qa_results: QAResult[]
   cost: number
   error?: string // сообщение об ошибке при status: 'failed'
+  failedStage?: string // на каком этапе произошла ошибка: 'stage1-vision' | 'stage1.5-enricher' | 'stage2-planner' | 'stage3-generate' | 'stage5-kie-image' | 'category-match' | 'r2-upload'
   productData?: ProductDraftData // только в product mode
   imageUrls?: string[] // R2 URLs сгенерированных карточек
   enrichedData?: EnricherOutput // Stage 1.5 — данные до мержа с детерминированными полями
